@@ -1,6 +1,9 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 
+/** Adsterra Smartlink: a plain URL, shown as a labelled "Sponsored" link. */
+export const SMARTLINK_URL = 'https://araplhn.org/4/a9ef72d12c902b3b6eafb0ff07a1f0cb';
+
 /**
  * Site-wide Adsterra units (social bar). Banners live in `AdBanner`.
  * No popunder: it opened a new tab on every card click during games.
