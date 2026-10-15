@@ -24,6 +24,16 @@ class Settings(BaseSettings):
             return [o.strip() for o in v.split(",") if o.strip()]
         return v
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def use_asyncpg_driver(cls, v: object) -> object:
+        # Render (and most hosts) hand out postgres:// or postgresql:// URLs.
+        if isinstance(v, str):
+            for prefix in ("postgres://", "postgresql://"):
+                if v.startswith(prefix):
+                    return "postgresql+asyncpg://" + v[len(prefix):]
+        return v
+
     @property
     def is_production(self) -> bool:
         return self.environment == "production"

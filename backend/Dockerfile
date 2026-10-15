@@ -12,4 +12,5 @@ USER appuser
 
 EXPOSE 8000
 # Apply migrations, then serve. Render/most PaaS set $PORT.
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers"]
+# Trust X-Forwarded-For from the platform proxy so rate limits key on the real client IP.
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
