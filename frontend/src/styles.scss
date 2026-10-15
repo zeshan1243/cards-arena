@@ -330,3 +330,6 @@ html.reduce-motion *::after {
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
+
+/* 320x50 banner at the top of game popups; bleeds into the modal's 28px padding so it fits small phones. */
+.modal-ad { display: flex; justify-content: center; margin: -14px -28px 14px; }

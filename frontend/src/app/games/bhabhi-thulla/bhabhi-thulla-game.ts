@@ -1,5 +1,6 @@
 import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { AuthService } from '../../core/services/auth.service';
 import { SeoService } from '../../core/services/seo.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -21,7 +22,7 @@ import { CORE_RULES, VARIANT_DESCRIPTIONS } from './engine/bhabhi-thulla.rules';
 
 @Component({
   selector: 'app-bhabhi-thulla-game',
-  imports: [RouterLink, Loader, Modal, GameTimer, PlayerAvatar, GameControls, GameResult, GameSetup, Opponent, PlayerHand, Scoreboard, TrickArea],
+  imports: [AdBanner, RouterLink, Loader, Modal, GameTimer, PlayerAvatar, GameControls, GameResult, GameSetup, Opponent, PlayerHand, Scoreboard, TrickArea],
   providers: [BhabhiThullaStore],
   templateUrl: './bhabhi-thulla-game.html',
   styleUrl: './bhabhi-thulla-game.scss',

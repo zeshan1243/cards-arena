@@ -128,6 +128,7 @@
 </div>
 
 <app-modal [open]="store.summaryOpen()" [dismissible]="false" label="Hand summary" [wide]="true">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   @if (store.view()?.handSummary; as s) {
     <div class="summary">
       <span class="eyebrow">Hand result</span>
@@ -147,6 +148,7 @@
 </app-modal>
 
 <app-modal [open]="store.phase() === 'finished'" [dismissible]="false" label="Game result">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   <div class="result" [class]="'result ' + (store.myOutcome()?.result ?? '')">
     <div class="emoji" aria-hidden="true">{{ resultCopy().emoji }}</div>
     <h2>{{ resultCopy().title }}</h2>

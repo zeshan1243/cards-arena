@@ -38,6 +38,9 @@ function mediaQuery(query: string) {
       <aside class="ad-rail left" aria-label="Advertisement"><app-ad-banner size="160x600" /></aside>
       <aside class="ad-rail right" aria-label="Advertisement"><app-ad-banner size="160x300" /></aside>
     }
+    @if (showGameAd()) {
+      <aside class="ad-game" aria-label="Advertisement"><app-ad-banner size="160x300" /></aside>
+    }
     @if (showStickyAd()) {
       <aside class="ad-sticky" aria-label="Advertisement">
         <app-ad-banner size="320x50" />
@@ -62,6 +65,8 @@ function mediaQuery(query: string) {
     .ad-rail { position: fixed; top: 96px; z-index: 5; }
     .ad-rail.left { left: 16px; }
     .ad-rail.right { right: 16px; }
+    /* Game screens: bottom-left corner is empty (scores sit bottom-right, hand in the centre). */
+    .ad-game { position: fixed; left: 16px; bottom: 16px; z-index: 3; }
     /* Mid-size screens: one banner centred above the footer instead. */
     .ad-inline { display: flex; justify-content: center; padding: 24px 16px; }
     .ad-sticky {
@@ -93,7 +98,9 @@ export class App {
   // Ads only mount where they fit, so hidden units never load.
   private readonly wide = mediaQuery('(min-width: 1600px)');
   private readonly phone = mediaQuery('(max-width: 767px)');
+  private readonly gameAdFits = mediaQuery('(min-width: 1200px) and (min-height: 720px)');
   readonly showRails = computed(() => this.wide() && !this.inGame());
+  readonly showGameAd = computed(() => this.gameAdFits() && this.inGame());
   readonly showInlineAd = computed(() => !this.wide() && !this.phone() && !this.inGame());
   /** Dismissed for the rest of the visit; never over a game table (cards sit at the bottom). */
   readonly stickyClosed = signal(false);

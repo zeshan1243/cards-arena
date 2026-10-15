@@ -71,6 +71,7 @@
 </div>
 
 <app-modal [open]="store.phase() === 'finished'" [dismissible]="false" label="Game result">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   @if (store.outcome(); as outcome) {
     <app-bt-game-result [outcome]="outcome" [standings]="store.standings()" [loggedIn]="auth.isLoggedIn()"
                         [finish]="store.finishResult()" [saving]="store.savingResult()" (playAgain)="store.start()" />
