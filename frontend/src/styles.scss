@@ -333,3 +333,22 @@ html.reduce-motion *::after {
 
 /* 320x50 banner at the top of game popups; bleeds into the modal's 28px padding so it fits small phones. */
 .modal-ad { display: flex; justify-content: center; margin: -14px -28px 14px; }
+
+/* Small caption above display ads. */
+.ad-label { display: block; margin-bottom: 4px; text-align: center; font-size: .68rem; letter-spacing: .04em; color: var(--text-muted); }
+
+/*
+ * Desktop game layout: centred play area with an ad column hugging each side.
+ * Global (not component-scoped) because the routed game component is a direct grid child.
+ */
+main.game-with-ads {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(0, 1140px) minmax(160px, 1fr);
+  column-gap: 24px;
+  padding-inline: 16px;
+  > router-outlet { display: none; }
+  > * { grid-row: 1; grid-column: 2; min-width: 0; }
+  > .ad-col { align-self: start; position: sticky; top: 0; padding-top: 72px; }
+  > .ad-col.left { grid-column: 1; justify-self: end; }
+  > .ad-col.right { grid-column: 3; justify-self: start; }
+}

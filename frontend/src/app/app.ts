@@ -26,8 +26,14 @@ function mediaQuery(query: string) {
     @if (!inGame()) {
       <app-navbar />
     }
-    <main id="main" [class.game-main]="inGame()">
+    <main id="main" [class.game-main]="inGame()" [class.game-with-ads]="showGameAds()">
+      @if (showGameAds()) {
+        <aside class="ad-col left" aria-label="Advertisement"><span class="ad-label">Advertisement</span><app-ad-banner [size]="tall() ? '160x600' : '160x300'" /></aside>
+      }
       <router-outlet />
+      @if (showGameAds()) {
+        <aside class="ad-col right" aria-label="Advertisement"><span class="ad-label">Advertisement</span><app-ad-banner size="160x300" /></aside>
+      }
     </main>
     @if (showInlineAd()) {
       <aside class="ad-inline" aria-label="Advertisement"><app-ad-banner size="160x300" /></aside>
@@ -36,11 +42,8 @@ function mediaQuery(query: string) {
       <app-footer />
     }
     @if (showRails()) {
-      <aside class="ad-rail left" aria-label="Advertisement"><app-ad-banner size="160x600" /></aside>
-      <aside class="ad-rail right" aria-label="Advertisement"><app-ad-banner size="160x300" /></aside>
-    }
-    @if (showGameAd()) {
-      <aside class="ad-game" aria-label="Advertisement"><app-ad-banner size="160x300" /></aside>
+      <aside class="ad-rail left" aria-label="Advertisement"><span class="ad-label">Advertisement</span><app-ad-banner size="160x600" /></aside>
+      <aside class="ad-rail right" aria-label="Advertisement"><span class="ad-label">Advertisement</span><app-ad-banner size="160x300" /></aside>
     }
     @if (showStickyAd()) {
       <aside class="ad-sticky" aria-label="Advertisement">
@@ -65,12 +68,10 @@ function mediaQuery(query: string) {
       padding: 10px 16px; border-radius: 10px; background: var(--color-primary); color: #fff;
       &:focus { top: 12px; }
     }
-    /* Skyscrapers sit in the gutters beside the 1200px container. */
+    /* Skyscrapers hug the 1200px container (24px gap), like a classic three-column page. */
     .ad-rail { position: fixed; top: 96px; z-index: 5; }
-    .ad-rail.left { left: 16px; }
-    .ad-rail.right { right: 16px; }
-    /* Game screens: bottom-left corner is empty (scores sit bottom-right, hand in the centre). */
-    .ad-game { position: fixed; left: 16px; bottom: 16px; z-index: 3; }
+    .ad-rail.left { left: max(16px, calc(50% - 600px - 24px - 160px)); }
+    .ad-rail.right { right: max(16px, calc(50% - 600px - 24px - 160px)); }
     /* Mid-size screens: one banner centred above the footer instead. */
     .ad-inline { display: flex; justify-content: center; padding: 24px 16px; }
     .ad-sticky {
@@ -102,9 +103,10 @@ export class App {
   // Ads only mount where they fit, so hidden units never load.
   private readonly wide = mediaQuery('(min-width: 1600px)');
   private readonly phone = mediaQuery('(max-width: 767px)');
-  private readonly gameAdFits = mediaQuery('(min-width: 1200px) and (min-height: 720px)');
+  private readonly gameRailsFit = mediaQuery('(min-width: 1280px)');
+  readonly tall = mediaQuery('(min-height: 720px)');
   readonly showRails = computed(() => this.wide() && !this.inGame());
-  readonly showGameAd = computed(() => this.gameAdFits() && this.inGame());
+  readonly showGameAds = computed(() => this.gameRailsFit() && this.inGame());
   readonly showInlineAd = computed(() => !this.wide() && !this.phone() && !this.inGame());
   /** Dismissed for the rest of the visit; never over a game table (cards sit at the bottom). */
   readonly stickyClosed = signal(false);

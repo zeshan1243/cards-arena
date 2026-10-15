@@ -62,7 +62,7 @@
 .felt {
   position: absolute;
   inset: clamp(10px, 3vw, 28px) clamp(8px, 4vw, 60px);
-  border-radius: 50% / 42%;
+  border-radius: clamp(16px, 2.5vw, 28px);
   background:
     radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.08), transparent 60%),
     radial-gradient(ellipse at center, #17604a 0%, var(--felt) 55%, var(--felt-edge) 100%);
