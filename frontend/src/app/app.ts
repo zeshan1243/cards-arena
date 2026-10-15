@@ -4,6 +4,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, fromEvent, map } from 'rxjs';
 import { AdsService } from './core/services/ads.service';
 import { AdBanner } from './shared/components/ad-banner/ad-banner';
+import { AdblockNotice } from './shared/components/adblock-notice/adblock-notice';
 import { Footer } from './shared/components/footer/footer';
 import { Navbar } from './shared/components/navbar/navbar';
 import { ToastContainer } from './shared/components/toast/toast';
@@ -18,7 +19,7 @@ function mediaQuery(query: string) {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer, ToastContainer, AdBanner],
+  imports: [RouterOutlet, Navbar, Footer, ToastContainer, AdBanner, AdblockNotice],
   host: { '[class.has-sticky-ad]': 'showStickyAd()' },
   template: `
     <a class="skip-link" href="#main">Skip to content</a>
@@ -48,6 +49,9 @@ function mediaQuery(query: string) {
           ×
         </button>
       </aside>
+    }
+    @if (!inGame()) {
+      <app-adblock-notice />
     }
     <app-toast-container />
   `,
