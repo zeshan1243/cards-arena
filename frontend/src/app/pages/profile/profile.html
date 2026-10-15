@@ -1,0 +1,76 @@
+<section class="section container">
+  @if (error()) {
+    <div class="empty-state panel"><div class="big">😕</div><p>{{ error() }}</p><button class="btn btn-ghost" type="button" (click)="load()">Retry</button></div>
+  } @else if (user(); as u) {
+    <div class="layout">
+      <aside class="panel card">
+        <div class="avatar-wrap">
+          <app-player-avatar [name]="u.username" [avatar]="u.avatarUrl" size="xl" />
+          @if (isSelf()) {
+            <button class="btn btn-ghost btn-sm" type="button" (click)="pickingAvatar.set(!pickingAvatar())">Change avatar</button>
+          }
+        </div>
+        @if (pickingAvatar()) {
+          <div class="avatar-grid" role="group" aria-label="Choose an avatar">
+            @for (a of avatars; track a) {
+              <button type="button" (click)="setAvatar(a)" [attr.aria-label]="'Use avatar ' + a" [class.current]="u.avatarUrl === a">{{ a }}</button>
+            }
+          </div>
+        }
+        <h1>{{ u.username }}</h1>
+        <p class="level">Level {{ u.level }}</p>
+        <div class="xp-bar" role="progressbar" [attr.aria-valuenow]="progress().pct | number: '1.0-0'" aria-valuemin="0" aria-valuemax="100" aria-label="Progress to next level">
+          <span [style.width.%]="progress().pct"></span>
+        </div>
+        <p class="xp-text">{{ u.xp | number }} XP · {{ progress().needed - progress().current | number }} XP to level {{ u.level + 1 }}</p>
+        <p class="since">Playing since {{ u.createdAt | date: 'MMM y' }}</p>
+        @if (isSelf()) {
+          <div class="links">
+            <a routerLink="/statistics" class="btn btn-ghost btn-sm">Statistics</a>
+            <a routerLink="/history" class="btn btn-ghost btn-sm">History</a>
+          </div>
+        }
+      </aside>
+
+      <div class="main">
+        @if (data(); as d) {
+          <div class="tiles">
+            <div class="tile panel"><span>Games played</span><b>{{ d.totals.gamesPlayed }}</b></div>
+            <div class="tile panel"><span>Games won</span><b>{{ d.totals.gamesWon }}</b></div>
+            <div class="tile panel"><span>Win rate</span><b>{{ d.totals.winRate | number: '1.0-1' }}%</b></div>
+            <div class="tile panel"><span>Achievements</span><b>{{ unlocked() }}/{{ d.achievements.length }}</b></div>
+          </div>
+
+          <div class="panel block">
+            <h2>Achievements</h2>
+            <div class="achievements">
+              @for (a of d.achievements; track a.code) {
+                <div class="ach" [class.locked]="!a.unlockedAt" [attr.title]="a.description">
+                  <span class="ach-icon" aria-hidden="true">{{ a.icon }}</span>
+                  <div><b>{{ a.name }}</b><small>{{ a.description }}</small></div>
+                  @if (a.unlockedAt) { <span class="chip chip-green">{{ a.unlockedAt | date: 'mediumDate' }}</span> } @else { <span class="chip">Locked</span> }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="panel block">
+            <h2>Favourite games</h2>
+            @for (g of favourites(); track g.gameSlug) {
+              <a class="fav" [routerLink]="['/games', g.gameSlug]">
+                <b>{{ g.gameName }}</b>
+                <span>{{ g.gamesPlayed }} played · {{ g.winRate | number: '1.0-1' }}% wins</span>
+              </a>
+            } @empty {
+              <div class="empty-state"><p>No games yet.</p><a routerLink="/play/bhabhi-thulla" class="btn btn-primary">Play your first game</a></div>
+            }
+          </div>
+        } @else {
+          <app-loader message="Loading profile…" />
+        }
+      </div>
+    </div>
+  } @else {
+    <app-loader message="Loading profile…" />
+  }
+</section>

@@ -1,0 +1,27 @@
+@if (interactive()) {
+  <button type="button" class="card" [class]="'card ' + size()" [class.red]="red()" [class.selected]="selected()" [class.disabled]="disabled()"
+          [class.playable]="playable()" [class.hint]="hint()" [attr.aria-label]="label()" [attr.aria-pressed]="selected()"
+          [attr.aria-disabled]="disabled()" (click)="onClick()">
+    <ng-container *ngTemplateOutlet="faceTpl" />
+  </button>
+} @else {
+  <div class="card" [class]="'card ' + size()" [class.red]="red()" [class.back]="faceDown()" role="img" [attr.aria-label]="label()">
+    @if (!faceDown()) { <ng-container *ngTemplateOutlet="faceTpl" /> }
+  </div>
+}
+
+<ng-template #faceTpl>
+  @if (card(); as c) {
+    <span class="corner tl"><b>{{ c.rank }}</b><i>{{ symbol() }}</i></span>
+    <span class="center" [class.face]="face()">
+      @if (face()) {
+        <span class="face-letter">{{ c.rank }}</span><span class="face-suit">{{ symbol() }}</span>
+      } @else if (c.rank === 'A') {
+        <span class="ace">{{ symbol() }}</span>
+      } @else {
+        {{ symbol() }}
+      }
+    </span>
+    <span class="corner br"><b>{{ c.rank }}</b><i>{{ symbol() }}</i></span>
+  }
+</ng-template>

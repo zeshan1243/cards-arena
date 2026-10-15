@@ -1,0 +1,16 @@
+import { inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { CanActivateFn, Router } from '@angular/router';
+import { filter, map, take } from 'rxjs';
+import { AuthService } from '../services/auth.service';
+
+/** Waits for session restore, then requires a logged-in user. */
+export const authGuard: CanActivateFn = (_route, state) => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return toObservable(auth.ready).pipe(
+    filter(Boolean),
+    take(1),
+    map(() => auth.isLoggedIn() || router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } })),
+  );
+};

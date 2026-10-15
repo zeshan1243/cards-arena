@@ -1,0 +1,122 @@
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/bhabhi-thulla" class="back" aria-label="Back to Bhabhi Thulla page">‹</a>
+    <h1 class="title">Bhabhi Thulla</h1>
+    @if (store.view(); as v) {
+      @if (store.phase() === 'playing' || store.phase() === 'finished') {
+        <div class="round">
+          <span class="chip">Trick {{ v.trickNumber }}</span>
+          <span class="chip hide-sm">🗑 {{ v.discardedCount }} discarded</span>
+          @if (leadSymbol(); as sym) { <span class="chip chip-cyan">Lead {{ sym }}</span> }
+        </div>
+      }
+    }
+    <button class="icon" type="button" aria-label="Settings" (click)="settingsOpen.set(true)">⚙️</button>
+  </header>
+
+  @switch (store.phase()) {
+    @case ('setup') {
+      <div class="center-stage"><div class="panel"><app-bt-game-setup (start)="store.start()" /></div></div>
+    }
+    @case ('loading') {
+      <div class="center-stage"><app-loader [message]="store.loadingStep()" /></div>
+    }
+    @default {
+      @if (store.view(); as v) {
+        <section class="table" [class]="'table seats-' + store.opponents().length" aria-label="Card table">
+          <div class="felt"></div>
+
+          @for (p of store.opponents(); track p.id) {
+            <app-bt-opponent class="opp" [attr.data-pos]="positions()[p.id]" [player]="p" [position]="positions()[p.id]"
+                             [active]="v.currentPlayerId === p.id" [isBhabhi]="v.bhabhiId === p.id" />
+          }
+
+          <div class="middle">
+            <app-bt-trick-area [plays]="store.tableCards()" [positions]="positions()" [animation]="store.trickAnimation()"
+                               [collectTo]="store.collectTarget()" [hint]="tableHint()" />
+          </div>
+
+          @if (store.banner(); as b) {
+            <div class="banner" [class]="'banner ' + b.kind" role="status">{{ b.text }}</div>
+          }
+        </section>
+
+        <section class="bottom" aria-label="Your area">
+          <div class="statusbar" [class.my-turn]="store.isMyTurn()">
+            <div class="me">
+              <app-player-avatar [name]="store.me()?.name ?? 'You'" [avatar]="auth.user()?.avatarUrl" size="sm" [active]="store.isMyTurn()" status="online" />
+              <div class="me-text">
+                <strong>{{ store.isMyTurn() ? 'YOUR TURN' : (store.me()?.finishPosition ? 'YOU’RE SAFE #' + store.me()?.finishPosition : 'Waiting') }}</strong>
+                <span>{{ status() }}</span>
+              </div>
+            </div>
+            @if (store.isMyTurn() && store.turnSeconds() && !store.autoPlay()) {
+              <app-game-timer [seconds]="store.timeLeft()" [total]="store.turnSeconds()" />
+            }
+            <button class="btn btn-primary play-card" type="button" [disabled]="!store.isMyTurn() || !store.selectedId()" (click)="store.playSelected()">
+              Play card
+            </button>
+          </div>
+
+          <app-bt-player-hand [cards]="store.hand()" [validIds]="store.validIds()" [selectedId]="store.selectedId()" [hintId]="store.hintId()"
+                              [myTurn]="store.isMyTurn()" [dealing]="store.dealing()" (cardClick)="store.select($event)" />
+
+          <app-bt-game-controls [myTurn]="store.isMyTurn()" [autoPlayOn]="store.autoPlay()" [soundOn]="settingsSvc.settings().sound"
+                                (hint)="store.showHint()" (autoPlay)="store.toggleAutoPlay()" (sound)="toggleSound()"
+                                (rules)="rulesOpen.set(true)" (settings)="settingsOpen.set(true)" (leave)="leaveOpen.set(true)" />
+        </section>
+      }
+    }
+  }
+</div>
+
+<app-modal [open]="store.phase() === 'finished'" [dismissible]="false" label="Game result">
+  @if (store.outcome(); as outcome) {
+    <app-bt-game-result [outcome]="outcome" [standings]="store.standings()" [loggedIn]="auth.isLoggedIn()"
+                        [finish]="store.finishResult()" [saving]="store.savingResult()" (playAgain)="store.start()" />
+  }
+</app-modal>
+
+<app-modal [open]="rulesOpen()" (closed)="rulesOpen.set(false)" label="Bhabhi Thulla rules" [wide]="true">
+  <h2>How to play</h2>
+  <ol class="rules-list">
+    @for (r of coreRules; track r) { <li>{{ r }}</li> }
+  </ol>
+  <h3>{{ variantInfo[settingsSvc.settings().bhabhiVariant].title }}</h3>
+  <ul class="rules-list">
+    @for (r of variantInfo[settingsSvc.settings().bhabhiVariant].rules; track r) { <li>{{ r }}</li> }
+  </ul>
+  <p class="text-secondary keys">Keyboard: ← → choose a card · Enter play · H hint</p>
+  @if (store.view()) {
+    <h3>Standings</h3>
+    <app-bt-scoreboard [rows]="store.standings()" [showScore]="false" />
+  }
+</app-modal>
+
+<app-modal [open]="settingsOpen()" (closed)="settingsOpen.set(false)" label="Game settings">
+  <h2>Settings</h2>
+  <div class="settings">
+    <label class="toggle"><input type="checkbox" [checked]="settingsSvc.settings().sound" (change)="settingsSvc.update({ sound: $any($event.target).checked })" /> Sound</label>
+    <label class="toggle"><input type="checkbox" [checked]="settingsSvc.settings().effects" (change)="settingsSvc.update({ effects: $any($event.target).checked })" /> Sound effects</label>
+    <label class="toggle"><input type="checkbox" [checked]="settingsSvc.settings().turnTimer" (change)="settingsSvc.update({ turnTimer: $any($event.target).checked })" /> Turn timer</label>
+    <div class="field">
+      <label for="speed">Game speed</label>
+      <select id="speed" class="input" [value]="settingsSvc.settings().gameSpeed" (change)="settingsSvc.update({ gameSpeed: $any($event.target).value })">
+        <option value="slow">Slow</option>
+        <option value="normal">Normal</option>
+        <option value="fast">Fast</option>
+      </select>
+    </div>
+    <p class="text-secondary small">Players, difficulty and rules apply to the next game.</p>
+    <button class="btn btn-ghost btn-block" type="button" (click)="restartFromSettings()">New game</button>
+  </div>
+</app-modal>
+
+<app-modal [open]="leaveOpen()" (closed)="leaveOpen.set(false)" label="Leave game">
+  <h2>Leave game?</h2>
+  <p class="text-secondary">Your current game will be abandoned.</p>
+  <div class="confirm">
+    <button class="btn btn-ghost" type="button" (click)="leaveOpen.set(false)" autofocus>Keep playing</button>
+    <button class="btn btn-danger" type="button" (click)="confirmLeave()">Leave</button>
+  </div>
+</app-modal>

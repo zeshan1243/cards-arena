@@ -1,0 +1,109 @@
+<header class="nav">
+  <div class="container nav-inner">
+    <a routerLink="/" class="logo" aria-label="CardArena home">
+      <span class="logo-mark" aria-hidden="true"><span>♠</span><span>♥</span></span>
+      <span class="logo-text">CARD<b>ARENA</b></span>
+    </a>
+
+    <nav class="links" aria-label="Primary">
+      <a routerLink="/games" routerLinkActive="active">Games</a>
+      <a routerLink="/multiplayer" routerLinkActive="active">Multiplayer</a>
+      <a routerLink="/leaderboard" routerLinkActive="active">Leaderboard</a>
+    </nav>
+
+    <div class="actions">
+      <button class="icon-btn" type="button" (click)="toggleSearch()" aria-label="Search games and players" [attr.aria-expanded]="searchOpen()">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+
+      @if (auth.user(); as user) {
+        <div class="user-menu">
+          <button class="user-btn" type="button" (click)="userMenuOpen.set(!userMenuOpen())" [attr.aria-expanded]="userMenuOpen()" aria-haspopup="menu">
+            <app-player-avatar [name]="user.username" [avatar]="user.avatarUrl" size="sm" />
+            <span class="user-meta">
+              <span class="user-name">{{ user.username }}</span>
+              <span class="user-level">Lvl {{ user.level }}</span>
+            </span>
+          </button>
+          @if (userMenuOpen()) {
+            <div class="dropdown" role="menu">
+              <a routerLink="/profile" role="menuitem">Profile</a>
+              <a routerLink="/statistics" role="menuitem">Statistics</a>
+              <a routerLink="/history" role="menuitem">Game history</a>
+              <a routerLink="/settings" role="menuitem">Settings</a>
+              <button type="button" role="menuitem" (click)="auth.logout()">Log out</button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a routerLink="/login" class="login-link">Login</a>
+      }
+
+      <a routerLink="/play/bhabhi-thulla" class="btn btn-primary btn-sm play-btn">Play now</a>
+
+      <button class="icon-btn menu-btn" type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-expanded]="menuOpen()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          @if (menuOpen()) {
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          } @else {
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          }
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  @if (searchOpen()) {
+    <div class="search-panel">
+      <div class="container">
+        <div class="search-box">
+          <input #searchInput class="input" type="search" placeholder="Search games and players..." aria-label="Search games and players"
+                 [value]="query()" (input)="query.set($any($event.target).value)" (keydown.enter)="goFirstResult()" />
+          <button class="btn btn-ghost btn-sm" type="button" (click)="closeSearch()">Close</button>
+        </div>
+        @if (query().trim()) {
+          <div class="results">
+            <div>
+              <h4>Games</h4>
+              @for (g of gameHits(); track g.slug) {
+                <a [routerLink]="['/games', g.slug]" class="hit"><span class="hit-icon" [style.background]="g.accent">{{ g.art[0] }}</span>{{ g.name }} <span class="text-secondary">· {{ g.region }}</span></a>
+              } @empty {
+                <p class="text-secondary">No games found.</p>
+              }
+            </div>
+            <div>
+              <h4>Players</h4>
+              @for (p of playerHits(); track p.username) {
+                <a [routerLink]="['/profile']" [queryParams]="{ u: p.username }" class="hit">
+                  <app-player-avatar [name]="p.username" [avatar]="p.avatarUrl" size="xs" /> {{ p.username }} <span class="text-secondary">· Lvl {{ p.level }}</span>
+                </a>
+              } @empty {
+                <p class="text-secondary">No players found.</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (menuOpen()) {
+    <nav class="mobile-menu" aria-label="Mobile">
+      <a routerLink="/games">Games</a>
+      <a routerLink="/multiplayer">Multiplayer</a>
+      <a routerLink="/leaderboard">Leaderboard</a>
+      @if (auth.isLoggedIn()) {
+        <a routerLink="/profile">Profile</a>
+        <a routerLink="/statistics">Statistics</a>
+        <a routerLink="/history">Game history</a>
+        <a routerLink="/settings">Settings</a>
+        <button type="button" (click)="auth.logout()">Log out</button>
+      } @else {
+        <a routerLink="/login">Login</a>
+        <a routerLink="/register">Create account</a>
+        <a routerLink="/settings">Settings</a>
+      }
+      <a routerLink="/play/bhabhi-thulla" class="btn btn-primary btn-block">Play now</a>
+    </nav>
+  }
+</header>

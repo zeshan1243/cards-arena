@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /profile
+Disallow: /statistics
+Disallow: /history
+Disallow: /settings
+
+# Replace the domain before production.
+Sitemap: https://your-domain.com/sitemap.xml

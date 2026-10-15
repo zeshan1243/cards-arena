@@ -1,0 +1,112 @@
+@if (game(); as g) {
+  <article [style.--accent]="g.accent">
+    <section class="hero">
+      <div class="container hero-inner">
+        <div>
+          <nav class="crumbs" aria-label="Breadcrumb"><a routerLink="/">Home</a> / <a routerLink="/games">Games</a> / <span>{{ g.name }}</span></nav>
+          <h1>{{ g.name }} Online</h1>
+          <p class="lead">{{ g.description }}</p>
+          <div class="meta">
+            <span class="chip">👥 {{ g.minPlayers === g.maxPlayers ? g.minPlayers : g.minPlayers + '–' + g.maxPlayers }} players</span>
+            <span class="chip">📍 {{ g.region }}</span>
+            @if (g.botEnabled) { <span class="chip chip-cyan">🤖 Play vs AI</span> }
+            <span class="chip" [class.chip-purple]="g.multiplayerEnabled">🌐 Multiplayer {{ g.multiplayerEnabled ? '' : '(coming soon)' }}</span>
+          </div>
+          @if (g.available) {
+            <div class="cta">
+              <a class="btn btn-primary btn-lg" [routerLink]="['/play', g.slug]">Play now</a>
+              <a class="btn btn-ghost btn-lg" href="#how-to-play">How to play</a>
+            </div>
+            <p class="free">Free to play • No download required</p>
+          } @else {
+            <div class="cta">
+              <span class="btn btn-ghost btn-lg" aria-disabled="true">Coming soon</span>
+              <a class="btn btn-primary btn-lg" routerLink="/play/bhabhi-thulla">Play Bhabhi Thulla</a>
+            </div>
+          }
+        </div>
+        <div class="art panel"><app-game-art [art]="g.art" [accent]="g.accent" [slug]="g.slug" [label]="g.name + ' artwork'" /></div>
+      </div>
+    </section>
+
+    <div class="container body">
+      <div class="main prose">
+        @if (content(); as c) {
+          <section id="how-to-play">
+            <h2>How to play {{ g.name }}</h2>
+            @for (p of c.howToPlay; track $index) { <p>{{ p }}</p> }
+          </section>
+
+          @if (isBhabhi()) {
+            <section id="rules">
+              <h2>{{ g.name }} rules</h2>
+              <ol>@for (r of coreRules; track r) { <li>{{ r }}</li> }</ol>
+              <h3>Supported rule variations</h3>
+              <div class="variants">
+                @for (v of variants; track v.title) {
+                  <div class="panel variant"><h4>{{ v.title }}</h4><ul>@for (r of v.rules; track r) { <li>{{ r }}</li> }</ul></div>
+                }
+              </div>
+            </section>
+          }
+
+          <section id="strategy">
+            <h2>{{ g.name }} strategy</h2>
+            <ul>@for (s of c.strategy; track s) { <li>{{ s }}</li> }</ul>
+          </section>
+
+          <section>
+            <h2>Play {{ g.name }} against AI</h2>
+            <p>Choose from four bot levels. Easy bots play loosely; Normal bots duck and shed their high cards; Hard bots remember which players are void in each suit; Expert bots count cards and estimate the risk of a Thulla before every play.</p>
+            <a class="btn btn-primary" [routerLink]="['/play', g.slug]">Start a game</a>
+          </section>
+
+          <section>
+            <h2>{{ g.name }} multiplayer</h2>
+            <p>Private rooms with shareable codes are coming soon. Create a free account now to be ready — your statistics and achievements will carry over.</p>
+          </section>
+
+          <section id="faq">
+            <h2>Frequently asked questions</h2>
+            @for (f of c.faq; track f.q) {
+              <details class="faq"><summary>{{ f.q }}</summary><p>{{ f.a }}</p></details>
+            }
+          </section>
+        } @else {
+          <section id="how-to-play">
+            <h2>About {{ g.name }}</h2>
+            <p>{{ g.description }}</p>
+            <p>{{ g.name }} is on the CardArena roadmap. We are building it on the same engine that powers Bhabhi Thulla, with smart AI opponents, clear rules for every regional variation and a mobile-first table.</p>
+            <p>In the meantime, try <a routerLink="/games/bhabhi-thulla">Bhabhi Thulla</a> — it’s free and you can play right now.</p>
+          </section>
+        }
+      </div>
+
+      <aside class="side">
+        <div class="panel info">
+          <h3>Game info</h3>
+          <dl>
+            <dt>Players</dt><dd>{{ g.minPlayers }}–{{ g.maxPlayers }}</dd>
+            <dt>Deck</dt><dd>{{ g.slug === '29' || g.slug === 'baloot' ? '32 cards' : '52 cards' }}</dd>
+            <dt>Region</dt><dd>{{ g.region }}</dd>
+            <dt>AI opponents</dt><dd>{{ g.botEnabled ? 'Yes' : 'No' }}</dd>
+            <dt>Status</dt><dd>{{ g.available ? 'Live' : 'Coming soon' }}</dd>
+          </dl>
+        </div>
+      </aside>
+    </div>
+
+    @if (related().length) {
+      <section class="section">
+        <div class="container">
+          <div class="section-head"><div><span class="eyebrow">Related</span><h2>You might also like</h2></div></div>
+          <div class="grid">
+            @for (r of related(); track r.slug) { <app-game-card [game]="r" /> }
+          </div>
+        </div>
+      </section>
+    }
+  </article>
+} @else {
+  <app-not-found />
+}

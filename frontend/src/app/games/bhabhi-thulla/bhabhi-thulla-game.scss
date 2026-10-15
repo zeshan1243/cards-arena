@@ -1,0 +1,184 @@
+:host { display: block; }
+
+.screen {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100dvh;
+  min-height: 520px;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: rgba(11, 16, 32, 0.85);
+}
+.back, .icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  text-decoration: none !important;
+  &:hover { background: rgba(255, 255, 255, 0.08); }
+}
+.icon { font-size: 1.05rem; margin-left: auto; }
+.title { margin: 0; font-size: 1.1rem; letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.round { display: flex; gap: 6px; margin-left: auto; flex-shrink: 0; }
+@media (max-width: 420px) {
+  .topbar { gap: 8px; padding: 8px 10px; }
+  .title { font-size: 0.95rem; }
+  .round .chip { padding: 3px 8px; font-size: 0.7rem; }
+  .back, .icon { width: 36px; height: 36px; flex-shrink: 0; }
+}
+.round + .icon { margin-left: 0; }
+.hide-sm { @media (max-width: 600px) { display: none; } }
+
+.center-stage {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow: auto;
+  .panel { width: min(560px, 100%); }
+}
+
+/* ------------------------------------------------------------- table */
+
+.table {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.felt {
+  position: absolute;
+  inset: clamp(10px, 3vw, 28px) clamp(8px, 4vw, 60px);
+  border-radius: 50% / 42%;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(255, 255, 255, 0.08), transparent 60%),
+    radial-gradient(ellipse at center, #17604a 0%, var(--felt) 55%, var(--felt-edge) 100%);
+  box-shadow:
+    inset 0 0 0 10px rgba(0, 0, 0, 0.25),
+    inset 0 0 60px rgba(0, 0, 0, 0.55),
+    0 0 0 3px rgba(108, 92, 231, 0.35),
+    0 30px 60px rgba(0, 0, 0, 0.5);
+}
+
+.middle { position: relative; z-index: 1; }
+
+.opp {
+  position: absolute;
+  z-index: 2;
+  &[data-pos='left'] { left: clamp(4px, 3vw, 40px); top: 50%; transform: translateY(-50%); }
+  &[data-pos='right'] { right: clamp(4px, 3vw, 40px); top: 50%; transform: translateY(-50%); }
+  &[data-pos='top'] { top: clamp(4px, 2vh, 20px); left: 50%; transform: translateX(-50%); }
+  &[data-pos='top-left'] { top: clamp(4px, 2vh, 20px); left: 22%; transform: translateX(-50%); }
+  &[data-pos='top-right'] { top: clamp(4px, 2vh, 20px); right: 22%; transform: translateX(50%); }
+}
+.seats-2 .opp[data-pos='top-left'] { left: 30%; }
+.seats-2 .opp[data-pos='top-right'] { right: 30%; }
+
+@media (max-width: 600px) {
+  .opp[data-pos='left'], .opp[data-pos='right'] { top: 38%; }
+  .seats-4 .opp[data-pos='top-left'], .seats-5 .opp[data-pos='top-left'] { left: 26%; }
+  .seats-4 .opp[data-pos='top-right'], .seats-5 .opp[data-pos='top-right'] { right: 26%; }
+  .seats-5 .opp[data-pos='top'] { top: 80px; }
+  .seats-5 .middle { margin-top: 90px; }
+}
+
+.banner {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(11, 16, 32, 0.9);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-card);
+  animation: banner 1.8s var(--ease-out) both;
+  &.thulla { color: #fde68a; border-color: rgba(245, 158, 11, 0.7); box-shadow: 0 0 40px rgba(245, 158, 11, 0.4); }
+  &.escaped { color: #86efac; border-color: rgba(34, 197, 94, 0.6); }
+}
+@keyframes banner {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+  20%, 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -70%); }
+}
+
+/* ------------------------------------------------------------ bottom */
+
+.bottom {
+  position: relative;
+  z-index: 3;
+  padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, transparent, rgba(11, 16, 32, 0.9) 30%);
+  display: grid;
+  gap: 4px;
+}
+
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 8px 10px 8px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: border-color var(--dur-med), box-shadow var(--dur-med);
+  &.my-turn { border-color: rgba(0, 212, 255, 0.6); box-shadow: var(--shadow-glow-cyan); }
+}
+.me { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.me-text {
+  display: grid;
+  line-height: 1.25;
+  min-width: 0;
+  strong { font-family: var(--font-display); letter-spacing: 0.06em; font-size: 0.95rem; }
+  span { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+.my-turn .me-text strong { color: var(--color-secondary); }
+.play-card { min-height: 44px; padding: 0 18px; }
+@media (max-width: 600px) {
+  .statusbar { gap: 8px; padding: 6px; }
+  .me-text strong { font-size: 0.8rem; white-space: nowrap; }
+  .me-text span { font-size: 0.72rem; }
+  .play-card { padding: 0 12px; font-size: 0.72rem; }
+  app-game-timer { transform: scale(0.85); margin: -4px; }
+}
+
+app-bt-game-controls {
+  @media (max-width: 600px) { ::ng-deep .lbl { display: none; } ::ng-deep .ctl { min-width: 46px; min-height: 42px; } }
+}
+
+/* ------------------------------------------------------------ modals */
+
+.rules-list { padding-left: 20px; display: grid; gap: 8px; color: var(--text-secondary); margin-bottom: 18px; }
+.keys { font-size: 0.85rem; }
+.settings { display: grid; gap: 14px; }
+.toggle { display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; input { width: 20px; height: 20px; accent-color: var(--color-primary); } }
+.small { font-size: 0.85rem; margin: 0; }
+.confirm { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+/* Fixed height so the turn timer appearing doesn't resize the table. */
+.statusbar { height: 64px; padding-block: 4px; }
+app-game-timer { flex-shrink: 0; }
+@media (max-width: 600px) { .statusbar { height: 58px; } }

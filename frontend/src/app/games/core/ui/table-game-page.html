@@ -1,0 +1,204 @@
+@if (notFound()) {
+  <section class="section container center-msg">
+    <h1>Game not available</h1>
+    <p class="text-secondary">This game isn’t playable yet.</p>
+    <a class="btn btn-primary" routerLink="/games">Browse games</a>
+  </section>
+} @else {
+<div class="screen">
+  <header class="topbar">
+    <a [routerLink]="['/games', slug()]" class="round-btn" [attr.aria-label]="'Back to ' + (info()?.name ?? 'game') + ' page'">‹</a>
+    <h1 class="title">{{ info()?.name ?? store.def()?.name }}</h1>
+    @if (store.view(); as v) {
+      @if (store.phase() === 'playing' || store.phase() === 'finished') {
+        <div class="chips">
+          @for (c of v.info; track c) { <span class="chip hide-sm">{{ c }}</span> }
+          @if (trumpChip(); as t) { <span class="chip chip-cyan trump" [class.red]="redTrump()">{{ t }}</span> }
+          <button class="chip chip-purple scores-toggle" type="button" (click)="scoresOpen.set(!scoresOpen())" [attr.aria-expanded]="scoresOpen()">Scores</button>
+        </div>
+      }
+    }
+    <button class="round-btn" type="button" aria-label="Settings" (click)="settingsOpen.set(true)">⚙️</button>
+  </header>
+
+  @switch (store.phase()) {
+    @case ('setup') {
+      <div class="center-stage">
+        @if (store.def(); as def) {
+          <div class="panel setup">
+            <span class="eyebrow">Play vs AI</span>
+            <h2>{{ def.name }}</h2>
+            <p class="text-secondary">{{ info()?.tagline }}</p>
+            @if (def.playerCounts.length > 1) {
+              <fieldset>
+                <legend>Players</legend>
+                <div class="segmented">
+                  @for (n of def.playerCounts; track n) {
+                    <button type="button" [attr.aria-pressed]="store.playerCount() === n" (click)="store.setPlayers(n)">{{ n }}</button>
+                  }
+                </div>
+              </fieldset>
+            }
+            <fieldset>
+              <legend>Bot difficulty</legend>
+              <div class="segmented">
+                @for (d of difficulties; track d.value) {
+                  <button type="button" [attr.aria-pressed]="settingsSvc.settings().difficulty === d.value" (click)="settingsSvc.update({ difficulty: d.value })">{{ d.label }}</button>
+                }
+              </div>
+            </fieldset>
+            @for (opt of def.setupOptions; track opt.key) {
+              <fieldset>
+                <legend>{{ opt.label }}</legend>
+                <div class="segmented">
+                  @for (c of opt.choices; track c.value) {
+                    <button type="button" [attr.aria-pressed]="store.gameSettings()[opt.key] === c.value" (click)="store.setOption(opt.key, c.value)">{{ c.label }}</button>
+                  }
+                </div>
+                @if (opt.help) { <p class="help">{{ opt.help }}</p> }
+              </fieldset>
+            }
+            @if (def.teams) { <p class="help">You and your partner (sitting opposite) play as a team.</p> }
+            <button class="btn btn-primary btn-lg btn-block deal" type="button" (click)="store.start()" autofocus>Deal cards</button>
+            <button class="btn btn-ghost btn-sm" type="button" (click)="rulesOpen.set(true)">How to play</button>
+          </div>
+        } @else {
+          <app-loader message="Loading game…" />
+        }
+      </div>
+    }
+    @case ('loading') {
+      <div class="center-stage"><app-loader [message]="store.loadingStep()" /></div>
+    }
+    @default {
+      @if (store.view(); as v) {
+        <section class="table" [class]="'table seats-' + opponents().length" aria-label="Card table">
+          <div class="felt"></div>
+          @for (p of opponents(); track p.id) {
+            <app-table-seat class="opp" [attr.data-pos]="positions()[p.id]" [seat]="p" [position]="positions()[p.id]"
+                            [active]="v.currentPlayerId === p.id" [partner]="myTeam() !== null && p.team === myTeam()" />
+          }
+          <div class="middle">
+            @if (v.floor) {
+              <app-table-floor [piles]="v.floor" />
+            } @else {
+              <app-table-trick [plays]="store.tableCards()" [positions]="positions()" [winnerId]="v.trickWinnerId"
+                               [animation]="store.trickAnimation()" [collectTo]="store.collectTo()"
+                               [hint]="store.isMyTurn() && !v.trick.length ? v.phaseLabel : ''" />
+            }
+          </div>
+          <div class="scores-float" [class.open]="scoresOpen()"><app-table-scores [table]="v.scores" /></div>
+          @if (store.banner(); as b) {
+            <div class="banner" [class]="'banner ' + b.kind" role="status">{{ b.text }}</div>
+          }
+        </section>
+
+        <section class="bottom" aria-label="Your area">
+          <app-action-panel [actions]="store.buttonActions()" [options]="store.cardOptions()" [selection]="store.selection()"
+                            [selectedCount]="store.selectedIds().length" [prompt]="store.isMyTurn() ? v.phaseLabel : ''"
+                            (act)="store.act($event)" (confirm)="store.confirmSelection()" />
+          <div class="statusbar" [class.my-turn]="store.isMyTurn()">
+            <div class="me">
+              <app-player-avatar [name]="me()?.name ?? 'You'" [avatar]="me()?.avatar" size="sm" [active]="store.isMyTurn()" status="online" />
+              <div class="me-text">
+                <strong>{{ store.isMyTurn() ? 'YOUR TURN' : (me()?.stat ?? '') }}</strong>
+                <span>{{ v.phaseLabel }}</span>
+              </div>
+            </div>
+            @if (store.isMyTurn() && store.turnSeconds() && !store.autoPlay()) {
+              <app-game-timer [seconds]="store.timeLeft()" [total]="store.turnSeconds()" />
+            }
+            @if (!store.selection()) {
+              <button class="btn btn-primary play-card" type="button" [disabled]="store.cardOptions().length !== 1" (click)="store.playSelected()">Play card</button>
+            }
+          </div>
+          <app-table-hand [cards]="v.hand" [playableIds]="store.playableIds()" [selectedIds]="store.selectedIds()"
+                          [myTurn]="store.isMyTurn()" [dealing]="store.dealing()" (cardClick)="store.clickCard($event)" />
+          <div class="controls" role="toolbar" aria-label="Game controls">
+            <button type="button" class="ctl" (click)="store.hint()" [disabled]="!store.isMyTurn()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
+            <button type="button" class="ctl" [class.on]="store.autoPlay()" [attr.aria-pressed]="store.autoPlay()" (click)="store.toggleAutoPlay()" title="Auto play"><span aria-hidden="true">🤖</span><span class="lbl">Auto</span></button>
+            <button type="button" class="ctl" [class.on]="settingsSvc.settings().sound" (click)="settingsSvc.update({ sound: !settingsSvc.settings().sound })"><span aria-hidden="true">{{ settingsSvc.settings().sound ? '🔊' : '🔇' }}</span><span class="lbl">Sound</span></button>
+            <button type="button" class="ctl" (click)="rulesOpen.set(true)"><span aria-hidden="true">📖</span><span class="lbl">Rules</span></button>
+            <button type="button" class="ctl" (click)="leaveOpen.set(true)"><span aria-hidden="true">🚪</span><span class="lbl">Leave</span></button>
+          </div>
+        </section>
+      }
+    }
+  }
+</div>
+
+<app-modal [open]="store.summaryOpen()" [dismissible]="false" label="Hand summary" [wide]="true">
+  @if (store.view()?.handSummary; as s) {
+    <div class="summary">
+      <span class="eyebrow">Hand result</span>
+      <h2>{{ s.title }}</h2>
+      <ul class="lines">
+        @for (l of summaryLines(); track $index) {
+          <li [class]="'line ' + l.tone">
+            @if (l.label) { <span class="who">{{ l.label }}</span> }
+            <span class="what">{{ l.text }}</span>
+          </li>
+        }
+      </ul>
+      @if (store.view(); as v) { <app-table-scores [table]="v.scores" size="lg" /> }
+      <button class="btn btn-primary btn-block" type="button" (click)="store.continueAfterHand()" autofocus>Continue</button>
+    </div>
+  }
+</app-modal>
+
+<app-modal [open]="store.phase() === 'finished'" [dismissible]="false" label="Game result">
+  <div class="result" [class]="'result ' + (store.myOutcome()?.result ?? '')">
+    <div class="emoji" aria-hidden="true">{{ resultCopy().emoji }}</div>
+    <h2>{{ resultCopy().title }}</h2>
+    <p class="text-secondary">{{ store.outcome()?.summary }}</p>
+    @if (auth.isLoggedIn()) {
+      <div class="xp">
+        @if (store.savingResult()) { <span class="text-secondary">Saving result…</span> }
+        @else if (store.finishResult(); as f) { <b>+{{ f.xpAwarded }} XP</b><span class="text-secondary">Level {{ f.level }}{{ f.leveledUp ? ' — level up!' : '' }}</span> }
+      </div>
+    }
+    <ol class="standings">
+      @for (p of standings(); track p.id) {
+        <li [class.you]="p.isYou" [class.lost]="p.result === 'loss'"><span>{{ medal(p.position) }}</span><span class="nm">{{ p.name }}</span><b>{{ p.score }}</b></li>
+      }
+    </ol>
+    @if (!auth.isLoggedIn()) {
+      <div class="guest"><p>Create a free account to save your statistics, earn XP and unlock achievements.</p><a class="btn btn-cyan btn-block" routerLink="/register">Create account</a></div>
+    }
+    <div class="actions">
+      <button class="btn btn-primary btn-lg btn-block" type="button" (click)="store.start()" autofocus>Play again</button>
+      <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+    </div>
+  </div>
+</app-modal>
+
+<app-modal [open]="rulesOpen()" (closed)="rulesOpen.set(false)" label="Rules" [wide]="true">
+  <h2>How to play {{ store.def()?.name }}</h2>
+  <ol class="rules-list">@for (r of store.def()?.rules ?? []; track r) { <li>{{ r }}</li> }</ol>
+  <p class="text-secondary small">Keyboard: ← → choose a card · Enter play · H hint. <a [routerLink]="['/games', slug()]" (click)="rulesOpen.set(false)">Full rules & strategy</a></p>
+</app-modal>
+
+<app-modal [open]="settingsOpen()" (closed)="settingsOpen.set(false)" label="Game settings">
+  <h2>Settings</h2>
+  <div class="settings">
+    <label class="toggle"><input type="checkbox" [checked]="settingsSvc.settings().sound" (change)="settingsSvc.update({ sound: $any($event.target).checked })" /> Sound</label>
+    <label class="toggle"><input type="checkbox" [checked]="settingsSvc.settings().turnTimer" (change)="settingsSvc.update({ turnTimer: $any($event.target).checked })" /> Turn timer</label>
+    <div class="field">
+      <label for="speed">Game speed</label>
+      <select id="speed" class="input" [value]="settingsSvc.settings().gameSpeed" (change)="settingsSvc.update({ gameSpeed: $any($event.target).value })">
+        <option value="slow">Slow</option><option value="normal">Normal</option><option value="fast">Fast</option>
+      </select>
+    </div>
+    <button class="btn btn-ghost btn-block" type="button" (click)="restart()">New game</button>
+  </div>
+</app-modal>
+
+<app-modal [open]="leaveOpen()" (closed)="leaveOpen.set(false)" label="Leave game">
+  <h2>Leave game?</h2>
+  <p class="text-secondary">Your current game will be abandoned.</p>
+  <div class="confirm">
+    <button class="btn btn-ghost" type="button" (click)="leaveOpen.set(false)" autofocus>Keep playing</button>
+    <button class="btn btn-danger" type="button" (click)="confirmLeave()">Leave</button>
+  </div>
+</app-modal>
+}

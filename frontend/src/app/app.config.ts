@@ -1,0 +1,30 @@
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { AuthService } from './core/services/auth.service';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top', anchorScrolling: 'enabled' }),
+    ),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    // Restore the session in the background; never block first paint on it.
+    provideAppInitializer(() => {
+      void firstValueFrom(inject(AuthService).restoreSession());
+    }),
+  ],
+};
