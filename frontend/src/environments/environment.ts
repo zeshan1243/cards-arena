@@ -6,4 +6,6 @@ export const environment = {
   siteName: 'CardArena',
   /** Login, profiles, stats, leaderboard and multiplayer. Off while the site is bots-only (no backend). */
   accountsEnabled: false,
+  /** Analytics stays off in development so local testing doesn't skew the numbers. */
+  gaMeasurementId: '',
 };

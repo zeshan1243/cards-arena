@@ -11,6 +11,7 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { AnalyticsService } from './core/services/analytics.service';
 import { AuthService } from './core/services/auth.service';
 
 export const appConfig: ApplicationConfig = {
@@ -26,6 +27,7 @@ export const appConfig: ApplicationConfig = {
     // Restore the session in the background; never block first paint on it.
     provideAppInitializer(() => {
       if (environment.accountsEnabled) void firstValueFrom(inject(AuthService).restoreSession());
+      inject(AnalyticsService).init();
     }),
   ],
 };
