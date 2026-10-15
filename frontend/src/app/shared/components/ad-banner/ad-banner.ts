@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
-export type AdBannerSize = '160x300' | '160x600';
+export type AdBannerSize = '160x300' | '160x600' | '320x50';
 
 /**
  * Adsterra iframe banner. Each unit runs in its own iframe (public/ads/*.html) because

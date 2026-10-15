@@ -18,7 +18,7 @@ import { ToastService } from '../../../core/services/toast.service';
     </div>
   `,
   styles: `
-    .stack { position: fixed; z-index: 200; right: 16px; bottom: 16px; left: 16px; display: grid; gap: 10px; justify-items: end; pointer-events: none; }
+    .stack { position: fixed; z-index: 200; right: 16px; bottom: calc(16px + var(--sticky-ad-h, 0px)); left: 16px; display: grid; gap: 10px; justify-items: end; pointer-events: none; }
     .toast {
       pointer-events: auto; display: flex; gap: 12px; align-items: flex-start; width: min(380px, 100%);
       padding: 14px 14px 14px 16px; border-radius: var(--radius-md); background: var(--bg-elevated);

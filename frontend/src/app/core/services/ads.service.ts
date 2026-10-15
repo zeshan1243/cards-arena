@@ -1,11 +1,11 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 
-/** Site-wide Adsterra units (popunder + social bar). Banners live in `AdBanner`. */
-const GLOBAL_AD_SCRIPTS = [
-  'https://abscloud.org/1/7e73ec51cfda35740991c219641c9725',
-  'https://bauval.org/14/1f99b6870942d7f3f777f4621994afa1',
-];
+/**
+ * Site-wide Adsterra units (social bar). Banners live in `AdBanner`.
+ * No popunder: it opened a new tab on every card click during games.
+ */
+const GLOBAL_AD_SCRIPTS = ['https://bauval.org/14/1f99b6870942d7f3f777f4621994afa1'];
 
 @Injectable({ providedIn: 'root' })
 export class AdsService {
