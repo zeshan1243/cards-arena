@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
 import { FinishSessionResponse } from '../../../../shared/models/user.model';
 import { PlayerOutcome, StandingRow } from '../../bhabhi-thulla.store';
 import { Scoreboard } from '../scoreboard/scoreboard';
@@ -34,7 +35,7 @@ const COPY: Record<PlayerOutcome, { emoji: string; title: string; sub: string }>
 
       <app-bt-scoreboard [rows]="standings()" />
 
-      @if (!loggedIn()) {
+      @if (accountsEnabled && !loggedIn()) {
         <div class="guest">
           <p>Create a free account to save your statistics, earn XP and unlock achievements.</p>
           <a class="btn btn-cyan btn-block" routerLink="/register">Create account</a>
@@ -68,6 +69,7 @@ export class GameResult {
   readonly outcome = input.required<PlayerOutcome>();
   readonly standings = input.required<StandingRow[]>();
   readonly loggedIn = input(false);
+  readonly accountsEnabled = environment.accountsEnabled;
   readonly finish = input<FinishSessionResponse | null>(null);
   readonly saving = input(false);
   readonly playAgain = output<void>();

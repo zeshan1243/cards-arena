@@ -10,7 +10,9 @@
             <span class="chip">👥 {{ g.minPlayers === g.maxPlayers ? g.minPlayers : g.minPlayers + '–' + g.maxPlayers }} players</span>
             <span class="chip">📍 {{ g.region }}</span>
             @if (g.botEnabled) { <span class="chip chip-cyan">🤖 Play vs AI</span> }
-            <span class="chip" [class.chip-purple]="g.multiplayerEnabled">🌐 Multiplayer {{ g.multiplayerEnabled ? '' : '(coming soon)' }}</span>
+            @if (accountsEnabled) {
+              <span class="chip" [class.chip-purple]="g.multiplayerEnabled">🌐 Multiplayer {{ g.multiplayerEnabled ? '' : '(coming soon)' }}</span>
+            }
           </div>
           @if (g.available) {
             <div class="cta">
@@ -61,10 +63,12 @@
             <a class="btn btn-primary" [routerLink]="['/play', g.slug]">Start a game</a>
           </section>
 
-          <section>
-            <h2>{{ g.name }} multiplayer</h2>
-            <p>Private rooms with shareable codes are coming soon. Create a free account now to be ready — your statistics and achievements will carry over.</p>
-          </section>
+          @if (accountsEnabled) {
+            <section>
+              <h2>{{ g.name }} multiplayer</h2>
+              <p>Private rooms with shareable codes are coming soon. Create a free account now to be ready — your statistics and achievements will carry over.</p>
+            </section>
+          }
 
           <section id="faq">
             <h2>Frequently asked questions</h2>

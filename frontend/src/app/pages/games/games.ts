@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameFilter, GameService, GameSort } from '../../core/services/game.service';
 import { SeoService } from '../../core/services/seo.service';
+import { environment } from '../../../environments/environment';
 import { GameCard } from '../../shared/components/game-card/game-card';
 import { GameInfo } from '../../shared/models/game.model';
 
@@ -66,7 +67,7 @@ export class GamesPage {
     { value: 'all', label: 'All' },
     { value: 'popular', label: 'Popular' },
     { value: 'regional', label: 'Regional' },
-    { value: 'multiplayer', label: 'Multiplayer' },
+    ...(environment.accountsEnabled ? [{ value: 'multiplayer' as const, label: 'Multiplayer' }] : []),
     { value: 'single', label: 'Single player' },
     { value: 'classic', label: 'Classic' },
   ];

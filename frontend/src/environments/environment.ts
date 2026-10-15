@@ -4,4 +4,6 @@ export const environment = {
   apiUrl: '/api/v1',
   siteUrl: 'http://localhost:4200',
   siteName: 'CardArena',
+  /** Login, profiles, stats, leaderboard and multiplayer. Off while the site is bots-only (no backend). */
+  accountsEnabled: false,
 };

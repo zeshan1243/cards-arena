@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 import { GameService } from '../../../core/services/game.service';
 
 @Component({
@@ -27,8 +28,10 @@ import { GameService } from '../../../core/services/game.service';
         <nav aria-label="CardArena">
           <h4>CardArena</h4>
           <a routerLink="/games">All games</a>
-          <a routerLink="/leaderboard">Leaderboard</a>
-          <a routerLink="/multiplayer">Multiplayer</a>
+          @if (accountsEnabled) {
+            <a routerLink="/leaderboard">Leaderboard</a>
+            <a routerLink="/multiplayer">Multiplayer</a>
+          }
           <a routerLink="/settings">Settings</a>
         </nav>
       </div>
@@ -49,6 +52,7 @@ import { GameService } from '../../../core/services/game.service';
   `,
 })
 export class Footer {
+  readonly accountsEnabled = environment.accountsEnabled;
   private readonly games = inject(GameService);
   readonly regional = this.games.byCategory('regional').slice(0, 6);
   readonly classic = this.games.byCategory('classic');

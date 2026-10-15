@@ -5,5 +5,4 @@ Disallow: /statistics
 Disallow: /history
 Disallow: /settings
 
-# Replace the domain before production.
-Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://cardsarena.world/sitemap.xml

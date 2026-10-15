@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { GameService } from '../../core/services/game.service';
 import { SeoService } from '../../core/services/seo.service';
+import { environment } from '../../../environments/environment';
 import { GameCard } from '../../shared/components/game-card/game-card';
 import { PlayingCard } from '../../shared/components/playing-card/playing-card';
 import { Card } from '../../shared/models/card.model';
@@ -14,6 +15,7 @@ import { GameInfo } from '../../shared/models/game.model';
   styleUrl: './home.scss',
 })
 export class HomePage {
+  readonly accountsEnabled = environment.accountsEnabled;
   private readonly games = inject(GameService);
   private readonly router = inject(Router);
 
@@ -34,7 +36,9 @@ export class HomePage {
     { icon: '🌏', title: 'Regional favourites', text: 'Bhabhi Thulla, Court Piece, 29, Seep and Call Break — the games you grew up with.' },
     { icon: '📱', title: 'Made for mobile', text: 'Big touch targets and smooth animations on every screen from 320px up.' },
     { icon: '⚡', title: 'Instant play', text: 'No download, no install and no account needed to start a game.' },
-    { icon: '🏆', title: 'Progress & stats', text: 'Earn XP, unlock achievements and climb the leaderboard with a free account.' },
+    environment.accountsEnabled
+      ? { icon: '🏆', title: 'Progress & stats', text: 'Earn XP, unlock achievements and climb the leaderboard with a free account.' }
+      : { icon: '🎚️', title: 'Four difficulty levels', text: 'From easy-going Easy bots to card-counting Expert ones — pick your challenge.' },
     { icon: '🎯', title: 'Clear rules', text: 'Every regional variation is spelled out, so you always know which rules apply.' },
   ];
 

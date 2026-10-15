@@ -1,5 +1,6 @@
 import { Component, HostListener, computed, effect, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 import { GameService } from '../../../core/services/game.service';
 import { SeoService } from '../../../core/services/seo.service';
@@ -37,6 +38,7 @@ const RESULT_COPY = {
 export class TableGamePage {
   readonly store = inject(TableGameStore);
   readonly auth = inject(AuthService);
+  readonly accountsEnabled = environment.accountsEnabled;
   readonly settingsSvc = inject(SettingsService);
   private readonly games = inject(GameService);
   private readonly seo = inject(SeoService);

@@ -102,6 +102,6 @@ Not yet: production deployment, multiplayer/WebSockets (deliberately deferred pe
 server-side rendering for SEO, real audio assets
 (sound effects are synthesized with Web Audio for now).
 
-Before going to production, replace `your-domain.com` in `frontend/public/{robots.txt,sitemap.xml}`,
-`frontend/src/index.html` and `environment.prod.ts`, set `ENVIRONMENT=production` (secure cookies)
-and a strong `JWT_SECRET_KEY`.
+The production domain is `cardsarena.world` (set in `frontend/public/{robots.txt,sitemap.xml}`,
+`frontend/src/index.html` and `environment.prod.ts`). When deploying the backend, set
+`ENVIRONMENT=production` (secure cookies) and a strong `JWT_SECRET_KEY`.

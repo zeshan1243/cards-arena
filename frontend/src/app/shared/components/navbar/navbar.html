@@ -7,12 +7,14 @@
 
     <nav class="links" aria-label="Primary">
       <a routerLink="/games" routerLinkActive="active">Games</a>
-      <a routerLink="/multiplayer" routerLinkActive="active">Multiplayer</a>
-      <a routerLink="/leaderboard" routerLinkActive="active">Leaderboard</a>
+      @if (accountsEnabled) {
+        <a routerLink="/multiplayer" routerLinkActive="active">Multiplayer</a>
+        <a routerLink="/leaderboard" routerLinkActive="active">Leaderboard</a>
+      }
     </nav>
 
     <div class="actions">
-      <button class="icon-btn" type="button" (click)="toggleSearch()" aria-label="Search games and players" [attr.aria-expanded]="searchOpen()">
+      <button class="icon-btn" type="button" (click)="toggleSearch()" [attr.aria-label]="accountsEnabled ? 'Search games and players' : 'Search games'" [attr.aria-expanded]="searchOpen()">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
 
@@ -35,7 +37,7 @@
             </div>
           }
         </div>
-      } @else {
+      } @else if (accountsEnabled) {
         <a routerLink="/login" class="login-link">Login</a>
       }
 
@@ -57,7 +59,7 @@
     <div class="search-panel">
       <div class="container">
         <div class="search-box">
-          <input #searchInput class="input" type="search" placeholder="Search games and players..." aria-label="Search games and players"
+          <input #searchInput class="input" type="search" [placeholder]="accountsEnabled ? 'Search games and players...' : 'Search games...'" [attr.aria-label]="accountsEnabled ? 'Search games and players' : 'Search games'"
                  [value]="query()" (input)="query.set($any($event.target).value)" (keydown.enter)="goFirstResult()" />
           <button class="btn btn-ghost btn-sm" type="button" (click)="closeSearch()">Close</button>
         </div>
@@ -71,6 +73,7 @@
                 <p class="text-secondary">No games found.</p>
               }
             </div>
+            @if (accountsEnabled) {
             <div>
               <h4>Players</h4>
               @for (p of playerHits(); track p.username) {
@@ -81,6 +84,7 @@
                 <p class="text-secondary">No players found.</p>
               }
             </div>
+            }
           </div>
         }
       </div>
@@ -90,8 +94,10 @@
   @if (menuOpen()) {
     <nav class="mobile-menu" aria-label="Mobile">
       <a routerLink="/games">Games</a>
-      <a routerLink="/multiplayer">Multiplayer</a>
-      <a routerLink="/leaderboard">Leaderboard</a>
+      @if (accountsEnabled) {
+        <a routerLink="/multiplayer">Multiplayer</a>
+        <a routerLink="/leaderboard">Leaderboard</a>
+      }
       @if (auth.isLoggedIn()) {
         <a routerLink="/profile">Profile</a>
         <a routerLink="/statistics">Statistics</a>
@@ -99,8 +105,10 @@
         <a routerLink="/settings">Settings</a>
         <button type="button" (click)="auth.logout()">Log out</button>
       } @else {
-        <a routerLink="/login">Login</a>
-        <a routerLink="/register">Create account</a>
+        @if (accountsEnabled) {
+          <a routerLink="/login">Login</a>
+          <a routerLink="/register">Create account</a>
+        }
         <a routerLink="/settings">Settings</a>
       }
       <a routerLink="/play/bhabhi-thulla" class="btn btn-primary btn-block">Play now</a>

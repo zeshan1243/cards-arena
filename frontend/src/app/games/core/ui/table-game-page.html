@@ -162,7 +162,7 @@
         <li [class.you]="p.isYou" [class.lost]="p.result === 'loss'"><span>{{ medal(p.position) }}</span><span class="nm">{{ p.name }}</span><b>{{ p.score }}</b></li>
       }
     </ol>
-    @if (!auth.isLoggedIn()) {
+    @if (accountsEnabled && !auth.isLoggedIn()) {
       <div class="guest"><p>Create a free account to save your statistics, earn XP and unlock achievements.</p><a class="btn btn-cyan btn-block" routerLink="/register">Create account</a></div>
     }
     <div class="actions">

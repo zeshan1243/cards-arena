@@ -15,6 +15,7 @@ import { NotFoundPage } from '../not-found/not-found';
   styleUrl: './game-detail.scss',
 })
 export class GameDetailPage {
+  readonly accountsEnabled = environment.accountsEnabled;
   private readonly games = inject(GameService);
   private readonly seo = inject(SeoService);
 

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { AuthService } from './core/services/auth.service';
@@ -24,7 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     // Restore the session in the background; never block first paint on it.
     provideAppInitializer(() => {
-      void firstValueFrom(inject(AuthService).restoreSession());
+      if (environment.accountsEnabled) void firstValueFrom(inject(AuthService).restoreSession());
     }),
   ],
 };

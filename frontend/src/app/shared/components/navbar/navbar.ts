@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
 import { GameService } from '../../../core/services/game.service';
@@ -22,6 +23,7 @@ interface PlayerHit {
 })
 export class Navbar {
   readonly auth = inject(AuthService);
+  readonly accountsEnabled = environment.accountsEnabled;
   private readonly games = inject(GameService);
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
@@ -39,7 +41,7 @@ export class Navbar {
       debounceTime(250),
       distinctUntilChanged(),
       switchMap((q) =>
-        q.trim().length < 2 ? of([]) : this.api.get<PlayerHit[]>('/users/search', { q: q.trim() }).pipe(catchError(() => of([]))),
+        !this.accountsEnabled || q.trim().length < 2 ? of([]) : this.api.get<PlayerHit[]>('/users/search', { q: q.trim() }).pipe(catchError(() => of([]))),
       ),
     ),
     { initialValue: [] as PlayerHit[] },
