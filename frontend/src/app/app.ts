@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, fromEvent, map } from 'rxjs';
@@ -113,10 +113,6 @@ export class App {
   readonly showStickyAd = computed(() => !this.stickyClosed() && !this.inGame());
 
   constructor() {
-    const ads = inject(AdsService);
-    // Keep the social bar off a game someone deep-links into; once loaded it stays.
-    effect(() => {
-      if (!this.inGame()) ads.loadGlobalScripts();
-    });
+    inject(AdsService).detectAdBlock();
   }
 }
