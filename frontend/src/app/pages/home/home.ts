@@ -20,6 +20,7 @@ export class HomePage {
   private readonly router = inject(Router);
 
   readonly featured = this.games.all.filter((g) => g.available).concat(this.games.query('regional', 'popular', '').filter((g) => !g.available).slice(0, 2));
+  readonly gameCount = this.games.all.filter((g) => g.available).length;
   readonly popular = this.games.query('popular', 'most-played', '').slice(0, 4);
   readonly regional = this.games.byCategory('regional');
 

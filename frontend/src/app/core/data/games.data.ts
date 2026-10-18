@@ -9,6 +9,7 @@ import { content as c_tarneeb } from '../../games/tarneeb/tarneeb.content';
 import { content as c_baloot } from '../../games/baloot/baloot.content';
 import { content as c_spades } from '../../games/spades/spades.content';
 import { content as c_hearts } from '../../games/hearts/hearts.content';
+import { content as c_thirteen } from '../../games/thirteen/thirteen.content';
 
 export type { GameContent };
 
@@ -198,6 +199,24 @@ export const GAMES: GameInfo[] = [
     art: '♥♥♥',
     related: ['spades', 'bhabhi-thulla', 'call-break'],
   },
+  {
+    slug: 'thirteen',
+    name: 'Thirteen',
+    tagline: 'Shed your cards. Beat the table. 2s rule.',
+    description: 'Tiến Lên, the Vietnamese climbing game: beat singles, pairs and runs, bomb the 2s, and be first to empty your hand.',
+    region: 'Vietnam',
+    minPlayers: 2,
+    maxPlayers: 4,
+    botEnabled: true,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 80,
+    releasedAt: '2026-10-18',
+    accent: '#22C55E',
+    art: '♥♦♠',
+    related: ['bhabhi-thulla', 'hearts', 'spades'],
+  },
 ];
 
 export const GAME_CONTENT: Record<string, GameContent> = {
@@ -251,6 +270,7 @@ GAME_CONTENT['tarneeb'] = c_tarneeb;
 GAME_CONTENT['baloot'] = c_baloot;
 GAME_CONTENT['spades'] = c_spades;
 GAME_CONTENT['hearts'] = c_hearts;
+GAME_CONTENT['thirteen'] = c_thirteen;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

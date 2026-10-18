@@ -1,8 +1,8 @@
 # CardArena
 
 Browser card-game platform — see [card-game.md](card-game.md) for the full product spec.
-All ten catalog games are playable against AI bots: **Bhabhi Thulla, Court Piece, 29, Seep, Call Break,
-Hokm, Tarneeb, Baloot, Spades and Hearts**. Multiplayer is not built yet (spec §157).
+All eleven catalog games are playable against AI bots: **Bhabhi Thulla, Court Piece, 29, Seep, Call Break,
+Hokm, Tarneeb, Baloot, Spades, Hearts and Thirteen**. Multiplayer is not built yet (spec §157).
 
 ```
 frontend/   Angular 20 (standalone components, signals, SCSS)

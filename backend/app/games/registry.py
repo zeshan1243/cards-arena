@@ -18,6 +18,7 @@ ENGINES: dict[str, str] = {
     "baloot": "app.games.baloot.engine:BalootEngine",
     "spades": "app.games.spades.engine:SpadesEngine",
     "hearts": "app.games.hearts.engine:HeartsEngine",
+    "thirteen": "app.games.thirteen.engine:ThirteenEngine",
 }
 
 

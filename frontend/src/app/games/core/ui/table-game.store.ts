@@ -13,10 +13,12 @@ import { botsFor } from '../bots';
 import { Rng, seededRng } from '../deck';
 import {
   Banner,
+  CardSelection,
   GameAction,
   GameDefinition,
   GameOutcome,
   GameSettings,
+  IllegalActionError,
   LegalAction,
   SeatConfig,
   TableGameEngine,
@@ -59,7 +61,7 @@ export class TableGameStore implements OnDestroy {
   readonly loadingStep = signal(LOADING_STEPS[0]);
   readonly view = signal<TableView | null>(null);
   readonly legal = signal<LegalAction[]>([]);
-  readonly selection = signal<{ count: number; label: string; actionType: GameAction['type'] } | null>(null);
+  readonly selection = signal<CardSelection | null>(null);
   readonly selectedIds = signal<string[]>([]);
   readonly tableCards = signal<TrickPlay[]>([]);
   readonly trickAnimation = signal<'idle' | 'collect'>('idle');
@@ -212,13 +214,21 @@ export class TableGameStore implements OnDestroy {
 
   confirmSelection(): void {
     const sel = this.selection();
-    if (sel && this.selectedIds().length === sel.count) this.act({ type: sel.actionType, cardIds: this.selectedIds() });
+    const n = this.selectedIds().length;
+    if (sel && n >= (sel.minCount ?? sel.count) && n <= sel.count) this.act({ type: sel.actionType, cardIds: this.selectedIds() });
   }
 
   act(action: GameAction): void {
     if (!this.isMyTurn() || !this.engine) return;
+    try {
+      this.apply(HUMAN_ID, action);
+    } catch (e) {
+      // Free-form selections (e.g. Thirteen combinations) can be illegal; explain and let them retry.
+      if (!(e instanceof IllegalActionError)) throw e;
+      this.toast.error('Can’t play that', e.message);
+      return;
+    }
     this.stopCountdown();
-    this.apply(HUMAN_ID, action);
     this.advance(this.generation);
   }
 

@@ -29,10 +29,15 @@ export interface LegalAction extends GameAction {
   label: string;
 }
 
-/** Multi-card selection phase (e.g. Hearts passing). */
+/** Multi-card selection phase (e.g. Hearts passing, Thirteen combinations). */
 export interface CardSelection {
+  /** Most cards that may be chosen (exactly this many unless `minCount` is set). */
   count: number;
+  /** Fewest cards that may be confirmed; defaults to `count`. */
+  minCount?: number;
   label: string;
+  /** Button text; defaults to "Confirm". */
+  confirmLabel?: string;
   /** Action type submitted with the chosen `cardIds`. */
   actionType: ActionType;
 }
@@ -111,6 +116,8 @@ export interface TableView {
   trump: { suit: Suit | null; hidden: boolean; label: string } | null;
   /** Seep-style floor instead of a trick. */
   floor: FloorPile[] | null;
+  /** Text on an empty floor; defaults to "The floor is empty". */
+  floorHint?: string;
   scores: ScoreTable;
   /** Small chips in the top bar, e.g. "Hand 2", "To 7". */
   info: string[];

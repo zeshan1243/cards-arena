@@ -18,7 +18,7 @@ import { FloorPile } from '../table-game';
           @if (pile.label) { <span class="label">{{ pile.label }}</span> }
         </div>
       } @empty {
-        <p class="empty">The floor is empty</p>
+        <p class="empty">{{ emptyText() }}</p>
       }
     </div>
   `,
@@ -35,4 +35,5 @@ import { FloorPile } from '../table-game';
 })
 export class TableFloor {
   readonly piles = input.required<FloorPile[]>();
+  readonly emptyText = input('The floor is empty');
 }

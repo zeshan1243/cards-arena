@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { GameAction, LegalAction } from '../table-game';
+import { CardSelection, GameAction, LegalAction } from '../table-game';
 
 /** Non-card decisions (bids, trump, pass…) and alternative ways to play the selected card. */
 @Component({
@@ -8,8 +8,8 @@ import { GameAction, LegalAction } from '../table-game';
     @if (actions().length || options().length > 1 || selection()) {
       <div class="panel-actions" role="group" aria-label="Choose an action">
         @if (selection(); as sel) {
-          <span class="prompt">{{ sel.label }} ({{ selectedCount() }}/{{ sel.count }})</span>
-          <button class="btn btn-primary btn-sm" type="button" [disabled]="selectedCount() !== sel.count" (click)="confirm.emit()">Confirm</button>
+          <span class="prompt">{{ sel.label }} ({{ sel.minCount === undefined ? selectedCount() + '/' + sel.count : selectedCount() + ' selected' }})</span>
+          <button class="btn btn-primary btn-sm" type="button" [disabled]="selectedCount() < (sel.minCount ?? sel.count) || selectedCount() > sel.count" (click)="confirm.emit()">{{ sel.confirmLabel ?? 'Confirm' }}</button>
         }
         @if (options().length > 1) {
           <span class="prompt">Play this card:</span>
@@ -40,7 +40,7 @@ import { GameAction, LegalAction } from '../table-game';
 export class ActionPanel {
   readonly actions = input<LegalAction[]>([]);
   readonly options = input<LegalAction[]>([]);
-  readonly selection = input<{ count: number; label: string } | null>(null);
+  readonly selection = input<CardSelection | null>(null);
   readonly selectedCount = input(0);
   readonly prompt = input('');
   readonly act = output<GameAction>();
