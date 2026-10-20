@@ -21,6 +21,7 @@
   &.red { color: #e11d48; }
   &.sm { --w: clamp(38px, 8vw, 58px); }
   &.lg { --w: clamp(64px, 16vw, 110px); }
+  &.fluid { --w: var(--card-w, 72px); }
 }
 
 button.card {

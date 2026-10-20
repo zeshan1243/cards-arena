@@ -7,7 +7,7 @@
           <h1>{{ g.name }} Online</h1>
           <p class="lead">{{ g.description }}</p>
           <div class="meta">
-            <span class="chip">👥 {{ g.minPlayers === g.maxPlayers ? g.minPlayers : g.minPlayers + '–' + g.maxPlayers }} players</span>
+            <span class="chip">👥 {{ g.minPlayers === g.maxPlayers ? g.minPlayers : g.minPlayers + '–' + g.maxPlayers }} {{ g.maxPlayers === 1 ? 'player' : 'players' }}</span>
             <span class="chip">📍 {{ g.region }}</span>
             @if (g.botEnabled) { <span class="chip chip-cyan">🤖 Play vs AI</span> }
             @if (accountsEnabled) {
@@ -58,8 +58,13 @@
           </section>
 
           <section>
-            <h2>Play {{ g.name }} against AI</h2>
-            <p>Choose from four bot levels. Easy bots play loosely; Normal bots duck and shed their high cards; Hard bots remember which players are void in each suit; Expert bots count cards and estimate the risk of a Thulla before every play.</p>
+            @if (g.botEnabled) {
+              <h2>Play {{ g.name }} against AI</h2>
+              <p>Choose from four bot levels. Easy bots play loosely; Normal bots duck and shed their high cards; Hard bots remember which players are void in each suit; Expert bots count cards and estimate the risk of a Thulla before every play.</p>
+            } @else {
+              <h2>Play {{ g.name }} online</h2>
+              <p>Every deal is shuffled fresh. Play on your phone, tablet or computer — your best score, best time and win record are saved in your browser.</p>
+            }
             <a class="btn btn-primary" [routerLink]="['/play', g.slug]">Start a game</a>
           </section>
 
@@ -90,7 +95,7 @@
         <div class="panel info">
           <h3>Game info</h3>
           <dl>
-            <dt>Players</dt><dd>{{ g.minPlayers }}–{{ g.maxPlayers }}</dd>
+            <dt>Players</dt><dd>{{ g.minPlayers === g.maxPlayers ? g.minPlayers : g.minPlayers + '–' + g.maxPlayers }}</dd>
             <dt>Deck</dt><dd>{{ g.slug === '29' || g.slug === 'baloot' ? '32 cards' : '52 cards' }}</dd>
             <dt>Region</dt><dd>{{ g.region }}</dd>
             <dt>AI opponents</dt><dd>{{ g.botEnabled ? 'Yes' : 'No' }}</dd>

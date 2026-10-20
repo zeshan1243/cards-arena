@@ -25,6 +25,11 @@ export const routes: Routes = [
     title: 'Play Bhabhi Thulla – CardArena',
   },
   {
+    path: 'play/solitaire',
+    loadComponent: () => import('./games/solitaire/solitaire-game').then((m) => m.SolitaireGame),
+    title: 'Play Solitaire – CardArena',
+  },
+  {
     path: 'play/:slug',
     loadComponent: () => import('./games/core/ui/table-game-page').then((m) => m.TableGamePage),
   },

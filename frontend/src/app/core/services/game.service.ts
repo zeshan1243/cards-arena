@@ -32,7 +32,7 @@ export class GameService {
       const matchesFilter =
         filter === 'all' ||
         (filter === 'multiplayer' && g.multiplayerEnabled) ||
-        (filter === 'single' && g.botEnabled) ||
+        (filter === 'single' && (g.botEnabled || g.maxPlayers === 1)) ||
         (filter !== 'multiplayer' && filter !== 'single' && g.categories.includes(filter));
       const matchesSearch = !q || [g.name, g.description, g.region, g.tagline].some((s) => s.toLowerCase().includes(q));
       return matchesFilter && matchesSearch;

@@ -80,7 +80,7 @@
           }
           <div class="middle">
             @if (v.floor) {
-              <app-table-floor [piles]="v.floor" [emptyText]="v.floorHint ?? 'The floor is empty'" />
+              <app-table-floor [piles]="v.floor" [emptyText]="v.floorHint ?? 'The floor is empty'" [positions]="positions()" />
             } @else {
               <app-table-trick [plays]="store.tableCards()" [positions]="positions()" [winnerId]="v.trickWinnerId"
                                [animation]="store.trickAnimation()" [collectTo]="store.collectTo()"

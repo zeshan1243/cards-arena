@@ -1,0 +1,58 @@
+:host { display: block; }
+
+.screen { display: grid; grid-template-rows: auto 1fr auto; height: 100dvh; min-height: 520px; overflow: hidden; }
+
+.topbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border-color); background: rgba(11,16,32,.85); }
+.round-btn { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.3rem; text-decoration: none !important; &:hover { background: rgba(255,255,255,.08); } }
+.title { margin: 0; font-size: 1.1rem; white-space: nowrap; }
+.chips { display: flex; gap: 6px; margin-left: auto; font-variant-numeric: tabular-nums; }
+@media (max-width: 420px) { .topbar { padding: 8px 10px; gap: 6px; } .chip { padding: 3px 8px; font-size: .7rem; } }
+
+/* The board is a size container: card width follows the board, so 7 columns always fit. */
+.board { position: relative; overflow: auto; container-type: inline-size; padding: clamp(10px, 2vw, 24px) clamp(8px, 2vw, 24px);
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.06), transparent 60%), linear-gradient(180deg, #145a45, var(--felt-edge, #0b3a2c));
+  &.dragging { cursor: grabbing; } }
+.inner { --gap: clamp(4px, 1.4cqw, 16px); --card-w: min(108px, calc((100cqw - 6 * var(--gap)) / 7)); margin: 0 auto; width: calc(7 * var(--card-w) + 6 * var(--gap)); }
+
+.top-row, .tableau { display: grid; grid-template-columns: repeat(7, var(--card-w)); gap: var(--gap); }
+.tableau { margin-top: calc(var(--gap) * 2 + 4px); }
+.spacer { pointer-events: none; }
+
+.pile { position: relative; width: var(--card-w); aspect-ratio: 5 / 7; border-radius: calc(var(--card-w) * .1); border: 2px dashed rgba(255,255,255,.16); background: rgba(0,0,0,.12); }
+.slot-icon { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: calc(var(--card-w) * .38); color: rgba(255,255,255,.18); pointer-events: none; }
+
+.stock { padding: 0; cursor: pointer; color: inherit; font: inherit;
+  app-playing-card { position: absolute; inset: 0; }
+  .count { position: absolute; right: -6px; bottom: -6px; z-index: 2; min-width: 22px; padding: 1px 6px; border-radius: 999px; background: var(--bg-elevated); border: 1px solid var(--border-color); font-size: .68rem; font-weight: 700; }
+  &:hover app-playing-card { filter: brightness(1.08); } }
+.waste { border-color: transparent; background: none; }
+.waste .card-btn { position: absolute; top: 0; left: calc(var(--i) * var(--card-w) * .26); }
+.foundation .under, .foundation .card-btn { position: absolute; inset: 0; }
+
+.column { position: relative; width: var(--card-w); height: calc(var(--h) * var(--card-w)); min-height: calc(var(--card-w) * 1.4); border-radius: calc(var(--card-w) * .1);
+  &:has(.slot-icon) { border: 2px dashed rgba(255,255,255,.16); background: rgba(0,0,0,.12); } }
+.column .card-btn { position: absolute; left: 0; top: calc(var(--y) * var(--card-w)); }
+
+/* touch-action: none lets a finger drag a card instead of scrolling the page. */
+.card-btn { display: block; padding: 0; border: 0; background: none; line-height: 0; cursor: grab; touch-action: none; -webkit-tap-highlight-color: transparent;
+  &:disabled { cursor: default; touch-action: auto; }
+  &:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; border-radius: calc(var(--card-w) * .1); }
+  &.dragged { z-index: 100; pointer-events: none; filter: drop-shadow(0 14px 18px rgba(0,0,0,.45)); }
+  &.hinted app-playing-card { filter: drop-shadow(0 0 10px rgba(245,158,11,.95)); } }
+.pile.hint, .column.hint { box-shadow: 0 0 0 3px var(--color-warning), 0 0 22px rgba(245,158,11,.55); }
+
+.controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border-color); background: rgba(11,16,32,.85); }
+.ctl { display: grid; justify-items: center; gap: 2px; min-width: 56px; min-height: 50px; padding: 6px 8px; border-radius: var(--radius-md); border: 1px solid var(--border-color); background: rgba(255,255,255,.04); color: var(--text-primary); cursor: pointer; font-size: 1.05rem;
+  &:hover:not(:disabled) { background: rgba(255,255,255,.1); } &:disabled { opacity: .4; cursor: not-allowed; } &.on { border-color: rgba(0,212,255,.6); background: rgba(0,212,255,.12); } }
+.lbl { font-size: .66rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); }
+.draw button { font-size: .8rem; }
+@media (max-width: 600px) { .lbl { display: none; } .ctl { min-width: 46px; min-height: 42px; } }
+
+.result { display: grid; gap: 10px; text-align: center; }
+.emoji { font-size: clamp(2.4rem, 7vh, 3.5rem); }
+.result h2 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.4rem); background: linear-gradient(90deg, #fde68a, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0;
+  div { padding: 10px 6px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--border-color); }
+  dt { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-secondary); }
+  dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; } }
+.result p { margin: 0; font-size: .85rem; }

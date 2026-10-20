@@ -83,6 +83,8 @@ export interface FloorPile {
   /** e.g. "House of 11" or null for a loose card. */
   label: string | null;
   owner?: string | null;
+  /** Seat the pile was just played from; it flies in from there. */
+  from?: string | null;
 }
 
 export interface ScoreTable {

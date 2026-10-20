@@ -16,7 +16,7 @@ import { GameArt } from '../game-art/game-art';
         <h3><a [routerLink]="['/games', game().slug]">{{ game().name }}</a></h3>
         <p class="desc">{{ game().tagline }}</p>
         <div class="meta">
-          <span class="chip">👥 {{ game().minPlayers === game().maxPlayers ? game().minPlayers : game().minPlayers + '–' + game().maxPlayers }} players</span>
+          <span class="chip">👥 {{ game().minPlayers === game().maxPlayers ? game().minPlayers : game().minPlayers + '–' + game().maxPlayers }} {{ game().maxPlayers === 1 ? 'player' : 'players' }}</span>
           @if (game().botEnabled) { <span class="chip chip-cyan">🤖 AI</span> }
           @if (game().multiplayerEnabled) { <span class="chip chip-purple">🌐 Online</span> }
           <span class="chip">{{ game().region }}</span>

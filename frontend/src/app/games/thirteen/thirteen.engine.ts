@@ -296,7 +296,15 @@ export class ThirteenEngine extends BaseTableEngine implements TableGameEngine<T
       leadSuit: null,
       trickWinnerId: null,
       trump: null,
-      floor: this.table ? [{ id: 'table', cards: this.table.cards, label: `${this.seats[this.table.seat].name} · ${comboLabel(this.table.cards)}` }] : [],
+      // A fresh id per play so each new combination animates in from its player's seat.
+      floor: this.table
+        ? [{
+            id: `h${this.handNumber}-p${this.played.length}`,
+            cards: this.table.cards,
+            label: `${this.seats[this.table.seat].name} · ${comboLabel(this.table.cards)}`,
+            from: this.seats[this.table.seat].id,
+          }]
+        : [],
       floorHint: must ? `${glyph(must)} leads` : 'New round — any combination',
       scores: {
         title: 'Scores',

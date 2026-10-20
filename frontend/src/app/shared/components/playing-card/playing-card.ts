@@ -17,7 +17,8 @@ export class PlayingCard {
   readonly playable = input(false);
   readonly hint = input(false);
   readonly interactive = input(false);
-  readonly size = input<'sm' | 'md' | 'lg'>('md');
+  /** `fluid` takes its width from the `--card-w` custom property of an ancestor. */
+  readonly size = input<'sm' | 'md' | 'lg' | 'fluid'>('md');
   readonly cardClick = output<Card>();
 
   readonly symbol = computed(() => (this.card() ? SUIT_SYMBOL[this.card()!.suit] : ''));

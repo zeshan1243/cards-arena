@@ -10,6 +10,7 @@ import { content as c_baloot } from '../../games/baloot/baloot.content';
 import { content as c_spades } from '../../games/spades/spades.content';
 import { content as c_hearts } from '../../games/hearts/hearts.content';
 import { content as c_thirteen } from '../../games/thirteen/thirteen.content';
+import { content as c_solitaire } from '../../games/solitaire/solitaire.content';
 
 export type { GameContent };
 
@@ -217,6 +218,24 @@ export const GAMES: GameInfo[] = [
     art: '♥♦♠',
     related: ['bhabhi-thulla', 'hearts', 'spades'],
   },
+  {
+    slug: 'solitaire',
+    name: 'Solitaire',
+    tagline: 'The classic Klondike patience game.',
+    description: 'Build four foundations from Ace to King. Draw 1 or Draw 3, drag or tap to move, with undo, hints and auto-finish.',
+    region: 'Worldwide',
+    minPlayers: 1,
+    maxPlayers: 1,
+    botEnabled: false,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 90,
+    releasedAt: '2026-10-19',
+    accent: '#0EA5E9',
+    art: '♠♦♣',
+    related: ['thirteen', 'hearts', 'bhabhi-thulla'],
+  },
 ];
 
 export const GAME_CONTENT: Record<string, GameContent> = {
@@ -271,6 +290,7 @@ GAME_CONTENT['baloot'] = c_baloot;
 GAME_CONTENT['spades'] = c_spades;
 GAME_CONTENT['hearts'] = c_hearts;
 GAME_CONTENT['thirteen'] = c_thirteen;
+GAME_CONTENT['solitaire'] = c_solitaire;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

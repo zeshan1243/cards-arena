@@ -1,0 +1,111 @@
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/solitaire" class="round-btn" aria-label="Back to Solitaire page">‹</a>
+    <h1 class="title">Solitaire</h1>
+    @if (view(); as v) {
+      <div class="chips" aria-live="polite">
+        <span class="chip">Score {{ v.score }}</span>
+        <span class="chip">Moves {{ v.moves }}</span>
+        <span class="chip">⏱ {{ time() }}</span>
+      </div>
+    }
+  </header>
+
+  @if (view(); as v) {
+    <section class="board" #board aria-label="Solitaire board" [class.dragging]="drag()?.moved"
+             (pointermove)="pointerMove($event)" (pointerup)="up($event)" (pointercancel)="cancel()">
+      <div class="inner">
+        <div class="top-row">
+          <button type="button" class="pile stock" data-pile="stock" [class.hint]="hintPile() === 'stock'" (click)="draw()"
+                  [attr.aria-label]="v.stock.length ? 'Stock, ' + v.stock.length + ' cards — draw' : 'Turn the waste back over'">
+            @if (v.stock.length) {
+              <app-playing-card size="fluid" [faceDown]="true" />
+              <span class="count">{{ v.stock.length }}</span>
+            } @else if (v.waste.length) {
+              <span class="slot-icon" aria-hidden="true">↻</span>
+            }
+          </button>
+
+          <div class="pile waste" data-pile="waste" [class.fan]="drawCount() === 3">
+            @for (c of wasteShown(); track c.id; let i = $index; let last = $last) {
+              <button type="button" class="card-btn" [attr.data-card]="c.id" [style.--i]="drawCount() === 3 ? i : 0"
+                      [class.dragged]="isDragged(c)" [class.hinted]="hintIds().has(c.id)" [disabled]="!last"
+                      [style.transform]="isDragged(c) ? 'translate(' + dx() + 'px,' + dy() + 'px)' : null"
+                      (pointerdown)="last && down($event, 'waste', v.waste.length - 1)" (click)="keyActivate($event, 'waste', v.waste.length - 1)">
+                <app-playing-card [card]="c" size="fluid" />
+              </button>
+            }
+          </div>
+
+          <div class="spacer"></div>
+
+          @for (f of v.foundations; track $index; let fi = $index) {
+            <div class="pile foundation" [attr.data-pile]="'f' + fi" [class.hint]="hintPile() === 'f' + fi">
+              <span class="slot-icon" aria-hidden="true">A</span>
+              @if (f.length > 1) {
+                <div class="under"><app-playing-card [card]="f[f.length - 2]" size="fluid" /></div>
+              }
+              @if (f[f.length - 1]; as top) {
+                <button type="button" class="card-btn" [attr.data-card]="top.id" [class.dragged]="isDragged(top)"
+                        [style.transform]="isDragged(top) ? 'translate(' + dx() + 'px,' + dy() + 'px)' : null"
+                        (pointerdown)="down($event, fnd(fi), f.length - 1)" (click)="keyActivate($event, fnd(fi), f.length - 1)">
+                  <app-playing-card [card]="top" size="fluid" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="tableau">
+          @for (col of v.tableau; track $index; let ti = $index) {
+            <div class="column" [attr.data-pile]="'t' + ti" [class.hint]="hintPile() === 't' + ti" [style.--h]="columnHeight(col)">
+              @if (!col.length) { <span class="slot-icon" aria-hidden="true">K</span> }
+              @for (t of col; track t.card.id; let k = $index) {
+                <button type="button" class="card-btn" [attr.data-card]="t.card.id" [style.--y]="offsets(col)[k]" [disabled]="!t.up"
+                        [class.dragged]="isDragged(t.card)" [class.hinted]="hintIds().has(t.card.id)"
+                        [style.transform]="isDragged(t.card) ? 'translate(' + dx() + 'px,' + dy() + 'px)' : null"
+                        (pointerdown)="down($event, tab(ti), k)" (click)="keyActivate($event, tab(ti), k)">
+                  <app-playing-card [card]="t.card" [faceDown]="!t.up" size="fluid" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <footer class="controls" role="toolbar" aria-label="Game controls">
+    <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
+    <button type="button" class="ctl" (click)="undo()" [disabled]="!canUndo() || autoFinishing()"><span aria-hidden="true">↩️</span><span class="lbl">Undo</span></button>
+    <button type="button" class="ctl" (click)="hint()" [disabled]="autoFinishing()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
+    @if (canAutoFinish()) {
+      <button type="button" class="ctl on" (click)="autoFinish()" [disabled]="autoFinishing()"><span aria-hidden="true">⚡</span><span class="lbl">Finish</span></button>
+    }
+    <div class="segmented draw" role="group" aria-label="Cards per draw">
+      <button type="button" [attr.aria-pressed]="drawCount() === 1" (click)="setDraw(1)">Draw 1</button>
+      <button type="button" [attr.aria-pressed]="drawCount() === 3" (click)="setDraw(3)">Draw 3</button>
+    </div>
+  </footer>
+</div>
+
+<app-modal [open]="won()" [dismissible]="false" label="You won">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
+  <div class="result">
+    <div class="emoji" aria-hidden="true">🏆</div>
+    <h2>You won!</h2>
+    @if (view(); as v) {
+      <dl class="stats">
+        <div><dt>Score</dt><dd>{{ v.score }}</dd></div>
+        <div><dt>Time</dt><dd>{{ time() }}</dd></div>
+        <div><dt>Moves</dt><dd>{{ v.moves }}</dd></div>
+      </dl>
+    }
+    <p class="text-secondary">
+      Games won: {{ stats().won }} of {{ stats().played }} · Best score {{ stats().bestScore }}
+      @if (stats().bestTime !== null) { · Best time {{ fmt(stats().bestTime!) }} }
+    </p>
+    <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>Play again</button>
+    <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+  </div>
+</app-modal>
