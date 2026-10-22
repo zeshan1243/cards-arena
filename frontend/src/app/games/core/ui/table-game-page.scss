@@ -110,3 +110,14 @@ app-game-timer { flex-shrink: 0; }
 app-action-panel { position: absolute; left: 12px; right: 12px; bottom: 100%; margin-bottom: 6px; z-index: 6; }
 @media (max-width: 600px) { .statusbar { height: 58px; } }
 @media (max-width: 600px) { .summary { gap: 10px; .eyebrow { display: none; } } .line { padding: 8px 12px; font-size: .92rem; } }
+
+/* Hearts passing: a big arrow pointing at the player who will receive the cards. */
+.pass { display: grid; justify-items: center; gap: 12px; width: min(420px, 80vw); }
+.pass-arrow { display: grid; place-items: center; width: clamp(96px, 14vw, 150px); aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; background: rgba(0,0,0,.18); cursor: pointer; transition: transform var(--dur-med) var(--ease-out), background var(--dur-med);
+  svg { width: 78%; transform: rotate(var(--rot)); fill: #4ade80; filter: drop-shadow(0 4px 10px rgba(0,0,0,.45)); transition: fill var(--dur-med); }
+  &:not(:disabled) { animation: pass-pulse 1.2s ease-in-out infinite; svg { fill: #86efac; } }
+  &:hover:not(:disabled) { background: rgba(74,222,128,.2); transform: scale(1.06); }
+  &:disabled { cursor: not-allowed; svg { fill: rgba(255,255,255,.28); } }
+  &:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 4px; } }
+.pass-text { margin: 0; padding: 8px 14px; border-radius: var(--radius-md); background: rgba(11,16,32,.7); border: 1px solid var(--border-color); text-align: center; font-size: .9rem; b { color: var(--color-secondary); } }
+@keyframes pass-pulse { 50% { box-shadow: 0 0 0 10px rgba(74,222,128,.12); } }

@@ -29,6 +29,9 @@ const RESULT_COPY = {
   safe: { emoji: '👏', title: 'Well played' },
 } as const;
 
+/** Arrow angle (pointing right = 0°) towards each opponent seat. */
+const PASS_ROTATION: Record<SeatPosition, number> = { left: 180, 'top-left': -135, top: -90, 'top-right': -45, right: 0, bottom: 90 };
+
 @Component({
   selector: 'app-table-game-page',
   imports: [AdBanner, RouterLink, Loader, Modal, GameTimer, PlayerAvatar, ActionPanel, TableFloor, TableHand, TableScores, TableSeat, TableTrick],
@@ -67,6 +70,14 @@ export class TableGamePage {
     const opp = this.opponents();
     const layout = seatPositions(opp.length);
     return Object.fromEntries([[HUMAN_ID, 'bottom' as SeatPosition], ...opp.map((p, i) => [p.id, layout[i]])]);
+  });
+  /** Card passing (Hearts): arrow pointing at the receiver's seat. */
+  readonly passTarget = computed(() => {
+    const sel = this.store.selection();
+    if (!sel?.targetId || !this.store.isMyTurn()) return null;
+    const name = this.store.view()?.players.find((p) => p.id === sel.targetId)?.name ?? '';
+    const rotate = PASS_ROTATION[this.positions()[sel.targetId] ?? 'top'];
+    return { name, rotate, count: sel.count };
   });
   readonly trumpChip = computed(() => {
     const t = this.store.view()?.trump;

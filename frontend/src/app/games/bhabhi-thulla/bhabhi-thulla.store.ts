@@ -177,12 +177,15 @@ export class BhabhiThullaStore implements OnDestroy {
     this.stop();
   }
 
+  /** Click or tap: play the card straight away. */
   select(card: Card): void {
     if (!this.isMyTurn() || !this.validIds().has(card.id)) return;
-    if (this.selectedId() === card.id) {
-      this.playHuman(card.id);
-      return;
-    }
+    this.playHuman(card.id);
+  }
+
+  /** Keyboard arrows: move the highlight without playing (Enter plays). */
+  focusCard(card: Card): void {
+    if (!this.isMyTurn() || !this.validIds().has(card.id)) return;
     this.sound.play('card-select');
     this.selectedId.set(card.id);
   }

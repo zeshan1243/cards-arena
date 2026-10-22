@@ -13,7 +13,7 @@ import {
   TableView,
 } from '../core/table-game';
 import { BaseTableEngine, SUIT_GLYPH } from '../core/tricks';
-import { Combo, beats, byPower, classify, comboLabel } from './thirteen.rules';
+import { Combo, beats, byPower, classify, comboLabel, enumeratePlays } from './thirteen.rules';
 
 /**
  * Thirteen (Tiến Lên) — 2 to 4 players, every player for themselves, 13 cards each.
@@ -231,8 +231,13 @@ export class ThirteenEngine extends BaseTableEngine implements TableGameEngine<T
     return [{ type: 'pass', label: 'Pass' }];
   }
 
+  /** True when the player on turn holds nothing that beats the table. */
+  private mustPass(seat: number): boolean {
+    return !!this.table && enumeratePlays(this.hands[seat], this.table.combo).length === 0;
+  }
+
   cardSelection(playerId: string): CardSelection | null {
-    if (this.currentPlayerId() !== playerId) return null;
+    if (this.currentPlayerId() !== playerId || this.mustPass(this.seatIndex(playerId))) return null;
     return {
       count: this.hands[this.seatIndex(playerId)].length,
       minCount: 1,
@@ -271,6 +276,7 @@ export class ThirteenEngine extends BaseTableEngine implements TableGameEngine<T
     if (this.finished) phaseLabel = 'Game over';
     else if (current !== viewerId) phaseLabel = current ? `Waiting for ${this.seats[this.seatIndex(current)].name}…` : 'Next round…';
     else if (must) phaseLabel = `Lead with the ${glyph(must)} — alone or in a combination`;
+    else if (this.table && this.mustPass(me)) phaseLabel = `No cards beat ${comboLabel(this.table.cards)} — you have to pass`;
     else if (this.table) phaseLabel = `Beat ${comboLabel(this.table.cards)} or pass`;
     else phaseLabel = 'Your lead — play any combination';
 

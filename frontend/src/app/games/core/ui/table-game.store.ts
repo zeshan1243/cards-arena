@@ -198,7 +198,8 @@ export class TableGameStore implements OnDestroy {
     }
     const actions = this.legal().filter((a) => a.cardId === card.id);
     if (!actions.length) return;
-    if (this.selectedIds()[0] === card.id && actions.length === 1) {
+    // One click plays; only cards with several possible plays (e.g. Seep capture vs. build) stop to ask.
+    if (actions.length === 1) {
       this.act(actions[0]);
       return;
     }

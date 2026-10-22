@@ -132,6 +132,14 @@ describe('Thirteen engine', () => {
     expect(e.currentPlayerId()).toBe('you');
   });
 
+  it('tells a player with nothing that beats the table to pass', () => {
+    const e = staged(['5s 9h', '4s 6h', '3c 7d', '3d 8s']);
+    e.apply('you', { type: 'play', cardIds: ids('9h') });
+    expect(e.cardSelection('bot-1')).toBeNull();
+    expect(e.legalActions('bot-1').map((a) => a.type)).toEqual(['pass']);
+    expect(e.getView('bot-1').phaseLabel).toMatch(/you have to pass/);
+  });
+
   it('skips players who passed and gives the lead to the last player', () => {
     const e = staged(['5s 9h Ks', '4s 6h Qd', '3c 7d Ad', '3d 8s Kd']);
     e.apply('you', { type: 'play', cardIds: ids('9h') });

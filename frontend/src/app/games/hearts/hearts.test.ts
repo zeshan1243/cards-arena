@@ -64,7 +64,7 @@ describe('Hearts engine — passing', () => {
     expect(v.players.every((p) => p.team === null)).toBe(true);
     expect(e.currentPlayerId()).toBe('you');
     expect(e.legalActions('you')).toEqual([]);
-    expect(e.cardSelection('you')).toEqual({ count: 3, label: 'Pass 3 cards left', actionType: 'pass-cards' });
+    expect(e.cardSelection('you')).toEqual({ count: 3, label: 'Pass 3 cards left', actionType: 'pass-cards', targetId: 'bot-1' });
     expect(e.cardSelection('bot-1')).toBeNull();
     expect(v.phaseLabel).toBe('Choose 3 cards to pass left');
   });

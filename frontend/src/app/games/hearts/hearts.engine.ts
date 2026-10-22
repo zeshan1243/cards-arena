@@ -270,7 +270,8 @@ export class HeartsEngine extends BaseTableEngine implements TableGameEngine<Hea
 
   cardSelection(playerId: string): CardSelection | null {
     if (this.phase !== 'pass' || this.currentPlayerId() !== playerId) return null;
-    return { count: 3, label: `Pass 3 cards ${this.passDirection()}`, actionType: 'pass-cards' };
+    const to = (this.seatIndex(playerId) + PASS_OFFSET[this.passDirection()]) % 4;
+    return { count: 3, label: `Pass 3 cards ${this.passDirection()}`, actionType: 'pass-cards', targetId: this.seats[to].id };
   }
 
   isGameOver(): boolean {

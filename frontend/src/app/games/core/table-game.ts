@@ -38,6 +38,8 @@ export interface CardSelection {
   label: string;
   /** Button text; defaults to "Confirm". */
   confirmLabel?: string;
+  /** Player the chosen cards go to (Hearts passing): the table shows an arrow to them instead of a button. */
+  targetId?: string;
   /** Action type submitted with the chosen `cardIds`. */
   actionType: ActionType;
 }

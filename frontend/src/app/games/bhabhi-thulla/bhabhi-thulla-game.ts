@@ -108,7 +108,7 @@ export class BhabhiThullaGame {
       e.preventDefault();
       const step = e.key === 'ArrowRight' ? 1 : -1;
       const next = valid[(idx + step + valid.length) % valid.length] ?? valid[0];
-      this.store.select(next);
+      this.store.focusCard(next);
     } else if ((e.key === 'Enter' || e.key === ' ') && this.store.selectedId() && target.tagName !== 'BUTTON') {
       e.preventDefault();
       this.store.playSelected();

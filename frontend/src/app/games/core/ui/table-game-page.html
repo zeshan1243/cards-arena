@@ -79,7 +79,18 @@
                             [active]="v.currentPlayerId === p.id" [partner]="myTeam() !== null && p.team === myTeam()" />
           }
           <div class="middle">
-            @if (v.floor) {
+            @if (passTarget(); as t) {
+              <div class="pass">
+                <button type="button" class="pass-arrow" [style.--rot]="t.rotate + 'deg'" [disabled]="store.selectedIds().length !== t.count"
+                        [attr.aria-label]="'Pass the selected cards to ' + t.name" (click)="store.confirmSelection()">
+                  <svg viewBox="0 0 100 60" aria-hidden="true"><path d="M4 22h56V6l36 24-36 24V38H4z" /></svg>
+                </button>
+                <p class="pass-text">
+                  @if (store.selectedIds().length === t.count) { Now click the arrow to pass these cards to <b>{{ t.name }}</b>. }
+                  @else { Select {{ t.count - store.selectedIds().length }} more card{{ t.count - store.selectedIds().length === 1 ? '' : 's' }} to pass to <b>{{ t.name }}</b>. }
+                </p>
+              </div>
+            } @else if (v.floor) {
               <app-table-floor [piles]="v.floor" [emptyText]="v.floorHint ?? 'The floor is empty'" [positions]="positions()" />
             } @else {
               <app-table-trick [plays]="store.tableCards()" [positions]="positions()" [winnerId]="v.trickWinnerId"
