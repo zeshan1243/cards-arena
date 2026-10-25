@@ -4,7 +4,8 @@ import { Component, computed, input } from '@angular/core';
 @Component({
   selector: 'app-game-art',
   template: `
-    <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" role="img" [attr.aria-label]="label()">
+    <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" [attr.role]="label() ? 'img' : null"
+         [attr.aria-label]="label() || null" [attr.aria-hidden]="label() ? null : 'true'">
       <defs>
         <radialGradient [attr.id]="gid() + '-bg'" cx="50%" cy="60%" r="75%">
           <stop offset="0%" [attr.stop-color]="accent()" stop-opacity=".75" />

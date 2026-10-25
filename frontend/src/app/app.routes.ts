@@ -22,12 +22,10 @@ export const routes: Routes = [
   {
     path: 'play/bhabhi-thulla',
     loadComponent: () => import('./games/bhabhi-thulla/bhabhi-thulla-game').then((m) => m.BhabhiThullaGame),
-    title: 'Play Bhabhi Thulla – CardArena',
   },
   {
     path: 'play/solitaire',
     loadComponent: () => import('./games/solitaire/solitaire-game').then((m) => m.SolitaireGame),
-    title: 'Play Solitaire – CardArena',
   },
   {
     path: 'play/:slug',

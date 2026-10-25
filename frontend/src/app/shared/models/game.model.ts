@@ -6,6 +6,8 @@ export type GameCategory = 'regional' | 'classic' | 'popular';
 export interface GameInfo {
   slug: string;
   name: string;
+  /** Other name people search for, e.g. "Tiến Lên" — used in page titles. */
+  aka?: string;
   tagline: string;
   description: string;
   region: string;

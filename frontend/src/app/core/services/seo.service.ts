@@ -7,6 +7,7 @@ export interface SeoConfig {
   title: string;
   description: string;
   path: string;
+  /** Site-relative share image, e.g. `/og/hearts.jpg`; defaults to `/og/default.jpg`. */
   image?: string;
   type?: 'website' | 'article' | 'game';
   structuredData?: object[];
@@ -30,10 +31,17 @@ export class SeoService {
     this.setProperty('og:type', cfg.type === 'article' ? 'article' : 'website');
     this.setProperty('og:url', url);
     this.setProperty('og:site_name', environment.siteName);
-    if (cfg.image) this.setProperty('og:image', cfg.image);
+    // Share previews (WhatsApp, Facebook, X…): 1200×630 images in public/og.
+    const image = `${environment.siteUrl}${cfg.image ?? '/og/default.jpg'}`;
+    this.setProperty('og:image', image);
+    this.setProperty('og:image:width', '1200');
+    this.setProperty('og:image:height', '630');
+    this.setProperty('og:image:alt', cfg.title);
+    this.setProperty('og:locale', 'en_US');
     this.setName('twitter:card', 'summary_large_image');
     this.setName('twitter:title', cfg.title);
     this.setName('twitter:description', cfg.description);
+    this.setName('twitter:image', image);
     this.setCanonical(url);
     this.setStructuredData(cfg.structuredData ?? []);
   }
@@ -61,7 +69,7 @@ export class SeoService {
     for (const item of items) {
       const script = this.doc.createElement('script');
       script.type = 'application/ld+json';
-      script.dataset['seo'] = 'page';
+      script.setAttribute('data-seo', 'page');
       script.textContent = JSON.stringify(item);
       this.doc.head.appendChild(script);
     }

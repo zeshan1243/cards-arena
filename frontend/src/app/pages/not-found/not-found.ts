@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { SeoService } from '../../core/services/seo.service';
 
 @Component({
   selector: 'app-not-found',
@@ -14,4 +15,13 @@ import { RouterLink } from '@angular/router';
   `,
   styles: `.nf { text-align: center; } .big { font-size: 4rem; } .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }`,
 })
-export class NotFoundPage {}
+export class NotFoundPage {
+  constructor() {
+    inject(SeoService).apply({
+      title: 'Page not found | CardArena',
+      description: 'This page does not exist. Browse free online card games on CardArena.',
+      path: inject(Router).url.split('?')[0],
+      noindex: true,
+    });
+  }
+}

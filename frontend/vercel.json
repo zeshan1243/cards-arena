@@ -4,11 +4,19 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": "dist/frontend/browser",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/play/:path*", "destination": "/index.csr.html" },
+    { "source": "/(settings|leaderboard|multiplayer|login|register|profile|statistics|history)", "destination": "/index.csr.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)\\.(js|css|woff2)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/(og|icons)/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
     }
   ]
 }

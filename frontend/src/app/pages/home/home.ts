@@ -45,9 +45,9 @@ export class HomePage {
 
   constructor() {
     inject(SeoService).apply({
-      title: 'CardArena – Play Bhabhi Thulla, Court Piece & Card Games Online Free',
+      title: 'Play Bhabhi Thulla, 29 & Solitaire Free Online | CardArena',
       description:
-        'Play classic and regional card games online for free. Bhabhi Thulla, Court Piece, 29, Seep and Call Break against smart AI — no download required.',
+        'Free online card games: Bhabhi Thulla, Court Piece, 29, Call Break, Thirteen, Hearts, Spades and Solitaire. Play in your browser vs smart AI — no download.',
       path: '/',
     });
   }

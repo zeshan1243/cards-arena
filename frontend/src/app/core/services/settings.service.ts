@@ -1,3 +1,4 @@
+import { DOCUMENT } from '@angular/common';
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { Difficulty } from '../../shared/models/game.model';
 import { BhabhiVariant } from '../../games/bhabhi-thulla/engine/bhabhi-thulla.rules';
@@ -30,13 +31,14 @@ const DEFAULTS: Settings = {
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
   private readonly storage = inject(StorageService);
+  private readonly document = inject(DOCUMENT);
   readonly settings = signal<Settings>({ ...DEFAULTS, ...this.storage.get<Partial<Settings>>('settings', {}) });
 
   constructor() {
     effect(() => {
       const s = this.settings();
       this.storage.set('settings', s);
-      document.documentElement.classList.toggle('reduce-motion', s.reducedMotion);
+      this.document.documentElement.classList.toggle('reduce-motion', s.reducedMotion);
     });
   }
 

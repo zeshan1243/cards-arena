@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Injectable, inject, signal } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 
 /** Adsterra Smartlink: a plain URL, shown as a labelled "Sponsored" link. */
 export const SMARTLINK_URL = 'https://araplhn.org/4/a9ef72d12c902b3b6eafb0ff07a1f0cb';
@@ -14,13 +14,14 @@ const BLOCKED_MESSAGE = 'cardarena:ad-blocked';
 @Injectable({ providedIn: 'root' })
 export class AdsService {
   private readonly document = inject(DOCUMENT);
+  private readonly platformId = inject(PLATFORM_ID);
   private started = false;
   /** True once an ad blocker is detected (banner script blocked, or bait element hidden). */
   readonly blocked = signal(false);
 
   /** Starts detection once; safe to call repeatedly. */
   detectAdBlock(): void {
-    if (this.started) return;
+    if (this.started || !isPlatformBrowser(this.platformId)) return;
     this.started = true;
     window.addEventListener('message', (e) => {
       if (e.origin === location.origin && e.data === BLOCKED_MESSAGE) this.blocked.set(true);

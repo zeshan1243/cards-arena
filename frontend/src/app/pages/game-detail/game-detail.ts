@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { GameService } from '../../core/services/game.service';
+import { GameInfo } from '../../shared/models/game.model';
 import { SeoService } from '../../core/services/seo.service';
 import { GameArt } from '../../shared/components/game-art/game-art';
 import { GameCard } from '../../shared/components/game-card/game-card';
@@ -46,6 +47,23 @@ export class GameDetailPage {
           ],
         },
       ];
+      structuredData.push({
+        '@context': 'https://schema.org',
+        '@type': 'VideoGame',
+        name: g.name,
+        ...(g.aka ? { alternateName: g.aka } : {}),
+        description: g.description,
+        url: `${environment.siteUrl}${path}`,
+        image: `${environment.siteUrl}/og/${g.slug}.jpg`,
+        genre: 'Card game',
+        gamePlatform: 'Web browser',
+        applicationCategory: 'Game',
+        operatingSystem: 'Any',
+        playMode: g.maxPlayers === 1 || g.botEnabled ? 'SinglePlayer' : 'MultiPlayer',
+        numberOfPlayers: { '@type': 'QuantitativeValue', minValue: g.minPlayers, maxValue: g.maxPlayers },
+        offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+        publisher: { '@type': 'Organization', name: 'CardArena', url: `${environment.siteUrl}/` },
+      });
       const faq = this.content()?.faq;
       if (faq?.length) {
         structuredData.push({
@@ -54,12 +72,25 @@ export class GameDetailPage {
           mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
         });
       }
-      this.seo.apply({
-        title: g.available ? `${g.name} Online – Play Free Card Game Against AI | CardArena` : `${g.name} Card Game – Rules & How to Play | CardArena`,
-        description: `${g.description} ${g.available ? 'Play free in your browser — no download required.' : 'Coming soon to CardArena.'}`,
-        path,
-        structuredData,
-      });
+      this.seo.apply({ title: gameTitle(g), description: gameDescription(g), path, structuredData, image: `/og/${g.slug}.jpg` });
     });
   }
+}
+
+/** e.g. "Thirteen (Tiến Lên) Online – Play Free vs AI | CardArena"; one-player games drop "vs AI". */
+function gameTitle(g: GameInfo): string {
+  const label = /^\d+$/.test(g.name) ? `${g.name} Card Game` : g.aka ? `${g.name} (${g.aka})` : g.name;
+  if (!g.available) return `${label} – Rules & How to Play | CardArena`;
+  if (!g.botEnabled) return `${label} – Play Free Online | CardArena`;
+  const card = g.aka || label !== g.name ? '' : ' Card Game';
+  return `${label} Online – Play Free${card} vs AI | CardArena`;
+}
+
+/** Catalog blurb plus a call to action, kept within the ~158 characters Google shows. */
+function gameDescription(g: GameInfo): string {
+  const cta = g.available ? 'Play free in your browser — no download required.' : 'Coming soon to CardArena.';
+  const full = `${g.description} ${cta}`;
+  if (full.length <= 158) return full;
+  if (g.description.length <= 158) return g.description;
+  return g.description.slice(0, 155).replace(/\s+\S*$/, '') + '…';
 }

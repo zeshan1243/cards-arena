@@ -123,6 +123,7 @@ export class TableGamePage {
         title: `Play ${name} Online – Free vs AI | CardArena`,
         description: `Play ${name} free in your browser against smart AI opponents. No download, no sign-up required.`,
         path: `/games/${slug}`,
+        image: `/og/${slug}.jpg`,
       });
     });
   }

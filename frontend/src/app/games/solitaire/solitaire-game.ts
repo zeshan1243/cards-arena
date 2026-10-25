@@ -75,6 +75,7 @@ export class SolitaireGame implements OnDestroy {
       title: 'Play Solitaire Online – Free Klondike | CardArena',
       description: 'Play classic Klondike Solitaire free in your browser. Draw 1 or Draw 3, drag and drop or tap to move, undo, hints and auto-finish.',
       path: '/games/solitaire',
+      image: '/og/solitaire.jpg',
     });
     this.newGame();
   }

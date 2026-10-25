@@ -6,6 +6,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../environments/environment';
@@ -29,5 +30,7 @@ export const appConfig: ApplicationConfig = {
       if (environment.accountsEnabled) void firstValueFrom(inject(AuthService).restoreSession());
       inject(AnalyticsService).init();
     }),
+    // Public pages are prerendered (see app.routes.server.ts); hydrate instead of re-rendering them.
+    provideClientHydration(withEventReplay()),
   ],
 };

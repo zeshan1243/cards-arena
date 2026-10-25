@@ -79,6 +79,7 @@ export class BhabhiThullaGame {
       title: 'Play Bhabhi Thulla Online – Free vs AI | CardArena',
       description: 'Play Bhabhi Thulla free in your browser against smart AI opponents. No download, no sign-up required.',
       path: '/games/bhabhi-thulla',
+      image: '/og/bhabhi-thulla.jpg',
     });
   }
 

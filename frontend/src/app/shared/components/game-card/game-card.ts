@@ -8,7 +8,8 @@ import { GameArt } from '../game-art/game-art';
   imports: [RouterLink, GameArt],
   template: `
     <article class="game-card" [style.--accent]="game().accent">
-      <a class="art" [routerLink]="['/games', game().slug]" [attr.aria-label]="game().name + ' details'">
+      <!-- Duplicate of the title link below, for pointer users only. -->
+      <a class="art" [routerLink]="['/games', game().slug]" tabindex="-1" aria-hidden="true">
         <app-game-art [art]="game().art" [accent]="game().accent" [slug]="game().slug" />
         @if (!game().available) { <span class="soon">Coming soon</span> }
       </a>

@@ -75,7 +75,7 @@ export class GamesPage {
   constructor() {
     inject(SeoService).apply({
       title: 'All Card Games – Play Free Online | CardArena',
-      description: 'Browse free online card games: Bhabhi Thulla, Court Piece, 29, Seep, Call Break, Hokm, Tarneeb, Baloot, Spades and Hearts.',
+      description: 'Browse free online card games: Bhabhi Thulla, Court Piece, 29, Seep, Call Break, Hokm, Tarneeb, Baloot, Spades, Hearts, Thirteen and Solitaire.',
       path: '/games',
     });
   }

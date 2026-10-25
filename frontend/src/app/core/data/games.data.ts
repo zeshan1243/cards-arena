@@ -37,6 +37,7 @@ export const GAMES: GameInfo[] = [
   {
     slug: 'court-piece',
     name: 'Court Piece',
+    aka: 'Rang',
     tagline: 'Pick trumps, win seven tricks, go for the Court.',
     description:
       'Also known as Rang. A fast four-player partnership trick-taking game where one player chooses trumps after seeing five cards.',
@@ -75,6 +76,7 @@ export const GAMES: GameInfo[] = [
   {
     slug: 'seep',
     name: 'Seep',
+    aka: 'Sweep',
     tagline: 'Build houses, sweep the floor.',
     description:
       'A fishing game for four players in partnerships. Capture cards from the floor by matching or summing values, build houses and score sweeps.',
@@ -94,6 +96,7 @@ export const GAMES: GameInfo[] = [
   {
     slug: 'call-break',
     name: 'Call Break',
+    aka: 'Call Bridge',
     tagline: 'Call your tricks. Spades always win.',
     description:
       'A four-player trick-taking game from Nepal and India. Spades are always trumps; call how many tricks you will take and hit your number.',
@@ -203,6 +206,7 @@ export const GAMES: GameInfo[] = [
   {
     slug: 'thirteen',
     name: 'Thirteen',
+    aka: 'Tiến Lên',
     tagline: 'Shed your cards. Beat the table. 2s rule.',
     description: 'Tiến Lên, the Vietnamese climbing game: beat singles, pairs and runs, bomb the 2s, and be first to empty your hand.',
     region: 'Vietnam',
@@ -221,6 +225,7 @@ export const GAMES: GameInfo[] = [
   {
     slug: 'solitaire',
     name: 'Solitaire',
+    aka: 'Klondike',
     tagline: 'The classic Klondike patience game.',
     description: 'Build four foundations from Ace to King. Draw 1 or Draw 3, drag or tap to move, with undo, hints and auto-finish.',
     region: 'Worldwide',

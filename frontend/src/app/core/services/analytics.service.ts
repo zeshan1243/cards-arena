@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Injectable, inject } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -17,10 +17,11 @@ declare global {
 export class AnalyticsService {
   private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID);
 
   init(): void {
     const id = environment.gaMeasurementId;
-    if (!id) return;
+    if (!id || !isPlatformBrowser(this.platformId)) return;
 
     const script = this.document.createElement('script');
     script.async = true;

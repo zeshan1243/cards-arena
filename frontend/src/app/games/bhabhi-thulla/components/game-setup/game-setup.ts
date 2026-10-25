@@ -8,7 +8,7 @@ import { BhabhiVariant, VARIANT_DESCRIPTIONS } from '../../engine/bhabhi-thulla.
   template: `
     <div class="setup">
       <span class="eyebrow">Play vs AI</span>
-      <h1>Bhabhi Thulla</h1>
+      <h2>Bhabhi Thulla</h2>
       <p class="text-secondary">Shed your cards, dodge the Thulla and don’t be the last one holding cards.</p>
 
       <fieldset>
@@ -47,7 +47,7 @@ import { BhabhiVariant, VARIANT_DESCRIPTIONS } from '../../engine/bhabhi-thulla.
   `,
   styles: `
     .setup { width: min(520px, 100%); margin: 0 auto; padding: 28px 22px; text-align: center; }
-    h1 { font-size: clamp(2rem, 6vw, 3rem); margin-bottom: 6px; }
+    h2 { font-size: clamp(2rem, 6vw, 3rem); margin-bottom: 6px; }
     fieldset { border: 0; padding: 0; margin: 22px 0 0; display: grid; justify-items: center; gap: 10px; }
     legend { font-family: var(--font-display); font-weight: 700; font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
     .segmented { justify-content: center; }

@@ -1,7 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, afterNextRender, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter, fromEvent, map } from 'rxjs';
+import { filter, map } from 'rxjs';
 import { AdsService } from './core/services/ads.service';
 import { AdBanner } from './shared/components/ad-banner/ad-banner';
 import { AdblockNotice } from './shared/components/adblock-notice/adblock-notice';
@@ -9,12 +9,21 @@ import { Footer } from './shared/components/footer/footer';
 import { Navbar } from './shared/components/navbar/navbar';
 import { ToastContainer } from './shared/components/toast/toast';
 
-/** Live boolean for a CSS media query. */
+/**
+ * Live boolean for a CSS media query. Starts false — as on the server, which prerenders the
+ * public pages — and picks up the real value after hydration, so server and client HTML match.
+ */
 function mediaQuery(query: string) {
-  const mql = matchMedia(query);
-  return toSignal(fromEvent<MediaQueryListEvent>(mql, 'change').pipe(map((e) => e.matches)), {
-    initialValue: mql.matches,
+  const matches = signal(false);
+  const destroyRef = inject(DestroyRef);
+  afterNextRender(() => {
+    const mql = matchMedia(query);
+    const update = () => matches.set(mql.matches);
+    update();
+    mql.addEventListener('change', update);
+    destroyRef.onDestroy(() => mql.removeEventListener('change', update));
   });
+  return matches.asReadonly();
 }
 
 @Component({
@@ -63,6 +72,7 @@ function mediaQuery(query: string) {
     /* Room for the sticky bar so it never covers the footer. */
     :host(.has-sticky-ad) { --sticky-ad-h: 62px; padding-bottom: var(--sticky-ad-h); }
     main { flex: 1; }
+    main:not(.game-main) { min-height: 100dvh; }
     .skip-link {
       position: absolute; left: 12px; top: -60px; z-index: 1000;
       padding: 10px 16px; border-radius: 10px; background: var(--color-primary); color: #fff;

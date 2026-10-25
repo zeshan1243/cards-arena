@@ -15,19 +15,19 @@ import { GameService } from '../../../core/services/game.service';
           <p class="text-secondary">A modern home for classic and regional card games. Free to play, no download required.</p>
         </div>
         <nav aria-label="Regional games">
-          <h4>Regional games</h4>
+          <h2 class="col-title">Regional games</h2>
           @for (g of regional; track g.slug) {
             <a [routerLink]="['/games', g.slug]">{{ g.name }}</a>
           }
         </nav>
         <nav aria-label="Classic games">
-          <h4>Classic games</h4>
+          <h2 class="col-title">Classic games</h2>
           @for (g of classic; track g.slug) {
             <a [routerLink]="['/games', g.slug]">{{ g.name }}</a>
           }
         </nav>
         <nav aria-label="CardArena">
-          <h4>CardArena</h4>
+          <h2 class="col-title">CardArena</h2>
           <a routerLink="/games">All games</a>
           @if (accountsEnabled) {
             <a routerLink="/leaderboard">Leaderboard</a>
@@ -48,7 +48,7 @@ import { GameService } from '../../../core/services/game.service';
     .brand { grid-column: 1 / -1; @media (min-width: 900px) { grid-column: auto; } p { max-width: 340px; margin-top: 12px; font-size: 0.9rem; } }
     .logo { font-family: var(--font-display); letter-spacing: .06em; color: var(--text-primary); font-size: 1.15rem; b { color: var(--color-secondary); } }
     nav { display: grid; gap: 8px; align-content: start; }
-    h4 { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
+    .col-title { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; }
     nav a { color: var(--text-primary); opacity: .85; font-size: .92rem; &:hover { opacity: 1; } }
     .bottom { padding-block: 24px; margin-top: 36px; border-top: 1px solid var(--border-color); font-size: .82rem; color: var(--text-muted); }
   `,

@@ -5,4 +5,4 @@ Disallow: /statistics
 Disallow: /history
 Disallow: /settings
 
-Sitemap: https://cardsarena.world/sitemap.xml
+Sitemap: https://www.cardsarena.world/sitemap.xml

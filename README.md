@@ -102,6 +102,10 @@ Not yet: production deployment, multiplayer/WebSockets (deliberately deferred pe
 server-side rendering for SEO, real audio assets
 (sound effects are synthesized with Web Audio for now).
 
-The production domain is `cardsarena.world` (set in `frontend/public/{robots.txt,sitemap.xml}`,
-`frontend/src/index.html` and `environment.prod.ts`). When deploying the backend, set
+The production site is `https://www.cardsarena.world` (Vercel redirects the bare domain to `www`);
+it is set in `frontend/src/environments/environment.prod.ts`, `frontend/src/index.html` and
+`frontend/public/robots.txt`. `npm run build` prerenders the home page, `/games` and every
+`/games/<slug>` page to static HTML (`frontend/src/app/app.routes.server.ts`), then
+`frontend/scripts/postbuild.mjs` writes `sitemap.xml` from those pages and a `404.html`.
+Share images live in `frontend/public/og/`. When deploying the backend, set
 `ENVIRONMENT=production` (secure cookies) and a strong `JWT_SECRET_KEY`.
