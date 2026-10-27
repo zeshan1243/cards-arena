@@ -13,7 +13,7 @@ import { Rng } from './deck';
 
 // ------------------------------------------------------------------ actions
 
-export type ActionType = 'play' | 'bid' | 'pass' | 'trump' | 'pass-cards' | 'reveal-trump' | 'choose';
+export type ActionType = 'play' | 'bid' | 'pass' | 'trump' | 'pass-cards' | 'reveal-trump' | 'choose' | 'draw' | 'meld' | 'lay-off' | 'discard';
 
 /** A player decision. Serialised as-is to the backend for replay. */
 export interface GameAction {
@@ -40,6 +40,8 @@ export interface CardSelection {
   confirmLabel?: string;
   /** Player the chosen cards go to (Hearts passing): the table shows an arrow to them instead of a button. */
   targetId?: string;
+  /** Several things to do with the chosen cards (Rummy: meld / lay off / discard), one button each. */
+  actions?: { actionType: ActionType; label: string; minCount: number; maxCount: number; isValid?: (cardIds: string[]) => boolean }[];
   /** Action type submitted with the chosen `cardIds`. */
   actionType: ActionType;
 }
@@ -87,6 +89,10 @@ export interface FloorPile {
   owner?: string | null;
   /** Seat the pile was just played from; it flies in from there. */
   from?: string | null;
+  /** Show the cards' backs (e.g. a draw pile). */
+  faceDown?: boolean;
+  /** Clicking the pile does this (e.g. draw from it), when it is legal right now. */
+  action?: GameAction;
 }
 
 export interface ScoreTable {

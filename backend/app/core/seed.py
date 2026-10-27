@@ -12,6 +12,7 @@ GAMES = [
     {"name": "Spades", "slug": "spades", "description": "Partnership classic where spades are always trumps.", "min_players": 4, "max_players": 4, "bot_enabled": True, "multiplayer_enabled": False, "is_available": True, "is_regional": False},
     {"name": "Hearts", "slug": "hearts", "description": "Avoid hearts and the Queen of Spades.", "min_players": 4, "max_players": 4, "bot_enabled": True, "multiplayer_enabled": False, "is_available": True, "is_regional": False},
     {"name": "Thirteen", "slug": "thirteen", "description": "Vietnamese climbing game: beat the table, bomb the 2s, shed every card.", "min_players": 2, "max_players": 4, "bot_enabled": True, "multiplayer_enabled": False, "is_available": True, "is_regional": False},
+    {"name": "Rummy", "slug": "rummy", "description": "Classic draw-and-discard game: meld sets and runs, lay off, go out first.", "min_players": 2, "max_players": 4, "bot_enabled": True, "multiplayer_enabled": False, "is_available": True, "is_regional": False},
 ]
 
 ACHIEVEMENTS = [

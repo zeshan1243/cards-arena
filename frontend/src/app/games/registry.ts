@@ -16,4 +16,5 @@ export const GAME_DEFINITIONS: Record<string, () => Promise<GameDefinition<any>>
   'spades': () => import('./spades/spades.definition').then((m) => m.definition),
   'hearts': () => import('./hearts/hearts.definition').then((m) => m.definition),
   'thirteen': () => import('./thirteen/thirteen.definition').then((m) => m.definition),
+  'rummy': () => import('./rummy/rummy.definition').then((m) => m.definition),
 };

@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { CardSelection, GameAction, LegalAction } from '../table-game';
+import { ActionType, CardSelection, GameAction, LegalAction } from '../table-game';
 
 /** Non-card decisions (bids, trump, pass…) and alternative ways to play the selected card. */
 @Component({
@@ -8,9 +8,15 @@ import { CardSelection, GameAction, LegalAction } from '../table-game';
     @if (actions().length || options().length > 1 || (selection() && !selection()!.targetId)) {
       <div class="panel-actions" role="group" aria-label="Choose an action">
         @if (selection(); as sel) {
-          @if (!sel.targetId) {
+          @if (sel.actions) {
+            <span class="prompt">{{ sel.label }} ({{ selectedCount() }} selected)</span>
+            @for (a of sel.actions; track a.actionType) {
+              <button class="btn btn-sm" [class.btn-primary]="a.actionType !== 'discard'" [class.btn-cyan]="a.actionType === 'discard'" type="button"
+                      [disabled]="!allowed(a)" (click)="confirm.emit(a.actionType)">{{ a.label }}</button>
+            }
+          } @else if (!sel.targetId) {
           <span class="prompt">{{ sel.label }} ({{ sel.minCount === undefined ? selectedCount() + '/' + sel.count : selectedCount() + ' selected' }})</span>
-          <button class="btn btn-primary btn-sm" type="button" [disabled]="selectedCount() < (sel.minCount ?? sel.count) || selectedCount() > sel.count" (click)="confirm.emit()">{{ sel.confirmLabel ?? 'Confirm' }}</button>
+          <button class="btn btn-primary btn-sm" type="button" [disabled]="selectedCount() < (sel.minCount ?? sel.count) || selectedCount() > sel.count" (click)="confirm.emit(undefined)">{{ sel.confirmLabel ?? 'Confirm' }}</button>
           }
         }
         @if (options().length > 1) {
@@ -44,12 +50,20 @@ export class ActionPanel {
   readonly options = input<LegalAction[]>([]);
   readonly selection = input<CardSelection | null>(null);
   readonly selectedCount = input(0);
+  readonly selectedIds = input<string[]>([]);
   readonly prompt = input('');
   readonly act = output<GameAction>();
+
+  /** A selection action is enabled when the chosen cards are a legal play for it. */
+  allowed(a: NonNullable<CardSelection['actions']>[number]): boolean {
+    const ids = this.selectedIds();
+    return ids.length >= a.minCount && ids.length <= a.maxCount && (a.isValid?.(ids) ?? true);
+  }
 
   /** Pass is the only move left (e.g. nothing in hand beats the table). */
   onlyPass(): boolean {
     return !this.selection() && this.actions().length === 1 && this.actions()[0].type === 'pass';
   }
-  readonly confirm = output<void>();
+  /** Confirm the selection, optionally as one of `selection.actions`. */
+  readonly confirm = output<ActionType | undefined>();
 }

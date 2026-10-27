@@ -11,6 +11,7 @@ import { content as c_spades } from '../../games/spades/spades.content';
 import { content as c_hearts } from '../../games/hearts/hearts.content';
 import { content as c_thirteen } from '../../games/thirteen/thirteen.content';
 import { content as c_solitaire } from '../../games/solitaire/solitaire.content';
+import { content as c_rummy } from '../../games/rummy/rummy.content';
 
 export type { GameContent };
 
@@ -241,6 +242,24 @@ export const GAMES: GameInfo[] = [
     art: '♠♦♣',
     related: ['thirteen', 'hearts', 'bhabhi-thulla'],
   },
+  {
+    slug: 'rummy',
+    name: 'Rummy',
+    tagline: 'Draw, meld sets and runs, go out first.',
+    description: 'The classic draw-and-discard game: build sets and runs, lay off on any meld, and empty your hand to score your opponents’ cards.',
+    region: 'Worldwide',
+    minPlayers: 2,
+    maxPlayers: 4,
+    botEnabled: true,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 88,
+    releasedAt: '2026-10-27',
+    accent: '#F97316',
+    art: '♣♥♣',
+    related: ['solitaire', 'thirteen', 'hearts'],
+  },
 ];
 
 export const GAME_CONTENT: Record<string, GameContent> = {
@@ -296,6 +315,7 @@ GAME_CONTENT['spades'] = c_spades;
 GAME_CONTENT['hearts'] = c_hearts;
 GAME_CONTENT['thirteen'] = c_thirteen;
 GAME_CONTENT['solitaire'] = c_solitaire;
+GAME_CONTENT['rummy'] = c_rummy;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

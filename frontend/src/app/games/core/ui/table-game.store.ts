@@ -213,10 +213,18 @@ export class TableGameStore implements OnDestroy {
     if (opts.length === 1) this.act(opts[0]);
   }
 
-  confirmSelection(): void {
+  confirmSelection(actionType?: GameAction['type']): void {
     const sel = this.selection();
-    const n = this.selectedIds().length;
-    if (sel && n >= (sel.minCount ?? sel.count) && n <= sel.count) this.act({ type: sel.actionType, cardIds: this.selectedIds() });
+    const ids = this.selectedIds();
+    if (!sel) return;
+    const choice = actionType ? sel.actions?.find((a) => a.actionType === actionType) : undefined;
+    if (choice) {
+      if (ids.length < choice.minCount || ids.length > choice.maxCount) return;
+      // Single-card actions (e.g. Rummy discard) carry `cardId`; the rest carry `cardIds`.
+      this.act(choice.maxCount === 1 ? { type: choice.actionType, cardId: ids[0] } : { type: choice.actionType, cardIds: ids });
+      return;
+    }
+    if (ids.length >= (sel.minCount ?? sel.count) && ids.length <= sel.count) this.act({ type: sel.actionType, cardIds: ids });
   }
 
   act(action: GameAction): void {

@@ -91,7 +91,7 @@
                 </p>
               </div>
             } @else if (v.floor) {
-              <app-table-floor [piles]="v.floor" [emptyText]="v.floorHint ?? 'The floor is empty'" [positions]="positions()" />
+              <app-table-floor [piles]="v.floor" [emptyText]="v.floorHint ?? 'The floor is empty'" [positions]="positions()" (pick)="store.act($event)" />
             } @else {
               <app-table-trick [plays]="store.tableCards()" [positions]="positions()" [winnerId]="v.trickWinnerId"
                                [animation]="store.trickAnimation()" [collectTo]="store.collectTo()"
@@ -106,8 +106,8 @@
 
         <section class="bottom" aria-label="Your area">
           <app-action-panel [actions]="store.buttonActions()" [options]="store.cardOptions()" [selection]="store.selection()"
-                            [selectedCount]="store.selectedIds().length" [prompt]="store.isMyTurn() ? v.phaseLabel : ''"
-                            (act)="store.act($event)" (confirm)="store.confirmSelection()" />
+                            [selectedCount]="store.selectedIds().length" [selectedIds]="store.selectedIds()" [prompt]="store.isMyTurn() ? v.phaseLabel : ''"
+                            (act)="store.act($event)" (confirm)="store.confirmSelection($event)" />
           <div class="statusbar" [class.my-turn]="store.isMyTurn()">
             <div class="me">
               <app-player-avatar [name]="me()?.name ?? 'You'" [avatar]="me()?.avatar" size="sm" [active]="store.isMyTurn()" status="online" />
