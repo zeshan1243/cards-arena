@@ -352,3 +352,16 @@ main.game-with-ads {
   > .ad-col.left { grid-column: 1; justify-self: end; }
   > .ad-col.right { grid-column: 3; justify-self: start; }
 }
+
+/* Static documents: About, Privacy Policy, Contact. */
+.doc-hero { padding-block: clamp(32px, 5vw, 64px) 8px; }
+.doc-hero .crumbs { font-size: .85rem; color: var(--text-secondary); margin-bottom: 14px; a { color: var(--text-secondary); } span { color: var(--text-primary); } }
+.doc-hero .lead { font-size: 1.1rem; color: var(--text-secondary); max-width: 640px; margin-top: 10px; }
+.doc { padding-bottom: 72px;
+  /* Readable line length, aligned with the page heading rather than centred. */
+  & > * { max-width: 760px; }
+  h2 { margin: 36px 0 10px; font-size: clamp(1.15rem, 2.4vw, 1.4rem); }
+  p, li { color: var(--text-secondary); line-height: 1.7; }
+  ul { padding-left: 22px; display: grid; gap: 6px; }
+  a { color: var(--color-secondary); }
+  .updated { font-size: .85rem; color: var(--text-muted); } }

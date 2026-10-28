@@ -33,6 +33,9 @@ import { GameService } from '../../../core/services/game.service';
             <a routerLink="/leaderboard">Leaderboard</a>
             <a routerLink="/multiplayer">Multiplayer</a>
           }
+          <a routerLink="/about">About</a>
+          <a routerLink="/contact">Contact</a>
+          <a routerLink="/privacy">Privacy policy</a>
           <a routerLink="/settings">Settings</a>
           <a [href]="smartlink" target="_blank" rel="sponsored noopener noreferrer">Sponsored</a>
         </nav>

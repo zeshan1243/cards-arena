@@ -123,6 +123,8 @@ export class App {
   readonly showStickyAd = computed(() => !this.stickyClosed() && !this.inGame());
 
   constructor() {
-    inject(AdsService).detectAdBlock();
+    const ads = inject(AdsService);
+    ads.detectAdBlock();
+    afterNextRender(() => ads.loadAdSense());
   }
 }

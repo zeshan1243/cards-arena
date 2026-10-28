@@ -9,6 +9,9 @@ import { GAMES } from './core/data/games.data';
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Prerender },
   { path: 'games', renderMode: RenderMode.Prerender },
+  { path: 'about', renderMode: RenderMode.Prerender },
+  { path: 'privacy', renderMode: RenderMode.Prerender },
+  { path: 'contact', renderMode: RenderMode.Prerender },
   {
     path: 'games/:slug',
     renderMode: RenderMode.Prerender,

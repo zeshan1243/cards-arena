@@ -4,6 +4,9 @@ import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 /** Adsterra Smartlink: a plain URL, shown as a labelled "Sponsored" link. */
 export const SMARTLINK_URL = 'https://araplhn.org/4/a9ef72d12c902b3b6eafb0ff07a1f0cb';
 
+/** Google AdSense publisher id; verification also uses the meta tag in index.html and public/ads.txt. */
+export const ADSENSE_CLIENT = 'ca-pub-3366385543056829';
+
 /** Posted by public/ads/*.html when its Adsterra script fails to load. */
 const BLOCKED_MESSAGE = 'cardarena:ad-blocked';
 
@@ -27,6 +30,20 @@ export class AdsService {
       if (e.origin === location.origin && e.data === BLOCKED_MESSAGE) this.blocked.set(true);
     });
     this.checkBait();
+  }
+
+  /**
+   * AdSense (Auto ads). Loaded after hydration rather than from index.html: Auto ads insert
+   * elements into the page, which must not happen before Angular hydrates the prerendered HTML.
+   */
+  loadAdSense(): void {
+    if (!isPlatformBrowser(this.platformId) || this.document.querySelector('script[src*="adsbygoogle.js"]')) return;
+    const script = this.document.createElement('script');
+    script.async = true;
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+    script.crossOrigin = 'anonymous';
+    script.onerror = () => this.blocked.set(true);
+    this.document.head.appendChild(script);
   }
 
   /** Cosmetic filters (uBlock, AdGuard, Brave) hide elements with ad-like class names. */

@@ -32,6 +32,9 @@ export const routes: Routes = [
     loadComponent: () => import('./games/core/ui/table-game-page').then((m) => m.TableGamePage),
   },
   ...(environment.accountsEnabled ? accountRoutes : accountRoutes.map((r) => ({ path: r.path, redirectTo: '' }))),
+  { path: 'about', loadComponent: () => import('./pages/about/about').then((m) => m.AboutPage) },
+  { path: 'privacy', loadComponent: () => import('./pages/privacy/privacy').then((m) => m.PrivacyPage) },
+  { path: 'contact', loadComponent: () => import('./pages/contact/contact').then((m) => m.ContactPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings').then((m) => m.SettingsPage) },
   { path: '**', loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFoundPage) },
 ];

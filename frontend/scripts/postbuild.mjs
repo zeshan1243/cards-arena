@@ -6,7 +6,7 @@ import { join, relative } from 'node:path';
 
 const SITE = 'https://www.cardsarena.world';
 const OUT = 'dist/frontend/browser';
-const PRIORITY = { '/': '1.0', '/games': '0.9' };
+const PRIORITY = { '/': '1.0', '/games': '0.9', '/about': '0.4', '/contact': '0.3', '/privacy': '0.3' };
 
 function pages(dir) {
   return readdirSync(dir).flatMap((name) => {
@@ -19,7 +19,7 @@ function pages(dir) {
 const today = new Date().toISOString().slice(0, 10);
 const urls = pages(OUT)
   .map((file) => '/' + relative(OUT, file).replace(/\/?index\.html$/, ''))
-  .sort((a, b) => (PRIORITY[b] ?? '0.7').localeCompare(PRIORITY[a] ?? '0.7') || a.localeCompare(b));
+  .sort((a, b) => (PRIORITY[b] ?? '0.8').localeCompare(PRIORITY[a] ?? '0.8') || a.localeCompare(b));
 
 const xml = [
   '<?xml version="1.0" encoding="UTF-8"?>',
