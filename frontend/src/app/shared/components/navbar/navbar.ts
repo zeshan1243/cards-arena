@@ -4,7 +4,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { environment } from '../../../../environments/environment';
-import { SMARTLINK_URL } from '../../../core/services/ads.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
 import { GameService } from '../../../core/services/game.service';
@@ -25,7 +24,6 @@ interface PlayerHit {
 export class Navbar {
   readonly auth = inject(AuthService);
   readonly accountsEnabled = environment.accountsEnabled;
-  readonly smartlink = SMARTLINK_URL;
   private readonly games = inject(GameService);
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
