@@ -1,0 +1,87 @@
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/spider-solitaire" class="round-btn" aria-label="Back to Spider Solitaire page">‹</a>
+    <h1 class="title">Spider</h1>
+    @if (view(); as v) {
+      <div class="chips" aria-live="polite">
+        <span class="chip">Score {{ v.score }}</span>
+        <span class="chip">Moves {{ v.moves }}</span>
+        <span class="chip">⏱ {{ time() }}</span>
+      </div>
+    }
+  </header>
+
+  @if (view(); as v) {
+    <section class="board" #board aria-label="Spider Solitaire board" [class.dragging]="drag()?.moved"
+             (pointermove)="pointerMove($event)" (pointerup)="up($event)" (pointercancel)="cancel()">
+      <div class="inner">
+        <div class="top-row">
+          @for (k of foundations(); track $index; let fi = $index) {
+            <div class="pile foundation" [attr.data-pile]="fnd(fi)">
+              @if (k) {
+                <div class="card-btn" [attr.data-card]="k.id"><app-playing-card [card]="k" size="fluid" /></div>
+              }
+            </div>
+          }
+          <div class="spacer"></div>
+          <button type="button" class="pile stock" data-pile="stock" [class.hint]="hintPile() === 'stock'" [class.empty]="!v.stock.length"
+                  [disabled]="!v.stock.length" (click)="deal()"
+                  [attr.aria-label]="v.stock.length ? 'Deal a row — ' + stockPacks().length + ' deals left' : 'Stock empty'">
+            @for (p of stockPacks(); track p) {
+              <span class="pack" [style.--p]="p"><app-playing-card size="fluid" [faceDown]="true" /></span>
+            }
+            @if (v.stock.length) { <span class="count">{{ stockPacks().length }}</span> }
+          </button>
+        </div>
+
+        <div class="tableau" #tableau>
+          @for (col of v.tableau; track $index; let ti = $index) {
+            <div class="column" [attr.data-pile]="'t' + ti" [class.hint]="hintPile() === 't' + ti" [style.--h]="columnHeight(ti)">
+              @if (!col.length) { <span class="slot-icon" aria-hidden="true"></span> }
+              @for (t of col; track t.card.id; let k = $index) {
+                <button type="button" class="card-btn" [attr.data-card]="t.card.id" [style.--y]="offsets()[ti][k]" [disabled]="!t.up"
+                        [class.dragged]="isDragged(t.card)" [class.hinted]="hintIds().has(t.card.id)"
+                        [style.transform]="isDragged(t.card) ? 'translate(' + dx() + 'px,' + dy() + 'px)' : null"
+                        (pointerdown)="down($event, ti, k)" (click)="keyActivate($event, ti, k)">
+                  <app-playing-card [card]="t.card" [faceDown]="!t.up" size="fluid" />
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <footer class="controls" role="toolbar" aria-label="Game controls">
+    <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
+    <button type="button" class="ctl" (click)="undo()" [disabled]="!canUndo()"><span aria-hidden="true">↩️</span><span class="lbl">Undo</span></button>
+    <button type="button" class="ctl" (click)="hint()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
+    <div class="segmented suits" role="group" aria-label="Number of suits">
+      <button type="button" [attr.aria-pressed]="suits() === 1" (click)="setSuits(1)">1 suit</button>
+      <button type="button" [attr.aria-pressed]="suits() === 2" (click)="setSuits(2)">2 suits</button>
+      <button type="button" [attr.aria-pressed]="suits() === 4" (click)="setSuits(4)">4 suits</button>
+    </div>
+  </footer>
+</div>
+
+<app-modal [open]="won()" [dismissible]="false" label="You won">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
+  <div class="result">
+    <div class="emoji" aria-hidden="true">🕷️</div>
+    <h2>You won!</h2>
+    @if (view(); as v) {
+      <dl class="stats">
+        <div><dt>Score</dt><dd>{{ v.score }}</dd></div>
+        <div><dt>Time</dt><dd>{{ time() }}</dd></div>
+        <div><dt>Moves</dt><dd>{{ v.moves }}</dd></div>
+      </dl>
+    }
+    <p class="text-secondary">
+      {{ suits() }}-suit games won: {{ stats().won }} of {{ stats().played }} · Best score {{ stats().bestScore }}
+      @if (stats().bestTime !== null) { · Best time {{ fmt(stats().bestTime!) }} }
+    </p>
+    <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>Play again</button>
+    <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+  </div>
+</app-modal>

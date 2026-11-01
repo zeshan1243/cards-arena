@@ -12,6 +12,7 @@ import { content as c_hearts } from '../../games/hearts/hearts.content';
 import { content as c_thirteen } from '../../games/thirteen/thirteen.content';
 import { content as c_solitaire } from '../../games/solitaire/solitaire.content';
 import { content as c_rummy } from '../../games/rummy/rummy.content';
+import { content as c_spider } from '../../games/spider/spider.content';
 
 export type { GameContent };
 
@@ -240,7 +241,7 @@ export const GAMES: GameInfo[] = [
     releasedAt: '2026-10-19',
     accent: '#0EA5E9',
     art: '♠♦♣',
-    related: ['thirteen', 'hearts', 'bhabhi-thulla'],
+    related: ['spider-solitaire', 'thirteen', 'hearts'],
   },
   {
     slug: 'rummy',
@@ -259,6 +260,24 @@ export const GAMES: GameInfo[] = [
     accent: '#F97316',
     art: '♣♥♣',
     related: ['solitaire', 'thirteen', 'hearts'],
+  },
+  {
+    slug: 'spider-solitaire',
+    name: 'Spider Solitaire',
+    tagline: 'Two decks, ten columns, eight runs to clear.',
+    description: 'Build King-to-Ace runs in suit to clear all 104 cards. Play 1, 2 or 4 suits, drag or tap to move, with unlimited undo and hints.',
+    region: 'Worldwide',
+    minPlayers: 1,
+    maxPlayers: 1,
+    botEnabled: false,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 89,
+    releasedAt: '2026-11-01',
+    accent: '#A855F7',
+    art: '♠♥♠',
+    related: ['solitaire', 'rummy', 'thirteen'],
   },
 ];
 
@@ -316,6 +335,7 @@ GAME_CONTENT['hearts'] = c_hearts;
 GAME_CONTENT['thirteen'] = c_thirteen;
 GAME_CONTENT['solitaire'] = c_solitaire;
 GAME_CONTENT['rummy'] = c_rummy;
+GAME_CONTENT['spider-solitaire'] = c_spider;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

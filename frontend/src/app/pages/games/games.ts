@@ -50,7 +50,7 @@ import { GameInfo } from '../../shared/models/game.model';
     .toolbar { display: grid; gap: 12px; margin-bottom: 18px; @media (min-width: 1000px) { grid-template-columns: 1fr auto 180px; align-items: center; } }
     .segmented { overflow-x: auto; flex-wrap: nowrap; @media (min-width: 1000px) { flex-wrap: wrap; } }
     .count { color: var(--text-secondary); font-size: .9rem; }
-    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); @media (min-width: 1100px) { grid-template-columns: repeat(4, 1fr); } }
     .empty-state { grid-column: 1 / -1; }
   `,
 })

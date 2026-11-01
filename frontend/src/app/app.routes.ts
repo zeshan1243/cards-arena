@@ -28,6 +28,10 @@ export const routes: Routes = [
     loadComponent: () => import('./games/solitaire/solitaire-game').then((m) => m.SolitaireGame),
   },
   {
+    path: 'play/spider-solitaire',
+    loadComponent: () => import('./games/spider/spider-game').then((m) => m.SpiderGame),
+  },
+  {
     path: 'play/:slug',
     loadComponent: () => import('./games/core/ui/table-game-page').then((m) => m.TableGamePage),
   },
