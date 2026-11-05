@@ -13,6 +13,7 @@ import { content as c_thirteen } from '../../games/thirteen/thirteen.content';
 import { content as c_solitaire } from '../../games/solitaire/solitaire.content';
 import { content as c_rummy } from '../../games/rummy/rummy.content';
 import { content as c_spider } from '../../games/spider/spider.content';
+import { content as c_tripeaks } from '../../games/tripeaks/tripeaks.content';
 
 export type { GameContent };
 
@@ -277,7 +278,26 @@ export const GAMES: GameInfo[] = [
     releasedAt: '2026-11-01',
     accent: '#A855F7',
     art: '♠♥♠',
-    related: ['solitaire', 'rummy', 'thirteen'],
+    related: ['solitaire', 'tripeaks', 'rummy'],
+  },
+  {
+    slug: 'tripeaks',
+    name: 'Tri Peaks Solitaire',
+    aka: 'TriPeaks',
+    tagline: 'Clear three peaks one card higher or lower.',
+    description: 'Play cards one rank up or down to clear three peaks of cards. Build long streaks for big scores, with undo and hints.',
+    region: 'Worldwide',
+    minPlayers: 1,
+    maxPlayers: 1,
+    botEnabled: false,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 87,
+    releasedAt: '2026-11-05',
+    accent: '#EAB308',
+    art: '♦♣♥',
+    related: ['solitaire', 'spider-solitaire', 'rummy'],
   },
 ];
 
@@ -336,6 +356,7 @@ GAME_CONTENT['thirteen'] = c_thirteen;
 GAME_CONTENT['solitaire'] = c_solitaire;
 GAME_CONTENT['rummy'] = c_rummy;
 GAME_CONTENT['spider-solitaire'] = c_spider;
+GAME_CONTENT['tripeaks'] = c_tripeaks;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

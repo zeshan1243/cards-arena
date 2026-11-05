@@ -1,0 +1,72 @@
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/tripeaks" class="round-btn" aria-label="Back to Tri Peaks page">‹</a>
+    <h1 class="title">Tri Peaks</h1>
+    @if (view(); as v) {
+      <div class="chips" aria-live="polite">
+        <span class="chip">Score {{ v.score }}</span>
+        <span class="chip" [class.streak]="v.streak > 2">Streak {{ v.streak }}</span>
+        <span class="chip">⏱ {{ time() }}</span>
+      </div>
+    }
+  </header>
+
+  @if (view(); as v) {
+    <section class="board" #board aria-label="Tri Peaks board">
+      <div class="inner">
+        <div class="peaks">
+          @for (s of v.slots; track s.card.id; let i = $index) {
+            @if (!s.gone) {
+              <button type="button" class="card-btn" [attr.data-card]="s.card.id" [style.--x]="s.x" [style.--r]="s.row"
+                      [disabled]="!free().has(i)" [class.hinted]="hintSlot() === i" (click)="tap(i)">
+                <app-playing-card [card]="s.card" [faceDown]="!s.up" size="fluid" />
+              </button>
+            }
+          }
+        </div>
+
+        <div class="bottom-row">
+          <button type="button" class="pile stock" data-pile="stock" [class.hint]="hintSlot() === 'stock'" [disabled]="!v.stock.length" (click)="draw()"
+                  [attr.aria-label]="v.stock.length ? 'Stock, ' + v.stock.length + ' cards — turn one over' : 'Stock empty'">
+            @for (c of stockShown(); track c.id; let k = $index) {
+              <span class="pack" [style.--p]="k"><app-playing-card size="fluid" [faceDown]="true" /></span>
+            }
+            @if (v.stock.length) { <span class="count">{{ v.stock.length }}</span> }
+          </button>
+          <div class="pile waste" data-pile="waste" aria-live="polite">
+            @for (c of wasteTop(); track c.id) {
+              <div class="card-btn" [attr.data-card]="c.id"><app-playing-card [card]="c" size="fluid" /></div>
+            }
+          </div>
+          <p class="progress">{{ cleared() }} / 28 cleared</p>
+        </div>
+      </div>
+    </section>
+  }
+
+  <footer class="controls" role="toolbar" aria-label="Game controls">
+    <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
+    <button type="button" class="ctl" (click)="undo()" [disabled]="!canUndo()"><span aria-hidden="true">↩️</span><span class="lbl">Undo</span></button>
+    <button type="button" class="ctl" (click)="hint()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
+  </footer>
+</div>
+
+<app-modal [open]="!!result()" [dismissible]="false" [label]="result() === 'won' ? 'You won' : 'No moves left'">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
+  <div class="result">
+    <div class="emoji" aria-hidden="true">{{ result() === 'won' ? '🏔️' : '🃏' }}</div>
+    <h2 [class.lost]="result() === 'lost'">{{ result() === 'won' ? 'Peaks cleared!' : 'No moves left' }}</h2>
+    @if (view(); as v) {
+      <dl class="stats">
+        <div><dt>Score</dt><dd>{{ v.score }}</dd></div>
+        <div><dt>Best streak</dt><dd>{{ v.bestStreak }}</dd></div>
+        <div><dt>Cleared</dt><dd>{{ cleared() }}/28</dd></div>
+      </dl>
+    }
+    <p class="text-secondary">
+      Games won: {{ stats().won }} of {{ stats().played }} · Best score {{ stats().bestScore }} · Longest streak {{ stats().bestStreak }}
+    </p>
+    <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>{{ result() === 'won' ? 'Play again' : 'New game' }}</button>
+    <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+  </div>
+</app-modal>

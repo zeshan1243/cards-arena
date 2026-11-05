@@ -32,6 +32,10 @@ export const routes: Routes = [
     loadComponent: () => import('./games/spider/spider-game').then((m) => m.SpiderGame),
   },
   {
+    path: 'play/tripeaks',
+    loadComponent: () => import('./games/tripeaks/tripeaks-game').then((m) => m.TriPeaksGame),
+  },
+  {
     path: 'play/:slug',
     loadComponent: () => import('./games/core/ui/table-game-page').then((m) => m.TableGamePage),
   },
