@@ -16,21 +16,22 @@ import {
 import { BaseTableEngine, SUIT_GLYPH } from '../core/tricks';
 
 /**
- * Donkey — a draw-and-match fishing game for 2 or 3 players. Each player gets 4 cards and 4 more
+ * Donkey — a draw-and-match fishing game for 2 to 5 players. Each player gets 4 cards and 4 more
  * go face up on the table; the rest is the deck.
  *
- * On your turn draw from the deck. If the card has the same rank as a table card, or as the top
- * card of an opponent's captured pile, you must take the pair onto your own pile, then draw
- * again. If it matches nothing, throw it face up on the table — or keep it and throw a card
- * from your hand instead — and your turn ends.
+ * On your turn draw a card into your hand, then play any card from your hand. If it has the same
+ * rank as a table card or as the top card of any captured pile — an opponent's or your own — it
+ * captures: both cards go on your pile (taking the opponent's top card, or simply joining your
+ * own pile) and you draw again. A card that matches nothing is thrown face up on the table and
+ * your turn ends.
  *
- * Once the deck is empty, players take turns playing their hand cards one at a time: a card that
- * matches captures as above, otherwise it stays on the table. When every hand is empty the round
- * ends and captured cards score: 2–9 are 5 points, 10–K 10 and Aces 20 (400 in the deck). Rounds
- * continue until someone reaches the target; the highest total wins.
+ * Once the deck is empty there is no drawing: players take turns playing one hand card each,
+ * capturing or throwing as above. When every hand is empty the round ends and captured cards
+ * score: 2–9 are 5 points, 10–K 10 and Aces 20 (400 in the deck). Rounds continue until someone
+ * reaches the target; the highest total wins.
  */
 
-export type DonkeyPhase = 'draw' | 'match' | 'throw' | 'play';
+export type DonkeyPhase = 'draw' | 'play';
 
 export interface DonkeyView extends TableView {
   phase: DonkeyPhase;
@@ -39,8 +40,6 @@ export interface DonkeyView extends TableView {
   table: Card[];
   /** Each player's captured cards, last captured on top. */
   piles: Card[][];
-  /** Card drawn (or played) this turn that still has to be placed. */
-  active: Card | null;
   stockCount: number;
   /** Every card captured or thrown this round (public knowledge). */
   seen: Card[];
@@ -68,19 +67,21 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
   private stock: Card[] = [];
   private table: Card[] = [];
   private piles: Card[][] = [];
-  private active: Card | null = null;
+  private drawn: Card | null = null;
   private seen: Card[] = [];
   private round = 0;
   private turn: number | null = null;
   private phase: DonkeyPhase = 'draw';
   private totals: number[];
   private pendingState: 'hand' | null = null;
+  /** Seat that took a table card with the last action, for the capture animation. */
+  private taker: number | null = null;
   private summary: { title: string; lines: string[] } | null = null;
   private finished = false;
 
   constructor(seats: SeatConfig[], seed: number, settings: GameSettings = {}) {
     super(seats, seed);
-    if (seats.length < 2 || seats.length > 3) throw new Error('Donkey needs 2 or 3 players');
+    if (seats.length < 2 || seats.length > 5) throw new Error('Donkey needs 2 to 5 players');
     this.n = seats.length;
     this.target = Number(settings['target'] ?? 300);
     this.totals = Array(this.n).fill(0);
@@ -100,87 +101,64 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
     this.stock = deck.slice(HAND_SIZE * this.n + TABLE_SIZE);
     this.piles = Array.from({ length: this.n }, () => []);
     this.seen = [...this.table];
-    this.active = null;
+    this.drawn = null;
     this.summary = null;
     // The player after the dealer starts; the deal rotates each round.
     this.turn = this.round % this.n;
     this.phase = 'draw';
   }
 
-  /** Where `card` could be paired: table card ids and opponents' pile tops ('pile:<seat>'). */
-  private targets(seat: number, card: Card): string[] {
+  /** Where `card` could be paired: table card ids, then pile tops ('pile:<seat>'), your own included. */
+  private targets(card: Card): string[] {
     const out = this.table.filter((t) => t.rank === card.rank).map((t) => t.id);
     this.piles.forEach((p, i) => {
-      if (i !== seat && p.length && p[p.length - 1].rank === card.rank) out.push(`pile:${i}`);
+      if (p.length && p[p.length - 1].rank === card.rank) out.push(`pile:${i}`);
     });
     return out;
   }
 
   protected handle(playerId: string, action: GameAction): void {
     const seat = this.seatIndex(playerId);
-    switch (action.type) {
-      case 'draw':
-        this.active = this.stock.pop()!;
-        this.phase = this.targets(seat, this.active).length ? 'match' : 'throw';
-        return;
-      case 'play': {
-        // Deck empty: a hand card becomes the active card.
-        const card = this.takeFromHand(seat, action.cardId!);
-        this.active = card;
-        if (this.targets(seat, card).length) this.phase = 'match';
-        else this.place(card, seat);
-        return;
-      }
-      case 'choose':
-        return this.capture(seat, String(action.value));
-      case 'discard': {
-        const active = this.active!;
-        if (action.cardId === active.id) return this.place(active, seat);
-        // Keep the drawn card and throw a hand card instead.
-        const thrown = this.takeFromHand(seat, action.cardId!);
-        this.hands[seat].push(active);
-        return this.place(thrown, seat);
-      }
-      default:
-        throw new IllegalActionError(`Illegal action ${action.type}`);
+    this.taker = null;
+    if (action.type === 'draw') {
+      this.drawn = this.stock.pop()!;
+      this.hands[seat].push(this.drawn);
+      this.phase = 'play';
+      return;
     }
-  }
-
-  private takeFromHand(seat: number, id: string): Card {
-    const i = this.hands[seat].findIndex((c) => c.id === id);
-    if (i < 0) throw new IllegalActionError('You do not hold that card');
-    return this.hands[seat].splice(i, 1)[0];
-  }
-
-  private capture(seat: number, target: string): void {
-    const card = this.active!;
-    let taken: Card;
-    if (target.startsWith('pile:')) {
-      const from = Number(target.slice(5));
-      taken = this.piles[from].pop()!;
-      this.announce('success', `${this.seats[seat].name} takes ${glyph(taken)} from ${this.seats[from].name}’s pile!`);
-    } else {
-      taken = this.table.splice(this.table.findIndex((c) => c.id === target), 1)[0];
+    const i = this.hands[seat].findIndex((c) => c.id === action.cardId);
+    const card = this.hands[seat].splice(i, 1)[0];
+    this.drawn = null;
+    if (action.value === undefined) {
+      this.table.push(card);
+      this.seen.push(card);
+      return this.nextTurn(seat);
     }
-    this.piles[seat].push(taken, card);
-    this.seen.push(card);
-    this.active = null;
+    this.capture(seat, card, String(action.value));
     // With cards left in the deck a capture earns another draw; afterwards it's one card a turn.
     if (this.stock.length) this.phase = 'draw';
     else this.nextTurn(seat);
   }
 
-  /** The card goes face up on the table and the turn passes. */
-  private place(card: Card, seat: number): void {
-    this.table.push(card);
+  private capture(seat: number, card: Card, target: string): void {
+    if (target === `pile:${seat}`) {
+      // Pairs with the top of your own pile: the card just joins it.
+      this.piles[seat].push(card);
+    } else if (target.startsWith('pile:')) {
+      const from = Number(target.slice(5));
+      const taken = this.piles[from].pop()!;
+      this.piles[seat].push(taken, card);
+      this.announce('success', `${this.seats[seat].name} takes ${glyph(taken)} from ${this.seats[from].name}’s pile!`);
+    } else {
+      this.piles[seat].push(this.table.splice(this.table.findIndex((c) => c.id === target), 1)[0], card);
+      this.taker = seat;
+    }
     this.seen.push(card);
-    this.active = null;
-    this.nextTurn(seat);
   }
 
   private nextTurn(seat: number): void {
     if (!this.stock.length && this.hands.every((h) => !h.length)) return this.endRound();
-    // Skip players with nothing left to do once the deck is gone.
+    // Once the deck is gone, skip players with nothing left to play.
     let next = (seat + 1) % this.n;
     while (!this.stock.length && !this.hands[next].length) next = (next + 1) % this.n;
     this.turn = next;
@@ -220,29 +198,23 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
     return this.pendingState || this.finished || this.turn === null ? null : this.seats[this.turn].id;
   }
 
+  /** Draw; or play a hand card — once per target it can capture, or as a throw when it matches nothing. */
   legalActions(playerId: string): LegalAction[] {
     if (this.currentPlayerId() !== playerId) return [];
+    if (this.phase === 'draw') return [{ type: 'draw', label: 'Draw a card' }];
     const seat = this.seatIndex(playerId);
-    switch (this.phase) {
-      case 'draw':
-        return [{ type: 'draw', label: 'Draw a card' }];
-      case 'match':
-        return this.targets(seat, this.active!).map((t) => ({ type: 'choose', value: t, label: this.targetLabel(t) }));
-      case 'throw':
-        return [
-          { type: 'discard', cardId: this.active!.id, label: `Throw ${glyph(this.active!)}` },
-          ...this.hands[seat].map((c) => ({ type: 'discard' as const, cardId: c.id, label: `Keep ${glyph(this.active!)}, throw ${glyph(c)}` })),
-        ];
-      case 'play':
-        return this.hands[seat].map((c) => ({ type: 'play', cardId: c.id, label: `Play ${glyph(c)}` }));
-    }
+    return this.hands[seat].flatMap((c): LegalAction[] => {
+      const targets = this.targets(c);
+      if (!targets.length) return [{ type: 'play', cardId: c.id, label: `Throw ${glyph(c)}` }];
+      return targets.map((t) => ({ type: 'play', cardId: c.id, value: t, label: this.targetLabel(seat, t) }));
+    });
   }
 
-  private targetLabel(t: string): string {
+  private targetLabel(seat: number, t: string): string {
     if (t.startsWith('pile:')) {
       const i = Number(t.slice(5));
       const top = this.piles[i][this.piles[i].length - 1];
-      return `Take ${glyph(top)} from ${this.seats[i].name}`;
+      return i === seat ? `Add to your pile (${glyph(top)})` : `Take ${glyph(top)} from ${this.seats[i].name}`;
     }
     return `Take ${glyph(this.table.find((c) => c.id === t)!)}`;
   }
@@ -273,21 +245,23 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
     const current = this.currentPlayerId();
     const mine = current === viewerId;
     const legal = mine ? this.legalActions(viewerId) : [];
+    // Tapping a glowing table card or pile plays the hand card that matches it.
     const action = (pred: (a: LegalAction) => boolean) => {
       const a = legal.find(pred);
-      return a ? { action: { type: a.type, cardId: a.cardId, value: a.value } as GameAction } : {};
+      return a ? { action: { type: a.type, ...(a.cardId ? { cardId: a.cardId } : {}), ...(a.value !== undefined ? { value: a.value } : {}) } } : {};
     };
+    const canCapture = legal.some((a) => a.type === 'play' && a.value !== undefined);
 
     let phaseLabel: string;
     if (this.finished) phaseLabel = 'Game over';
     else if (!current) phaseLabel = 'Round over';
     else if (!mine) phaseLabel = `Waiting for ${this.seats[this.seatIndex(current)].name}…`;
     else if (this.phase === 'draw') phaseLabel = 'Draw a card from the deck';
-    else if (this.phase === 'match') phaseLabel = `${glyph(this.active!)} matches! Tap the card to take`;
-    else if (this.phase === 'throw') phaseLabel = `No match — throw the ${glyph(this.active!)}, or tap a hand card to throw instead`;
-    else phaseLabel = 'Deck is empty — play a card from your hand';
+    else if (canCapture) phaseLabel = 'You have a match! Tap a glowing card to take it — or throw a card to end your turn';
+    else phaseLabel = this.stock.length ? 'No match — throw a card from your hand to end your turn' : 'Deck is empty — play a card from your hand';
 
     const roundPoints = this.piles.map((p) => pilePoints(p));
+    // Ids follow the card, so cards glide when the table shifts.
     const floor: FloorPile[] = [
       {
         id: 'stock',
@@ -296,31 +270,7 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
         faceDown: true,
         ...action((a) => a.type === 'draw'),
       },
-      ...(this.active
-        ? [
-            {
-              id: `active-${this.active.id}`,
-              cards: [this.active],
-              label: this.phase === 'throw' && mine ? 'Tap to throw' : 'Drawn',
-              from: this.seats[this.turn!].id,
-              ...action((a) => a.type === 'discard' && a.cardId === this.active!.id),
-            },
-          ]
-        : []),
-      ...this.table.map((c) => ({ id: `t-${c.id}`, cards: [c], label: null, ...action((a) => a.value === c.id) })),
-      ...this.piles.flatMap((p, i) =>
-        p.length
-          ? [
-              {
-                id: `pile-${i}`,
-                cards: [p[p.length - 1]],
-                label: `${i === me ? 'Your' : this.seats[i].name + '’s'} pile · ${p.length}`,
-                owner: this.seats[i].id,
-                ...action((a) => a.value === `pile:${i}`),
-              },
-            ]
-          : [],
-      ),
+      ...this.table.map((c) => ({ id: `c-${c.id}`, cards: [c], label: null, ...action((a) => a.value === c.id) })),
     ];
 
     return structuredClone({
@@ -335,10 +285,12 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
         isBot: s.isBot,
         team: null,
         cardCount: this.hands[i].length,
-        stat: `${roundPoints[i]} pts this round`,
+        stat: `${roundPoints[i]} pts`,
         badges: (this.round - 1) % this.n === i ? ['Dealer'] : [],
+        pile: { top: this.piles[i][this.piles[i].length - 1] ?? null, count: this.piles[i].length, ...action((a) => a.value === `pile:${i}`) },
       })),
       hand: sortHand(this.hands[me]),
+      freshCardId: mine && this.drawn ? this.drawn.id : null,
       currentPlayerId: current,
       trick: [],
       leadSuit: null,
@@ -346,6 +298,7 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
       trump: null,
       floor,
       floorHint: 'The table is empty',
+      floorTaker: this.taker === null ? null : this.seats[this.taker].id,
       scores: {
         title: 'Scores',
         columns: ['Round', 'Total'],
@@ -358,7 +311,6 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
       round: this.round,
       table: this.table,
       piles: this.piles,
-      active: this.active,
       stockCount: this.stock.length,
       seen: this.seen,
       roundPoints,

@@ -5,7 +5,7 @@ import { DonkeyEngine, DonkeyView } from './donkey.engine';
 export const definition: GameDefinition<DonkeyView> = {
   slug: 'donkey',
   name: 'Donkey',
-  playerCounts: [2, 3],
+  playerCounts: [2, 3, 4, 5],
   teams: false,
   setupOptions: [
     {
@@ -21,9 +21,10 @@ export const definition: GameDefinition<DonkeyView> = {
   ],
   rules: [
     'Everyone gets 4 cards and 4 more are dealt face up on the table. The rest is the deck.',
-    'On your turn, draw a card. If it has the same rank as a card on the table, take the pair onto your pile — then draw again.',
-    'You can also pair it with the top card of an opponent’s pile and take that card from them.',
-    'If the card matches nothing, throw it face up on the table — or keep it and throw a card from your hand instead. Your turn ends.',
+    'On your turn, draw a card into your hand. Then play any card from your hand.',
+    'If it has the same rank as a card on the table, take the pair onto your pile — then draw again and keep going.',
+    'It can also pair with the top card of any pile: take the top card of an opponent’s pile, or add it to your own pile when its top card matches.',
+    'If the card you play matches nothing, it is thrown face up on the table and your turn ends.',
     'When the deck is empty, take turns playing your hand cards one at a time: a match captures, anything else goes on the table.',
     'Captured cards score: 2–9 are 5 points, 10 to King 10, Aces 20. Rounds continue until someone reaches the target.',
   ],

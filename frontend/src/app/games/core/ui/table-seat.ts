@@ -1,13 +1,14 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { PlayerAvatar } from '../../../shared/components/player-avatar/player-avatar';
-import { SeatView } from '../table-game';
+import { GameAction, SeatView } from '../table-game';
+import { SeatPile } from './seat-pile';
 import { SeatPosition } from './seat-layout';
 
 @Component({
   selector: 'app-table-seat',
-  imports: [PlayerAvatar],
+  imports: [PlayerAvatar, SeatPile],
   template: `
-    <div class="seat" [class.active]="active()" [class.compact]="position().startsWith('top')" [class.team-0]="seat().team === 0" [class.team-1]="seat().team === 1">
+    <div class="seat" [class.with-pile]="!!seat().pile" [class.active]="active()" [class.compact]="position().startsWith('top')" [class.team-0]="seat().team === 0" [class.team-1]="seat().team === 1">
       <app-player-avatar [name]="seat().name" [avatar]="seat().avatar" [active]="active()" size="md" status="bot" />
       <div class="info">
         <span class="name">{{ seat().name }}@if (partner()) { <small> · partner</small> }</span>
@@ -16,6 +17,7 @@ import { SeatPosition } from './seat-layout';
           <span class="badges">@for (b of seat().badges; track b) { <i>{{ b }}</i> }</span>
         }
       </div>
+      @if (seat().pile; as p) { <app-seat-pile [pile]="p" [seatId]="seat().id" [label]="seat().name + '’s pile'" (pick)="pick.emit($event)" /> }
       @if (active()) { <span class="thinking" aria-label="Thinking"><b></b><b></b><b></b></span> }
     </div>
   `,
@@ -28,6 +30,7 @@ import { SeatPosition } from './seat-layout';
       &.active { border-color: rgba(0,212,255,.6); box-shadow: var(--shadow-glow-cyan); }
       &.team-0 { border-top: 3px solid var(--color-secondary); }
       &.team-1 { border-top: 3px solid #f472b6; }
+      &.with-pile { grid-auto-flow: column; align-items: center; gap: 10px; }
       &.compact { grid-auto-flow: column; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; .info { justify-items: start; } }
     }
     .info { display: grid; justify-items: center; line-height: 1.25; }
@@ -38,6 +41,11 @@ import { SeatPosition } from './seat-layout';
     .thinking b { width: 5px; height: 5px; border-radius: 50%; background: #04111a; animation: dot 1s infinite; }
     .thinking b:nth-child(2) { animation-delay: .15s; } .thinking b:nth-child(3) { animation-delay: .3s; }
     @keyframes dot { 50% { transform: translateY(-3px); opacity: .5; } }
+    /* Floor games put opponents two to a row on phones: a slim seat filling its cell. */
+    @media (max-width: 600px) {
+      :host-context(.has-floor) .seat { min-width: 0; width: 100%; padding: 4px 8px 4px 4px; gap: 6px; grid-auto-flow: column; align-items: center; justify-content: start; grid-template-columns: auto 1fr auto;
+        .info { justify-items: start; min-width: 0; } .stat { overflow: hidden; text-overflow: ellipsis; } }
+    }
     @media (max-width: 600px) { .seat { min-width: 76px; padding: 5px 7px; } .name { font-size: .78rem; } .stat { font-size: .66rem; } app-player-avatar { transform: scale(.8); margin: -4px; } }
   `,
 })
@@ -46,4 +54,6 @@ export class TableSeat {
   readonly position = input.required<SeatPosition>();
   readonly active = input(false);
   readonly partner = input(false);
+  /** The seat's pile was clicked (e.g. to take its top card). */
+  readonly pick = output<GameAction>();
 }

@@ -40,6 +40,19 @@
   .seats-4 .opp[data-pos='top-right'], .seats-5 .opp[data-pos='top-right'] { right: 26%; }
 }
 
+/* Floor games with seats at the sides: keep the floor between them; on narrower screens the
+   opponents move into a strip along the top so they never cover the cards. */
+.table.has-floor:is(.seats-3, .seats-4, .seats-5) { --floor-w: min(680px, max(320px, calc(100cqw - 600px))); }
+@container (max-width: 900px) {
+  .table.has-floor:is(.seats-3, .seats-4, .seats-5) { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: 6px;
+    padding: clamp(16px, 3vw, 32px) clamp(14px, 4vw, 64px) 8px; --floor-w: 100%;
+    .opp { position: static; transform: none; }
+    .middle { flex: 1 1 100%; display: grid; place-items: center; } }
+}
+@container (max-width: 600px) {
+  .table.has-floor:is(.seats-3, .seats-4, .seats-5) { gap: 4px; padding-inline: 18px; .opp { flex: 0 0 calc(50% - 2px); } }
+}
+
 .scores-float { position: absolute; z-index: 4; right: 12px; bottom: 8px; display: none;
   &.open { display: block; top: 8px; bottom: auto; } }
 /* Pinned open only when the game area (not the viewport — ad columns can narrow it) clears the bid panel. */
@@ -58,6 +71,7 @@
 .me-text { display: grid; line-height: 1.25; min-width: 0;
   strong { font-family: var(--font-display); letter-spacing: .06em; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   span { font-size: .78rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+.my-pile { flex-shrink: 0; margin: 0 6px 0 auto; }
 .my-turn .me-text strong { color: var(--color-secondary); }
 .play-card { min-height: 44px; padding: 0 18px; }
 @media (max-width: 600px) { .statusbar { gap: 8px; padding: 6px; } .play-card { padding: 0 12px; font-size: .72rem; } app-game-timer { transform: scale(.85); margin: -4px; } }

@@ -79,6 +79,8 @@ export interface SeatView {
   stat: string;
   /** Small labels, e.g. "Dealer", "Hakem", "Bidder". */
   badges: string[];
+  /** Cards this player has captured, shown in their seat (Donkey); clickable when `action` is set. */
+  pile?: { top: Card | null; count: number; action?: GameAction };
 }
 
 export interface FloorPile {
@@ -116,6 +118,8 @@ export interface TableView {
   players: SeatView[];
   /** Viewer's hand, already sorted for display. */
   hand: Card[];
+  /** A card that just arrived in the viewer's hand (e.g. drawn), highlighted there. */
+  freshCardId?: string | null;
   currentPlayerId: string | null;
   /** Cards on the table for the current (or just-completed) trick. */
   trick: TrickPlay[];
@@ -128,6 +132,8 @@ export interface TableView {
   floor: FloorPile[] | null;
   /** Text on an empty floor; defaults to "The floor is empty". */
   floorHint?: string;
+  /** Seat that just took cards off the floor: removed floor cards fly to its pile. */
+  floorTaker?: string | null;
   scores: ScoreTable;
   /** Small chips in the top bar, e.g. "Hand 2", "To 7". */
   info: string[];

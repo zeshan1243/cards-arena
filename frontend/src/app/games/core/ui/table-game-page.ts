@@ -19,6 +19,7 @@ import { HUMAN_ID, TableGameStore } from './table-game.store';
 import { TableFloor } from './table-floor';
 import { TableHand } from './table-hand';
 import { TableScores } from './table-scores';
+import { SeatPile } from './seat-pile';
 import { TableSeat } from './table-seat';
 import { TableTrick } from './table-trick';
 
@@ -34,7 +35,7 @@ const PASS_ROTATION: Record<SeatPosition, number> = { left: 180, 'top-left': -13
 
 @Component({
   selector: 'app-table-game-page',
-  imports: [AdBanner, RouterLink, Loader, Modal, GameTimer, PlayerAvatar, ActionPanel, TableFloor, TableHand, TableScores, TableSeat, TableTrick],
+  imports: [AdBanner, RouterLink, Loader, Modal, GameTimer, PlayerAvatar, ActionPanel, SeatPile, TableFloor, TableHand, TableScores, TableSeat, TableTrick],
   providers: [TableGameStore],
   templateUrl: './table-game-page.html',
   styleUrl: './table-game-page.scss',

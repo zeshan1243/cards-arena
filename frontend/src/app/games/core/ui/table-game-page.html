@@ -72,11 +72,11 @@
     }
     @default {
       @if (store.view(); as v) {
-        <section class="table" [class]="'table seats-' + opponents().length" aria-label="Card table">
+        <section class="table" [class]="'table seats-' + opponents().length + (v.floor ? ' has-floor' : '')" aria-label="Card table">
           <div class="felt"></div>
           @for (p of opponents(); track p.id) {
             <app-table-seat class="opp" [attr.data-pos]="positions()[p.id]" [seat]="p" [position]="positions()[p.id]"
-                            [active]="v.currentPlayerId === p.id" [partner]="myTeam() !== null && p.team === myTeam()" />
+                            [active]="v.currentPlayerId === p.id" [partner]="myTeam() !== null && p.team === myTeam()" (pick)="store.act($event)" />
           }
           <div class="middle">
             @if (passTarget(); as t) {
@@ -91,7 +91,7 @@
                 </p>
               </div>
             } @else if (v.floor) {
-              <app-table-floor [piles]="v.floor" [emptyText]="v.floorHint ?? 'The floor is empty'" [positions]="positions()" (pick)="store.act($event)" />
+              <app-table-floor [piles]="v.floor" [emptyText]="v.floorHint ?? 'The floor is empty'" [positions]="positions()" [taker]="v.floorTaker ?? null" (pick)="store.act($event)" />
             } @else {
               <app-table-trick [plays]="store.tableCards()" [positions]="positions()" [winnerId]="v.trickWinnerId"
                                [animation]="store.trickAnimation()" [collectTo]="store.collectTo()"
@@ -115,6 +115,7 @@
                 <strong>{{ store.isMyTurn() ? 'YOUR TURN' : (me()?.stat ?? '') }}</strong>
                 <span>{{ v.phaseLabel }}</span>
               </div>
+              @if (me()?.pile; as p) { <app-seat-pile class="my-pile" [pile]="p" [seatId]="humanId" label="Your pile" (pick)="store.act($event)" /> }
             </div>
             @if (store.isMyTurn() && store.turnSeconds() && !store.autoPlay()) {
               <app-game-timer [seconds]="store.timeLeft()" [total]="store.turnSeconds()" />
@@ -124,7 +125,7 @@
             }
           </div>
           <app-table-hand [cards]="v.hand" [playableIds]="store.playableIds()" [selectedIds]="store.selectedIds()"
-                          [myTurn]="store.isMyTurn()" [dealing]="store.dealing()" (cardClick)="store.clickCard($event)" />
+                          [myTurn]="store.isMyTurn()" [dealing]="store.dealing()" [freshId]="v.freshCardId ?? null" (cardClick)="store.clickCard($event)" />
           <div class="controls" role="toolbar" aria-label="Game controls">
             <button type="button" class="ctl" (click)="store.hint()" [disabled]="!store.isMyTurn()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
             <button type="button" class="ctl" [class.on]="store.autoPlay()" [attr.aria-pressed]="store.autoPlay()" (click)="store.toggleAutoPlay()" title="Auto play"><span aria-hidden="true">🤖</span><span class="lbl">Auto</span></button>
