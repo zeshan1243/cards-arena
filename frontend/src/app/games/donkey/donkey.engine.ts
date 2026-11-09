@@ -16,7 +16,7 @@ import {
 import { BaseTableEngine, SUIT_GLYPH } from '../core/tricks';
 
 /**
- * Donkey — a draw-and-match fishing game for 2 to 5 players. Each player gets 4 cards and 4 more
+ * Donkey — a draw-and-match fishing game for 2 to 6 players. Each player gets 4 cards and 4 more
  * go face up on the table; the rest is the deck.
  *
  * On your turn draw a card into your hand, then play any card from your hand. If it has the same
@@ -81,7 +81,7 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
 
   constructor(seats: SeatConfig[], seed: number, settings: GameSettings = {}) {
     super(seats, seed);
-    if (seats.length < 2 || seats.length > 5) throw new Error('Donkey needs 2 to 5 players');
+    if (seats.length < 2 || seats.length > 6) throw new Error('Donkey needs 2 to 6 players');
     this.n = seats.length;
     this.target = Number(settings['target'] ?? 300);
     this.totals = Array(this.n).fill(0);

@@ -96,8 +96,8 @@ describe('Donkey', () => {
     expect(e.getView('you').totals).toEqual([40, 0]);
   });
 
-  it('bots finish whole games for 2 to 5 players', () => {
-    for (const players of [2, 3, 4, 5]) {
+  it('bots finish whole games for 2 to 6 players', () => {
+    for (const players of [2, 3, 4, 5, 6]) {
       for (const seed of [1, 2, 3]) {
         const { engine } = playThrough(definition, seed, { players, settings: { target: 500 } });
         expect(engine.isGameOver()).toBe(true);

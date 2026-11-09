@@ -5,7 +5,7 @@ import { DonkeyEngine, DonkeyView } from './donkey.engine';
 export const definition: GameDefinition<DonkeyView> = {
   slug: 'donkey',
   name: 'Donkey',
-  playerCounts: [2, 3, 4, 5],
+  playerCounts: [2, 3, 4, 5, 6],
   teams: false,
   setupOptions: [
     {
