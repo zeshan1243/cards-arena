@@ -21,8 +21,9 @@ import { BaseTableEngine, SUIT_GLYPH } from '../core/tricks';
  *
  * On your turn draw a card into your hand, then play any card from your hand. If it has the same
  * rank as a table card or as the top card of any captured pile — an opponent's or your own — it
- * captures: both cards go on your pile (taking the opponent's top card, or simply joining your
- * own pile) and you draw again. A card that matches nothing is thrown face up on the table and
+ * captures: both cards go on your pile and you draw again. Robbing an opponent takes every card
+ * of that rank from the top of their pile (a captured pair of 3s goes together); matching your
+ * own pile simply adds the card to it. A card that matches nothing is thrown face up on the table and
  * your turn ends.
  *
  * Once the deck is empty there is no drawing: players take turns playing one hand card each,
@@ -57,6 +58,8 @@ export const pilePoints = (cards: readonly Card[]) => cards.reduce((s, c) => s +
 
 const STOCK_BACK: Card = { id: 'stock-back', suit: 'spades', rank: 'A' };
 const glyph = (c: Card) => `${c.rank}${SUIT_GLYPH[c.suit]}`;
+const RANK_NAMES: Partial<Record<Card['rank'], string>> = { J: 'Jacks', Q: 'Queens', K: 'Kings', A: 'Aces' };
+const rankName = (c: Card) => RANK_NAMES[c.rank] ?? `${c.rank}s`;
 
 export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<DonkeyView> {
   readonly slug = 'donkey';
@@ -146,14 +149,24 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
       this.piles[seat].push(card);
     } else if (target.startsWith('pile:')) {
       const from = Number(target.slice(5));
-      const taken = this.piles[from].pop()!;
-      this.piles[seat].push(taken, card);
-      this.announce('success', `${this.seats[seat].name} takes ${glyph(taken)} from ${this.seats[from].name}’s pile!`);
+      const taken = this.topRun(from);
+      this.piles[from].length -= taken.length;
+      this.piles[seat].push(...taken, card);
+      const what = taken.length === 1 ? glyph(taken[0]) : `${taken.length} ${rankName(card)}`;
+      this.announce('success', `${this.seats[seat].name} takes ${what} from ${this.seats[from].name}’s pile!`);
     } else {
       this.piles[seat].push(this.table.splice(this.table.findIndex((c) => c.id === target), 1)[0], card);
       this.taker = seat;
     }
     this.seen.push(card);
+  }
+
+  /** The cards of the top card's rank sitting together on top of a pile. */
+  private topRun(seat: number): Card[] {
+    const pile = this.piles[seat];
+    let i = pile.length - 1;
+    while (i > 0 && pile[i - 1].rank === pile[pile.length - 1].rank) i--;
+    return pile.slice(i);
   }
 
   private nextTurn(seat: number): void {
@@ -214,7 +227,9 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
     if (t.startsWith('pile:')) {
       const i = Number(t.slice(5));
       const top = this.piles[i][this.piles[i].length - 1];
-      return i === seat ? `Add to your pile (${glyph(top)})` : `Take ${glyph(top)} from ${this.seats[i].name}`;
+      if (i === seat) return `Add to your pile (${glyph(top)})`;
+      const n = this.topRun(i).length;
+      return n === 1 ? `Take ${glyph(top)} from ${this.seats[i].name}` : `Take ${this.seats[i].name}’s ${n} ${rankName(top)}`;
     }
     return `Take ${glyph(this.table.find((c) => c.id === t)!)}`;
   }

@@ -58,14 +58,22 @@ describe('Donkey', () => {
     expect(e.currentPlayerId()).toBe('bot-1');
   });
 
-  it('steals the top card of an opponent’s pile', () => {
+  it('steals the cards of that rank from the top of an opponent’s pile', () => {
     const e = setup({ hands: [[c('2')], [c('3')]], table: [c('9')], stock: [c('5'), c('K', 'hearts')], piles: [[], [c('4'), c('K'), c('K', 'clubs')]] });
     e.apply('you', { type: 'draw' });
     expect(values(e)).toEqual(['spades-2>throw', 'hearts-K>pile:1']);
     e.apply('you', { type: 'play', cardId: 'hearts-K', value: 'pile:1' });
     const v = e.getView('you');
-    expect(v.piles[1].map((x) => x.id)).toEqual(['spades-4', 'spades-K']);
-    expect(v.piles[0].map((x) => x.id)).toEqual(['clubs-K', 'hearts-K']);
+    // Both Kings on top of Bilal's pile come over together.
+    expect(v.piles[1].map((x) => x.id)).toEqual(['spades-4']);
+    expect(v.piles[0].map((x) => x.id)).toEqual(['spades-K', 'clubs-K', 'hearts-K']);
+  });
+
+  it('only the cards of that rank on top are taken, not ones buried lower', () => {
+    const e = setup({ hands: [[c('3', 'hearts')], [c('2')]], table: [], stock: [c('5'), c('9')], phase: 'play', piles: [[], [c('3'), c('8'), c('3', 'clubs'), c('3', 'diamonds')]] });
+    expect(e.legalActions('you').find((a) => a.value === 'pile:1')?.label).toBe('Take Bot 1’s 2 3s');
+    e.apply('you', { type: 'play', cardId: 'hearts-3', value: 'pile:1' });
+    expect(e.getView('you').piles[1].map((x) => x.id)).toEqual(['spades-3', 'spades-8']);
   });
 
   it('pairs with the top of your own pile too', () => {

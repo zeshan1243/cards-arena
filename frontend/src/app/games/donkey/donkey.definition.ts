@@ -23,7 +23,7 @@ export const definition: GameDefinition<DonkeyView> = {
     'Everyone gets 4 cards and 4 more are dealt face up on the table. The rest is the deck.',
     'On your turn, draw a card into your hand. Then play any card from your hand.',
     'If it has the same rank as a card on the table, take the pair onto your pile — then draw again and keep going.',
-    'It can also pair with the top card of any pile: take the top card of an opponent’s pile, or add it to your own pile when its top card matches.',
+    'It can also pair with the top card of any pile. From an opponent’s pile you take every card of that rank on top (both 3s of a captured pair); a match with your own pile just adds the card to it.',
     'If the card you play matches nothing, it is thrown face up on the table and your turn ends.',
     'When the deck is empty, take turns playing your hand cards one at a time: a match captures, anything else goes on the table.',
     'Captured cards score: 2–9 are 5 points, 10 to King 10, Aces 20. Rounds continue until someone reaches the target.',

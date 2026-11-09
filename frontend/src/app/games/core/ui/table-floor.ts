@@ -36,10 +36,10 @@ const GLIDE = { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' };
   `,
   styles: `
     .floor { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-content: center; width: var(--floor-w, min(680px, 86vw)); min-height: 150px; padding: 8px; }
-    .pile { display: grid; justify-items: center; gap: 4px; animation: in var(--dur-slow) var(--ease-out); }
+    .pile { display: grid; justify-items: center; align-content: start; gap: 4px; animation: in var(--dur-slow) var(--ease-out); }
     .pile.house { padding: 6px; border-radius: 12px; background: rgba(245,158,11,.12); border: 1px dashed rgba(245,158,11,.6); }
-    .stack { display: flex; }
-    .layer { display: flex; margin-left: -24px; } .layer:first-child { margin-left: 0; }
+    .stack { display: flex; align-items: flex-start; align-self: start; }
+    .layer { display: flex; align-items: flex-start; margin-left: -24px; } .layer:first-child { margin-left: 0; }
     .pick { padding: 0; border: 0; background: none; cursor: pointer; border-radius: 8px; box-shadow: 0 0 0 3px rgba(0,212,255,.75), 0 0 22px rgba(0,212,255,.45); animation: glow 1.4s ease-in-out infinite; transition: transform var(--dur-fast) var(--ease-out); }
     .pick:hover { transform: translateY(-3px); }
     .pick:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 3px; }
