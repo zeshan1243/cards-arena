@@ -59,7 +59,7 @@ export class GameDetailPage {
         gamePlatform: 'Web browser',
         applicationCategory: 'Game',
         operatingSystem: 'Any',
-        playMode: g.maxPlayers === 1 || g.botEnabled ? 'SinglePlayer' : 'MultiPlayer',
+        playMode: g.multiplayerEnabled ? 'MultiPlayer' : 'SinglePlayer',
         numberOfPlayers: { '@type': 'QuantitativeValue', minValue: g.minPlayers, maxValue: g.maxPlayers },
         offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
         publisher: { '@type': 'Organization', name: 'CardArena', url: `${environment.siteUrl}/` },

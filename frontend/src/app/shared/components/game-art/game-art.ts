@@ -23,6 +23,17 @@ import { Component, computed, input } from '@angular/core';
           <text [attr.x]="p.x" [attr.y]="p.y">{{ symbols()[$index % symbols().length] }}</text>
         }
       </g>
+      @if (slug() === 'checkers') {
+        <!-- A corner of a checkers board in perspective, with a few pieces and a king. -->
+        <g transform="translate(160 112) scale(1 .55) rotate(45)">
+          @for (sq of boardSquares; track $index) {
+            <rect [attr.x]="sq.x" [attr.y]="sq.y" width="34" height="34" [attr.fill]="sq.dark ? '#b07a4f' : '#f1dfb8'" />
+          }
+          @for (pc of checkerPieces; track $index) {
+            <circle [attr.cx]="pc.x" [attr.cy]="pc.y" r="13" [attr.fill]="pc.red ? '#e11d48' : '#1e293b'" stroke="rgba(255,255,255,.45)" stroke-width="2" />
+          }
+        </g>
+      } @else {
       <g transform="translate(160 196)">
         @for (s of symbols(); track $index) {
           <g [attr.transform]="'rotate(' + angle($index) + ') translate(-34 -150)'">
@@ -32,6 +43,7 @@ import { Component, computed, input } from '@angular/core';
           </g>
         }
       </g>
+      }
     </svg>
   `,
   styles: `:host { display: block; } svg { display: block; width: 100%; height: 100%; }`,
@@ -45,6 +57,11 @@ export class GameArt {
   readonly symbols = computed(() => [...this.art()]);
   readonly gid = computed(() => `ga-${this.slug()}`);
   readonly pattern = Array.from({ length: 24 }, (_, i) => ({ x: (i % 8) * 44 + (Math.floor(i / 8) % 2) * 22, y: Math.floor(i / 8) * 64 + 30 }));
+
+  readonly boardSquares = Array.from({ length: 36 }, (_, i) => ({ x: (i % 6) * 34 - 102, y: Math.floor(i / 6) * 34 - 102, dark: ((i % 6) + Math.floor(i / 6)) % 2 === 1 }));
+  readonly checkerPieces = [
+    [1, 0, false], [3, 0, false], [0, 1, false], [2, 1, false], [3, 2, true], [1, 4, true], [2, 5, true], [4, 5, true], [5, 4, false],
+  ].map(([c, r, red]) => ({ x: (c as number) * 34 - 85, y: (r as number) * 34 - 85, red: red as boolean }));
 
   angle(i: number): number {
     const n = this.symbols().length;

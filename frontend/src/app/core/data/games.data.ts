@@ -14,6 +14,8 @@ import { content as c_solitaire } from '../../games/solitaire/solitaire.content'
 import { content as c_rummy } from '../../games/rummy/rummy.content';
 import { content as c_spider } from '../../games/spider/spider.content';
 import { content as c_tripeaks } from '../../games/tripeaks/tripeaks.content';
+import { content as c_war } from '../../games/war/war.content';
+import { content as c_checkers } from '../../games/checkers/checkers.content';
 
 export type { GameContent };
 
@@ -299,6 +301,44 @@ export const GAMES: GameInfo[] = [
     art: '♦♣♥',
     related: ['solitaire', 'spider-solitaire', 'rummy'],
   },
+  {
+    slug: 'war',
+    name: 'War',
+    aka: 'Battle',
+    tagline: 'Flip, compare, and win the whole deck.',
+    description: 'The classic card game of luck: flip against the computer, higher card wins, ties mean War. Classic or Quick games, with auto-play.',
+    region: 'Worldwide',
+    minPlayers: 2,
+    maxPlayers: 2,
+    botEnabled: false,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic'],
+    popularity: 78,
+    releasedAt: '2026-11-09',
+    accent: '#EF4444',
+    art: '♠♥♣',
+    related: ['checkers', 'tripeaks', 'solitaire'],
+  },
+  {
+    slug: 'checkers',
+    name: 'Checkers',
+    aka: 'Draughts',
+    tagline: 'Jump, capture and crown your kings.',
+    description: 'The classic board game against the computer: compulsory captures, multi-jumps and kings, with four AI levels, undo and hints.',
+    region: 'Worldwide',
+    minPlayers: 2,
+    maxPlayers: 2,
+    botEnabled: true,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 86,
+    releasedAt: '2026-11-09',
+    accent: '#DC2626',
+    art: '●○●',
+    related: ['war', 'solitaire', 'spider-solitaire'],
+  },
 ];
 
 export const GAME_CONTENT: Record<string, GameContent> = {
@@ -357,6 +397,8 @@ GAME_CONTENT['solitaire'] = c_solitaire;
 GAME_CONTENT['rummy'] = c_rummy;
 GAME_CONTENT['spider-solitaire'] = c_spider;
 GAME_CONTENT['tripeaks'] = c_tripeaks;
+GAME_CONTENT['war'] = c_war;
+GAME_CONTENT['checkers'] = c_checkers;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

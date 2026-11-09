@@ -1,0 +1,87 @@
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/war" class="round-btn" aria-label="Back to War page">‹</a>
+    <h1 class="title">War</h1>
+    @if (view(); as v) {
+      <div class="chips" aria-live="polite">
+        <span class="chip">You {{ totals()[0] }}</span>
+        <span class="chip">CPU {{ totals()[1] }}</span>
+        <span class="chip">Battle {{ v.battles + (battle() ? 1 : 0) }}</span>
+      </div>
+    }
+  </header>
+
+  <section class="board" #board aria-label="War table">
+    <div class="inner">
+      <div class="side cpu">
+        <div class="pile deck" data-pile="deck-1" aria-label="Computer's deck">
+          @if (deckCounts()[1]) { <app-playing-card size="fluid" [faceDown]="true" /> }
+          <span class="count">{{ deckCounts()[1] }}</span>
+        </div>
+        <span class="who">🤖 Computer</span>
+        @if (mode() === 'quick') {
+          <div class="pile won" data-pile="won-1" aria-label="Computer's winnings">
+            @if (wonCounts()[1]) { <app-playing-card size="fluid" [faceDown]="true" /> }
+            <span class="count">{{ wonCounts()[1] }}</span>
+          </div>
+        }
+      </div>
+
+      <div class="table" aria-live="polite">
+        @for (side of [1, 0]; track side) {
+          <div class="row" [class.winner]="battle()?.winner === side">
+            @for (t of battle()?.table?.[side] ?? []; track t.card.id; let i = $index) {
+              <div class="tcard" [attr.data-card]="t.card.id" [attr.data-side]="side" [attr.data-i]="i" [style.--i]="i">
+                <app-playing-card [card]="t.card" [faceDown]="!t.up" size="fluid" />
+              </div>
+            }
+          </div>
+        }
+        <p class="message" [class.war]="!!battle()?.wars">{{ message() }}</p>
+      </div>
+
+      <div class="side you">
+        <button type="button" class="pile deck" data-pile="deck-0" (click)="flip()" [disabled]="busy() || auto() || result() !== null"
+                [attr.aria-label]="'Your deck, ' + deckCounts()[0] + ' cards — flip'">
+          @if (deckCounts()[0]) { <app-playing-card size="fluid" [faceDown]="true" /> }
+          <span class="count">{{ deckCounts()[0] }}</span>
+        </button>
+        <span class="who">🙂 You</span>
+        @if (mode() === 'quick') {
+          <div class="pile won" data-pile="won-0" aria-label="Your winnings">
+            @if (wonCounts()[0]) { <app-playing-card size="fluid" [faceDown]="true" /> }
+            <span class="count">{{ wonCounts()[0] }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <footer class="controls" role="toolbar" aria-label="Game controls">
+    <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
+    <button type="button" class="ctl" [class.on]="auto()" (click)="toggleAuto()" [attr.aria-pressed]="auto()"><span aria-hidden="true">{{ auto() ? '⏸️' : '▶️' }}</span><span class="lbl">Auto</span></button>
+    <button type="button" class="ctl" [class.on]="speed() === 'fast'" (click)="toggleSpeed()" [attr.aria-pressed]="speed() === 'fast'"><span aria-hidden="true">⏩</span><span class="lbl">Fast</span></button>
+    <div class="segmented modes" role="group" aria-label="Game length">
+      <button type="button" [attr.aria-pressed]="mode() === 'classic'" (click)="setMode('classic')">Classic</button>
+      <button type="button" [attr.aria-pressed]="mode() === 'quick'" (click)="setMode('quick')">Quick</button>
+    </div>
+  </footer>
+</div>
+
+<app-modal [open]="result() !== null" [dismissible]="false" [label]="result() === 0 ? 'You won' : 'Game over'">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
+  <div class="result">
+    <div class="emoji" aria-hidden="true">{{ result() === 0 ? '🏆' : result() === 'draw' ? '🤝' : '⚔️' }}</div>
+    <h2 [class.lost]="result() !== 0">{{ result() === 0 ? 'You won the war!' : result() === 'draw' ? 'It’s a draw' : 'The computer won' }}</h2>
+    @if (view(); as v) {
+      <dl class="stats">
+        <div><dt>Your cards</dt><dd>{{ totals()[0] }}</dd></div>
+        <div><dt>Battles</dt><dd>{{ v.battles }}</dd></div>
+        <div><dt>Wars</dt><dd>{{ v.wars }}</dd></div>
+      </dl>
+    }
+    <p class="text-secondary">Games won: {{ stats().won }} of {{ stats().played }}</p>
+    <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>Play again</button>
+    <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+  </div>
+</app-modal>

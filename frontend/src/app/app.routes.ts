@@ -36,6 +36,14 @@ export const routes: Routes = [
     loadComponent: () => import('./games/tripeaks/tripeaks-game').then((m) => m.TriPeaksGame),
   },
   {
+    path: 'play/war',
+    loadComponent: () => import('./games/war/war-game').then((m) => m.WarGame),
+  },
+  {
+    path: 'play/checkers',
+    loadComponent: () => import('./games/checkers/checkers-game').then((m) => m.CheckersGame),
+  },
+  {
     path: 'play/:slug',
     loadComponent: () => import('./games/core/ui/table-game-page').then((m) => m.TableGamePage),
   },
