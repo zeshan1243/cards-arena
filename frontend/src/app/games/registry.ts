@@ -17,4 +17,5 @@ export const GAME_DEFINITIONS: Record<string, () => Promise<GameDefinition<any>>
   'hearts': () => import('./hearts/hearts.definition').then((m) => m.definition),
   'thirteen': () => import('./thirteen/thirteen.definition').then((m) => m.definition),
   'rummy': () => import('./rummy/rummy.definition').then((m) => m.definition),
+  'donkey': () => import('./donkey/donkey.definition').then((m) => m.definition),
 };

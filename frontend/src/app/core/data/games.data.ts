@@ -16,6 +16,7 @@ import { content as c_spider } from '../../games/spider/spider.content';
 import { content as c_tripeaks } from '../../games/tripeaks/tripeaks.content';
 import { content as c_war } from '../../games/war/war.content';
 import { content as c_checkers } from '../../games/checkers/checkers.content';
+import { content as c_donkey } from '../../games/donkey/donkey.content';
 
 export type { GameContent };
 
@@ -339,6 +340,24 @@ export const GAMES: GameInfo[] = [
     art: '●○●',
     related: ['war', 'solitaire', 'spider-solitaire'],
   },
+  {
+    slug: 'donkey',
+    name: 'Donkey',
+    tagline: 'Draw, match and steal — Aces are worth 20.',
+    description: 'Draw from the deck, pair cards with the table or steal from an opponent’s pile. 2 or 3 players, first to 300 or 500 points wins.',
+    region: 'South Asia',
+    minPlayers: 2,
+    maxPlayers: 3,
+    botEnabled: true,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['regional', 'popular'],
+    popularity: 84,
+    releasedAt: '2026-11-09',
+    accent: '#8B5CF6',
+    art: '♣♦♠',
+    related: ['seep', 'rummy', 'bhabhi-thulla'],
+  },
 ];
 
 export const GAME_CONTENT: Record<string, GameContent> = {
@@ -399,6 +418,7 @@ GAME_CONTENT['spider-solitaire'] = c_spider;
 GAME_CONTENT['tripeaks'] = c_tripeaks;
 GAME_CONTENT['war'] = c_war;
 GAME_CONTENT['checkers'] = c_checkers;
+GAME_CONTENT['donkey'] = c_donkey;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);
