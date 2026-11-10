@@ -18,6 +18,7 @@ import { content as c_war } from '../../games/war/war.content';
 import { content as c_checkers } from '../../games/checkers/checkers.content';
 import { content as c_donkey } from '../../games/donkey/donkey.content';
 import { content as c_yacht } from '../../games/yacht/yacht.content';
+import { content as c_pyramid } from '../../games/pyramid/pyramid.content';
 
 export type { GameContent };
 
@@ -301,7 +302,7 @@ export const GAMES: GameInfo[] = [
     releasedAt: '2026-11-05',
     accent: '#EAB308',
     art: '♦♣♥',
-    related: ['solitaire', 'spider-solitaire', 'rummy'],
+    related: ['solitaire', 'spider-solitaire', 'pyramid-solitaire'],
   },
   {
     slug: 'war',
@@ -377,6 +378,24 @@ export const GAMES: GameInfo[] = [
     art: '⚀⚂⚄',
     related: ['checkers', 'war', 'solitaire'],
   },
+  {
+    slug: 'pyramid-solitaire',
+    name: 'Pyramid Solitaire',
+    tagline: 'Pair cards that add up to 13 to bring the pyramid down.',
+    description: 'Remove pairs of cards that add up to 13, and Kings alone, to clear a pyramid of 28 cards. One, three or unlimited passes, with undo and hints.',
+    region: 'Worldwide',
+    minPlayers: 1,
+    maxPlayers: 1,
+    botEnabled: false,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 86,
+    releasedAt: '2026-11-10',
+    accent: '#F97316',
+    art: '♥♠♦',
+    related: ['tripeaks', 'solitaire', 'spider-solitaire'],
+  },
 ];
 
 export const GAME_CONTENT: Record<string, GameContent> = {
@@ -439,6 +458,7 @@ GAME_CONTENT['war'] = c_war;
 GAME_CONTENT['checkers'] = c_checkers;
 GAME_CONTENT['donkey'] = c_donkey;
 GAME_CONTENT['yacht-dice'] = c_yacht;
+GAME_CONTENT['pyramid-solitaire'] = c_pyramid;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);
