@@ -52,6 +52,10 @@ export const routes: Routes = [
     loadComponent: () => import('./games/pyramid/pyramid-game').then((m) => m.PyramidGame),
   },
   {
+    path: 'play/farkle',
+    loadComponent: () => import('./games/farkle/farkle-game').then((m) => m.FarkleGame),
+  },
+  {
     path: 'play/:slug',
     loadComponent: () => import('./games/core/ui/table-game-page').then((m) => m.TableGamePage),
   },

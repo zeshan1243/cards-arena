@@ -1,0 +1,120 @@
+@if (view(); as v) {
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/farkle" class="round-btn" aria-label="Back to Farkle page">‹</a>
+    <h1 class="title">Farkle</h1>
+    <div class="chips" aria-live="polite">
+      <span class="chip">To {{ v.target.toLocaleString() }}</span>
+      <span class="chip status" [class.cpu]="v.turn !== 0" [class.alert]="v.phase === 'farkle'">{{ status() }}</span>
+    </div>
+  </header>
+
+  <main class="body">
+    <section class="tray" aria-label="Dice">
+      <div class="turn-line">
+        <span class="kept" aria-label="Dice set aside this turn">
+          @for (d of v.kept; track $index) {
+            <span class="mini"><span class="face">@for (on of pipsOf(d); track $index) { <i [class.on]="on"></i> }</span></span>
+          }
+        </span>
+        <span class="turn-pts" [class.zero]="v.phase === 'farkle'">
+          <small>{{ v.turn === 0 ? 'Your turn' : names()[v.turn] }}</small>
+          <b>{{ (v.phase === 'farkle' ? 0 : v.turnPoints + pickPoints()).toLocaleString() }}</b>
+        </span>
+      </div>
+
+      <div class="dice" role="group" aria-label="Dice — tap scoring dice to set them aside">
+        @for (d of v.dice; track $index; let i = $index) {
+          <button #die type="button" class="die" [class.sel]="selected().includes(i)" [class.dead]="!rolling() && v.phase !== 'start' && !scoringDice().has(i)"
+                  [class.farkle]="v.phase === 'farkle' && !rolling()" [disabled]="!choosing()"
+                  [attr.aria-pressed]="selected().includes(i)" [attr.aria-label]="'Die ' + (i + 1) + ': ' + d" (click)="toggle(i)">
+            <span class="face">@for (on of pipsOf(d); track $index) { <i [class.on]="on"></i> }</span>
+          </button>
+        } @empty {
+          @for (k of [1, 2, 3, 4, 5, 6]; track k) { <span class="die ghost"><span class="face"></span></span> }
+        }
+      </div>
+      @if (v.phase === 'farkle' && !rolling()) { <p class="banner" role="status">Farkle!</p> }
+
+      <p class="pick-line" aria-live="polite">
+        @if (choosing()) {
+          @if (!selected().length) { Tap scoring dice to set them aside · <button type="button" class="link" (click)="selectBest()">select best</button> }
+          @else if (pickPoints()) { Set aside for <b>+{{ pickPoints().toLocaleString() }}</b> }
+          @else { <span class="bad">Those dice don’t all score</span> }
+        } @else { {{ log() }} }
+      </p>
+
+      <div class="actions">
+        <button type="button" class="roll" (click)="roll()" [disabled]="!myTurn() || rolling() || v.phase === 'farkle' || (v.phase === 'choose' && !pickPoints())">
+          @if (v.turn !== 0) { {{ names()[v.turn] }} is rolling… }
+          @else if (v.phase === 'start') { Roll 6 dice }
+          @else { Roll {{ rollCount() }} {{ rollCount() === 1 ? 'die' : 'dice' }} }
+        </button>
+        <button type="button" class="bank" (click)="bank()" [disabled]="!choosing() || !pickPoints()">
+          Bank {{ choosing() && pickPoints() ? bankTotal().toLocaleString() : '' }}
+        </button>
+      </div>
+      <p class="keys">Space to roll · B to bank · 1–6 to pick dice</p>
+    </section>
+
+    <aside class="side">
+      <ol class="board" aria-label="Scores">
+        @for (p of v.players; track $index; let s = $index) {
+          <li [class.turn]="v.turn === s && !over()" [class.leader]="v.finalFrom === s">
+            <span class="who">{{ names()[s] }} @if (v.finalFrom === s) { <em>reached {{ v.target.toLocaleString() }}</em> }</span>
+            <b class="pts">{{ p.score.toLocaleString() }}</b>
+            <span class="bar"><i [style.width.%]="progress(p.score) * 100"></i></span>
+          </li>
+        }
+      </ol>
+      <button type="button" class="chart-toggle" (click)="showChart.set(!showChart())" [attr.aria-expanded]="showChart()">Scoring <span class="arrow">{{ showChart() ? '▴' : '▾' }}</span></button>
+      <table class="chart" [class.open]="showChart()">
+        <tbody>
+          @for (r of scoring; track r.combo) { <tr><th scope="row">{{ r.combo }}</th><td>{{ r.pts }}</td></tr> }
+        </tbody>
+      </table>
+    </aside>
+  </main>
+
+  <footer class="controls" role="toolbar" aria-label="Game controls">
+    <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
+    <div class="segmented" role="group" aria-label="Opponents">
+      @for (o of [0, 1, 2, 3]; track o) {
+        <button type="button" [attr.aria-pressed]="opponents() === o" (click)="setOpponents(o)">{{ o === 0 ? 'Solo' : 'vs ' + o }}</button>
+      }
+    </div>
+    <div class="segmented" role="group" aria-label="Target score">
+      @for (t of [5000, 10000]; track t) {
+        <button type="button" [attr.aria-pressed]="target() === t" (click)="setTarget(t)">{{ t / 1000 }}k</button>
+      }
+    </div>
+    @if (opponents() > 0) {
+      <div class="segmented levels" role="group" aria-label="Computer level">
+        @for (l of ['easy', 'normal', 'hard']; track l) {
+          <button type="button" [attr.aria-pressed]="level() === l" (click)="setLevel($any(l))">{{ l }}</button>
+        }
+      </div>
+    }
+  </footer>
+</div>
+
+<app-modal [open]="over()" [dismissible]="false" [label]="winnerText()">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
+  <div class="result">
+    <div class="emoji" aria-hidden="true">{{ v.players.length === 1 || winnerText() === 'You won!' ? '🎲' : '🤖' }}</div>
+    <h2 [class.lost]="v.players.length > 1 && winnerText() !== 'You won!'">{{ winnerText() }}</h2>
+    <dl class="stats" [style.--cols]="v.players.length">
+      @for (p of v.players; track $index) {
+        <div><dt>{{ names()[$index] }}</dt><dd>{{ p.score.toLocaleString() }}</dd></div>
+      }
+    </dl>
+    <p class="text-secondary">
+      Biggest turn {{ stats().bestTurn.toLocaleString() }}
+      @if (stats().bestTurns) { · Best solo {{ stats().bestTurns }} turns }
+      @if (opponents()) { · Won {{ stats().won }} of {{ stats().played }} }
+    </p>
+    <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>Play again</button>
+    <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+  </div>
+</app-modal>
+}

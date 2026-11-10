@@ -65,7 +65,9 @@ export function scoreOf(dice: number[]): number {
     if (!n) continue;
     const single = face === 1 ? 100 : face === 5 ? 50 : 0;
     let faceBest = single ? n * single : -1;
-    for (let k = 3; k <= n; k++) faceBest = Math.max(faceBest, ofAKind(face, k) + (n - k) * single - (single ? 0 : (n - k) * 1e9));
+    for (let k = 3; k <= n; k++) {
+      if (single || k === n) faceBest = Math.max(faceBest, ofAKind(face, k) + (n - k) * single);
+    }
     if (faceBest < 0) {
       total = -1;
       break;

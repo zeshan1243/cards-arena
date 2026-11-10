@@ -1,6 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 
 const DICE_PIPS: Record<number, number[][]> = {
+  1: [[0, 0]],
   3: [[-1, -1], [0, 0], [1, 1]],
   5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]],
   6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]],
@@ -39,9 +40,9 @@ const DICE_PIPS: Record<number, number[][]> = {
             <circle [attr.cx]="pc.x" [attr.cy]="pc.y" r="13" [attr.fill]="pc.red ? '#e11d48' : '#1e293b'" stroke="rgba(255,255,255,.45)" stroke-width="2" />
           }
         </g>
-      } @else if (slug() === 'yacht-dice') {
+      } @else if (slug() === 'yacht-dice' || slug() === 'farkle') {
         <!-- Three tumbling dice. -->
-        @for (d of dice; track $index) {
+        @for (d of slug() === 'farkle' ? farkleDice : dice; track $index) {
           <g [attr.transform]="'translate(' + d.x + ' ' + d.y + ') rotate(' + d.r + ')'">
             <rect x="-30" y="-30" width="60" height="60" rx="12" [attr.fill]="'url(#' + gid() + '-card)'" stroke="rgba(0,0,0,.18)" />
             @for (p of d.pips; track $index) {
@@ -83,6 +84,12 @@ export class GameArt {
     { x: 100, y: 108, r: -14, face: 5 },
     { x: 165, y: 82, r: 9, face: 6 },
     { x: 225, y: 116, r: -6, face: 3 },
+  ].map((d) => ({ ...d, pips: DICE_PIPS[d.face] }));
+
+  readonly farkleDice = [
+    { x: 92, y: 112, r: 12, face: 1 },
+    { x: 160, y: 84, r: -8, face: 5 },
+    { x: 228, y: 114, r: 16, face: 1 },
   ].map((d) => ({ ...d, pips: DICE_PIPS[d.face] }));
 
   angle(i: number): number {

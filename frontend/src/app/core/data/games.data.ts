@@ -19,6 +19,7 @@ import { content as c_checkers } from '../../games/checkers/checkers.content';
 import { content as c_donkey } from '../../games/donkey/donkey.content';
 import { content as c_yacht } from '../../games/yacht/yacht.content';
 import { content as c_pyramid } from '../../games/pyramid/pyramid.content';
+import { content as c_farkle } from '../../games/farkle/farkle.content';
 
 export type { GameContent };
 
@@ -376,7 +377,7 @@ export const GAMES: GameInfo[] = [
     releasedAt: '2026-11-10',
     accent: '#10B981',
     art: '⚀⚂⚄',
-    related: ['checkers', 'war', 'solitaire'],
+    related: ['farkle', 'checkers', 'war'],
   },
   {
     slug: 'pyramid-solitaire',
@@ -395,6 +396,24 @@ export const GAMES: GameInfo[] = [
     accent: '#F97316',
     art: '♥♠♦',
     related: ['tripeaks', 'solitaire', 'spider-solitaire'],
+  },
+  {
+    slug: 'farkle',
+    name: 'Farkle',
+    tagline: 'Roll six dice, bank your points — or push your luck.',
+    description: 'The push-your-luck dice game: set aside 1s, 5s and sets, then roll again or bank before you Farkle. Play solo or against up to three computers.',
+    region: 'Worldwide',
+    minPlayers: 1,
+    maxPlayers: 4,
+    botEnabled: true,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 85,
+    releasedAt: '2026-11-10',
+    accent: '#EF4444',
+    art: '⚀⚄⚅',
+    related: ['yacht-dice', 'war', 'checkers'],
   },
 ];
 
@@ -459,6 +478,7 @@ GAME_CONTENT['checkers'] = c_checkers;
 GAME_CONTENT['donkey'] = c_donkey;
 GAME_CONTENT['yacht-dice'] = c_yacht;
 GAME_CONTENT['pyramid-solitaire'] = c_pyramid;
+GAME_CONTENT['farkle'] = c_farkle;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);
