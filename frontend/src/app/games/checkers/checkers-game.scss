@@ -31,6 +31,7 @@
     box-shadow: inset 0 0 0 calc(var(--size) * .006) rgba(255,255,255,.35), inset 0 0 0 calc(var(--size) * .014) rgba(0,0,0,.15), 0 calc(var(--size) * .006) calc(var(--size) * .012) rgba(0,0,0,.45); }
   &.cpu::before { background: radial-gradient(circle at 35% 30%, #475569, #1e293b 45%, #020617); }
   &.movable::before { box-shadow: 0 0 0 calc(var(--size) * .005) rgba(255,255,255,.9), 0 0 calc(var(--size) * .02) rgba(0,212,255,.8); }
+  &.jumper::before { box-shadow: 0 0 0 calc(var(--size) * .006) #fde68a, 0 0 calc(var(--size) * .025) rgba(245,158,11,.9); }
   &.selected::before { box-shadow: 0 0 0 calc(var(--size) * .007) #facc15, 0 0 calc(var(--size) * .03) rgba(250,204,21,.9); }
   .crown { position: relative; font-size: calc(var(--size) * .055); line-height: 1; color: #fde68a; text-shadow: 0 1px 2px rgba(0,0,0,.6); } }
 

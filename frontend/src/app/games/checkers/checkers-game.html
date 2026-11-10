@@ -5,7 +5,7 @@
     <div class="chips" aria-live="polite">
       <span class="chip"><i class="dot you"></i>{{ counts()[0] }}</span>
       <span class="chip"><i class="dot cpu"></i>{{ counts()[1] }}</span>
-      <span class="chip status" [class.alert]="mustCapture() || partial().length">{{ status() }}</span>
+      <span class="chip status" [class.alert]="canCapture() || partial().length">{{ status() }}</span>
     </div>
   </header>
 
@@ -23,7 +23,7 @@
       }
       @for (x of pieces(); track x.p.id) {
         <div class="piece" [class.cpu]="x.p.side === 1" [class.king]="x.p.king" [style.--r]="x.row" [style.--c]="x.col"
-             [class.movable]="movable().has(x.sq) && !partial().length" [class.selected]="selected() === x.sq || (partial().length && x.sq === partial()[partial().length - 1])"
+             [class.movable]="movable().has(x.sq) && !partial().length" [class.jumper]="jumpers().has(x.sq) && !partial().length" [class.selected]="selected() === x.sq || (partial().length && x.sq === partial()[partial().length - 1])"
              aria-hidden="true">
           @if (x.p.king) { <span class="crown">♛</span> }
         </div>
@@ -35,6 +35,7 @@
     <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
     <button type="button" class="ctl" (click)="undo()" [disabled]="busy() || !view().plies"><span aria-hidden="true">↩️</span><span class="lbl">Undo</span></button>
     <button type="button" class="ctl" (click)="hint()" [disabled]="!yourTurn()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
+    <button type="button" class="ctl" [class.on]="forced()" [attr.aria-pressed]="forced()" (click)="toggleForced()" title="Must jump: when on, an available capture has to be taken"><span aria-hidden="true">⚔️</span><span class="lbl">Must jump</span></button>
     <div class="segmented levels" role="group" aria-label="Computer level">
       @for (l of ['easy', 'normal', 'hard', 'expert']; track l) {
         <button type="button" [attr.aria-pressed]="level() === l" (click)="setLevel($any(l))">{{ l }}</button>

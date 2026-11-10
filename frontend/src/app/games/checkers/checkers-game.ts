@@ -41,7 +41,9 @@ export class CheckersGame implements OnDestroy {
   private readonly toast = inject(ToastService);
   private readonly rng = seededRng(Math.floor(Math.random() * 2 ** 31));
 
-  private engine = new CheckersEngine();
+  /** Standard rule: if you can jump, you must. Off by default: capturing is your choice. */
+  readonly forced = signal<boolean>(this.storage.get<boolean>('checkers.forced', false));
+  private engine = new CheckersEngine(this.forced());
   private timers: ReturnType<typeof setTimeout>[] = [];
   private started = false;
 
@@ -70,19 +72,23 @@ export class CheckersGame implements OnDestroy {
     return this.moves().filter((m) => m.from === from && part.every((s, i) => m.path[i] === s));
   });
   readonly targets = computed(() => new Set(this.candidates().map((m) => m.path[this.partial().length])));
-  readonly mustCapture = computed(() => this.yourTurn() && !!this.moves()[0]?.captures.length);
+  /** Your pieces that can capture this turn. */
+  readonly jumpers = computed(() => new Set(this.yourTurn() ? this.moves().filter((m) => m.captures.length).map((m) => m.from) : []));
+  /** A capture is on for you this turn (moves list captures first). */
+  readonly canCapture = computed(() => this.yourTurn() && !!this.moves()[0]?.captures.length);
+  readonly mustCapture = computed(() => this.forced() && this.canCapture());
   readonly counts = computed(() => [0, 1].map((side) => this.view().board.filter((p) => p?.side === side).length));
   readonly status = computed(() => {
     if (this.result() !== null) return 'Game over';
     if (this.view().turn === 1) return 'Computer is thinking…';
     if (this.partial().length) return 'Keep jumping!';
-    return this.mustCapture() ? 'You must capture' : 'Your move';
+    return this.mustCapture() ? 'You must capture' : this.canCapture() ? 'You can capture' : 'Your move';
   });
 
   constructor() {
     inject(SeoService).apply({
       title: 'Play Checkers Online – Free vs Computer | CardArena',
-      description: 'Play Checkers (draughts) free in your browser against the computer. Four AI levels, compulsory captures, multi-jumps, kings, undo and hints. No download.',
+      description: 'Play Checkers (draughts) free in your browser against the computer. Four AI levels, optional or forced captures, multi-jumps, kings, undo and hints. No download.',
       path: '/games/checkers',
       image: '/og/checkers.jpg',
     });
@@ -97,7 +103,7 @@ export class CheckersGame implements OnDestroy {
   newGame(): void {
     this.clearTimers();
     if (this.started && this.result() === null) this.saveStats({ played: this.stats().played + 1 });
-    this.engine = new CheckersEngine();
+    this.engine = new CheckersEngine(this.forced());
     this.started = false;
     this.busy.set(false);
     this.result.set(null);
@@ -110,6 +116,16 @@ export class CheckersGame implements OnDestroy {
     this.level.set(l);
     this.storage.set('checkers.level', l);
     if (this.started && this.result() === null) this.toast.info(`${l[0].toUpperCase() + l.slice(1)} level`, 'The computer plays at this level from its next move.');
+  }
+
+  /** Switch the forced-capture rule; applies straight away, including to the computer. */
+  toggleForced(): void {
+    const on = !this.forced();
+    this.forced.set(on);
+    this.storage.set('checkers.forced', on);
+    this.engine.forced = on;
+    if (this.yourTurn()) this.sync();
+    this.toast.info(on ? 'Must jump: on' : 'Must jump: off', on ? 'If a capture is available, it has to be taken.' : 'Capturing is your choice — you can jump or make another move.');
   }
 
   clickSquare(sq: number): void {
@@ -235,7 +251,7 @@ export class CheckersGame implements OnDestroy {
   }
 
   private nope(message: string): void {
-    this.toast.info(message, this.mustCapture() ? 'Captures are compulsory — pick a highlighted piece.' : 'Pick one of the highlighted pieces.');
+    this.toast.info(message, this.mustCapture() ? 'Must jump is on — pick a highlighted piece.' : 'Pick one of the highlighted pieces.');
   }
 
   private saveStats(patch: Partial<Stats>): void {

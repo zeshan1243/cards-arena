@@ -7,14 +7,17 @@ import { ToastService } from '../../core/services/toast.service';
 import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { PlayingCard } from '../../shared/components/playing-card/playing-card';
-import { Card } from '../../shared/models/card.model';
+import { Card, SUIT_SYMBOL } from '../../shared/models/card.model';
 import { value } from '../solitaire/solitaire.engine';
-import { Passes, PyramidEngine, PyramidState } from './pyramid.engine';
+import { Passes, PyramidEngine, PyramidState, coveredBy } from './pyramid.engine';
 
 interface Stats {
   played: number;
   won: number;
   bestScore: number;
+  /** Endless mode: best running total and most boards cleared in one run. */
+  bestRun?: number;
+  mostBoards?: number;
 }
 
 const FLIGHT = { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' };
@@ -37,6 +40,9 @@ export class PyramidGame implements OnDestroy {
   private timer: ReturnType<typeof setInterval> | null = null;
   private hintTimer: ReturnType<typeof setTimeout> | null = null;
   private started = false;
+  /** Set the moment a deal ends, before the result modal appears, so no further moves count. */
+  private ended = false;
+  private resultTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly passOptions: Passes[] = [1, 3, 0];
   readonly passLabels = PASS_LABELS;
@@ -53,7 +59,17 @@ export class PyramidGame implements OnDestroy {
   readonly result = signal<'won' | 'lost' | null>(null);
   readonly hinted = signal<Set<string>>(new Set());
   readonly hintStock = signal(false);
+  /** Why the last tapped card couldn't be used, shown in the help line. */
+  readonly blocked = signal<string | null>(null);
   readonly stats = signal<Stats>(this.storage.get<Stats>('pyramid.stats', { played: 0, won: 0, bestScore: 0 }));
+
+  /** Endless: clearing a board deals the next one and the score keeps adding up. */
+  readonly endless = signal<boolean>(this.storage.get<boolean>('pyramid.endless', false));
+  /** Board number within the current run. */
+  readonly boardNo = signal(1);
+  /** Points from boards already cleared this run. */
+  readonly carried = signal(0);
+  readonly total = computed(() => this.carried() + (this.view()?.score ?? 0));
 
   readonly time = computed(() => formatTime(this.elapsed()));
   readonly wasteTop = computed(() => this.view()?.waste.slice(-2) ?? []);
@@ -83,17 +99,43 @@ export class PyramidGame implements OnDestroy {
 
   ngOnDestroy(): void {
     this.stopTimer();
+    if (this.resultTimer) clearTimeout(this.resultTimer);
   }
 
   // -------------------------------------------------------------- game flow
 
+  /** Start over: a fresh run (or single game). */
   newGame(): void {
     this.stopTimer();
     if (this.started && !this.result()) this.saveStats({ played: this.stats().played + 1 });
+    this.carried.set(0);
+    this.boardNo.set(1);
+    this.elapsed.set(0);
+    this.deal();
+  }
+
+  /** Endless: bank this board's score and deal the next one; the clock keeps running. */
+  nextBoard(): void {
+    this.carried.update((c) => c + (this.view()?.score ?? 0));
+    this.boardNo.update((n) => n + 1);
+    this.deal();
+  }
+
+  toggleEndless(): void {
+    const on = !this.endless();
+    this.endless.set(on);
+    this.storage.set('pyramid.endless', on);
+    if (this.started && !this.result()) this.toast.info(on ? 'Endless mode on' : 'Endless mode off', on ? 'Clear this board and the next one is dealt — your score keeps adding up.' : 'Starts with your next game.');
+    else if (!on || this.boardNo() > 1) this.newGame();
+    else this.toast.info('Endless mode on', 'Clear a board and the next one is dealt — your score keeps adding up.');
+  }
+
+  private deal(): void {
+    if (this.resultTimer) clearTimeout(this.resultTimer);
+    this.ended = false;
     this.engine = new PyramidEngine(Math.floor(Math.random() * 2 ** 31), this.passes());
     this.started = false;
     this.result.set(null);
-    this.elapsed.set(0);
     this.selected.set(null);
     this.clearHint();
     this.sync();
@@ -110,11 +152,13 @@ export class PyramidGame implements OnDestroy {
   }
 
   tap(id: string): void {
-    if (this.result()) return;
+    if (this.ended) return;
     if (!this.available().has(id)) {
       this.shake(id);
+      this.explainBlocked(id);
       return;
     }
+    this.blocked.set(null);
     const card = this.cardById(id)!;
     const sel = this.selected();
     if (value(card) === 13 && this.engine.canRemove([id])) {
@@ -137,7 +181,7 @@ export class PyramidGame implements OnDestroy {
   }
 
   draw(): void {
-    if (this.result()) return;
+    if (this.ended) return;
     const prev = this.snapshot();
     const recycling = this.engine.canRecycle();
     if (!this.engine.draw()) return;
@@ -149,6 +193,8 @@ export class PyramidGame implements OnDestroy {
   undo(): void {
     if (!this.engine.undo()) return;
     const prev = this.snapshot();
+    if (this.resultTimer) clearTimeout(this.resultTimer);
+    this.ended = false;
     this.result.set(null);
     this.selected.set(null);
     this.sync();
@@ -213,20 +259,43 @@ export class PyramidGame implements OnDestroy {
   }
 
   private finish(result: 'won' | 'lost'): void {
+    if (this.ended) return;
+    this.ended = true;
     this.stopTimer();
     const s = this.stats();
-    this.saveStats({ played: s.played + 1, won: s.won + (result === 'won' ? 1 : 0), bestScore: Math.max(s.bestScore, this.view()!.score) });
+    this.saveStats({ played: s.played + 1, won: s.won + (result === 'won' ? 1 : 0), bestScore: Math.max(s.bestScore, this.view()!.score), ...this.runStats(result) });
     this.started = false;
-    setTimeout(() => {
+    this.resultTimer = setTimeout(() => {
       this.sound.play(result === 'won' ? 'win' : 'lose');
       this.result.set(result);
     }, 500);
+  }
+
+  private blockedTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** Tell the player which cards are still on top of a covered card. */
+  private explainBlocked(id: string): void {
+    const slots = this.view()?.slots ?? [];
+    const i = slots.findIndex((x) => !x.gone && x.card.id === id);
+    if (i < 0) return;
+    const on = coveredBy(i, slots).filter((c) => !slots[c].gone).map((c) => cardName(slots[c].card));
+    if (!on.length) return;
+    this.blocked.set(`${cardName(slots[i].card)} is covered — remove ${on.join(' and ')} first`);
+    if (this.blockedTimer) clearTimeout(this.blockedTimer);
+    this.blockedTimer = setTimeout(() => this.blocked.set(null), 3000);
   }
 
   private cardById(id: string): Card | null {
     const v = this.view();
     if (!v) return null;
     return v.slots.find((s) => !s.gone && s.card.id === id)?.card ?? v.waste.find((c) => c.id === id) ?? null;
+  }
+
+  private runStats(result: 'won' | 'lost'): Partial<Stats> {
+    if (!this.endless()) return {};
+    const s = this.stats();
+    const boards = this.boardNo() - (result === 'won' ? 0 : 1);
+    return { bestRun: Math.max(s.bestRun ?? 0, this.total()), mostBoards: Math.max(s.mostBoards ?? 0, boards) };
   }
 
   private saveStats(patch: Partial<Stats>): void {
@@ -292,6 +361,10 @@ export class PyramidGame implements OnDestroy {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
   }
+}
+
+function cardName(c: Card): string {
+  return `${c.rank}${SUIT_SYMBOL[c.suit]}`;
 }
 
 function formatTime(s: number): string {

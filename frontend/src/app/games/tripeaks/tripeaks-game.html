@@ -4,9 +4,10 @@
     <h1 class="title">Tri Peaks</h1>
     @if (view(); as v) {
       <div class="chips" aria-live="polite">
-        <span class="chip">Score {{ v.score }}</span>
+        @if (endless()) { <span class="chip board-chip">Board {{ boardNo() }}</span> }
+        <span class="chip">Score {{ total() }}</span>
         <span class="chip" [class.streak]="v.streak > 2">Streak {{ v.streak }}</span>
-        <span class="chip">⏱ {{ time() }}</span>
+        <span class="chip time">⏱ {{ time() }}</span>
       </div>
     }
   </header>
@@ -48,25 +49,48 @@
     <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
     <button type="button" class="ctl" (click)="undo()" [disabled]="!canUndo()"><span aria-hidden="true">↩️</span><span class="lbl">Undo</span></button>
     <button type="button" class="ctl" (click)="hint()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
+    <button type="button" class="ctl" [class.on]="endless()" [attr.aria-pressed]="endless()" (click)="toggleEndless()" title="Endless: clear a board and the next is dealt, score keeps adding up"><span aria-hidden="true">♾️</span><span class="lbl">Endless</span></button>
   </footer>
 </div>
 
-<app-modal [open]="!!result()" [dismissible]="false" [label]="result() === 'won' ? 'You won' : 'No moves left'">
+<app-modal [open]="!!result()" [dismissible]="false" [label]="result() === 'won' ? 'Board cleared' : 'No moves left'">
   <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   <div class="result">
     <div class="emoji" aria-hidden="true">{{ result() === 'won' ? '🏔️' : '🃏' }}</div>
-    <h2 [class.lost]="result() === 'lost'">{{ result() === 'won' ? 'Peaks cleared!' : 'No moves left' }}</h2>
     @if (view(); as v) {
-      <dl class="stats">
-        <div><dt>Score</dt><dd>{{ v.score }}</dd></div>
-        <div><dt>Best streak</dt><dd>{{ v.bestStreak }}</dd></div>
-        <div><dt>Cleared</dt><dd>{{ cleared() }}/28</dd></div>
-      </dl>
+      @if (endless()) {
+        @if (result() === 'won') {
+          <h2>Board {{ boardNo() }} cleared!</h2>
+          <dl class="stats">
+            <div><dt>This board</dt><dd>+{{ v.score }}</dd></div>
+            <div><dt>Total</dt><dd>{{ total() }}</dd></div>
+            <div><dt>Time</dt><dd>{{ time() }}</dd></div>
+          </dl>
+          <p class="text-secondary">Your total carries over to the next board. Best run {{ stats().bestRun ?? 0 }} · Most boards {{ stats().mostBoards ?? 0 }}</p>
+          <button class="btn btn-primary btn-lg btn-block" type="button" (click)="nextBoard()" autofocus>Next board →</button>
+          <button class="btn btn-ghost btn-block" type="button" (click)="newGame()">End run &amp; start over</button>
+        } @else {
+          <h2 class="lost">Run over</h2>
+          <dl class="stats">
+            <div><dt>Total</dt><dd>{{ total() }}</dd></div>
+            <div><dt>Boards</dt><dd>{{ boardNo() - 1 }}</dd></div>
+            <div><dt>Time</dt><dd>{{ time() }}</dd></div>
+          </dl>
+          <p class="text-secondary">No moves left on board {{ boardNo() }} ({{ cleared() }}/28 cleared). Best run {{ stats().bestRun ?? 0 }} · Most boards {{ stats().mostBoards ?? 0 }}</p>
+          <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>New run</button>
+          <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+        }
+      } @else {
+        <h2 [class.lost]="result() === 'lost'">{{ result() === 'won' ? 'Peaks cleared!' : 'No moves left' }}</h2>
+        <dl class="stats">
+          <div><dt>Score</dt><dd>{{ total() }}</dd></div>
+          <div><dt>Best streak</dt><dd>{{ v.bestStreak }}</dd></div>
+          <div><dt>Cleared</dt><dd>{{ cleared() }}/28</dd></div>
+        </dl>
+        <p class="text-secondary">Games won: {{ stats().won }} of {{ stats().played }} · Best score {{ stats().bestScore }} · Longest streak {{ stats().bestStreak }}</p>
+        <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>{{ result() === 'won' ? 'Play again' : 'New game' }}</button>
+        <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+      }
     }
-    <p class="text-secondary">
-      Games won: {{ stats().won }} of {{ stats().played }} · Best score {{ stats().bestScore }} · Longest streak {{ stats().bestStreak }}
-    </p>
-    <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>{{ result() === 'won' ? 'Play again' : 'New game' }}</button>
-    <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
   </div>
 </app-modal>

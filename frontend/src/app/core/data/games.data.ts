@@ -329,7 +329,7 @@ export const GAMES: GameInfo[] = [
     name: 'Checkers',
     aka: 'Draughts',
     tagline: 'Jump, capture and crown your kings.',
-    description: 'The classic board game against the computer: compulsory captures, multi-jumps and kings, with four AI levels, undo and hints.',
+    description: 'The classic board game against the computer: multi-jumps and kings, captures your choice or forced, with four AI levels, undo and hints.',
     region: 'Worldwide',
     minPlayers: 2,
     maxPlayers: 2,

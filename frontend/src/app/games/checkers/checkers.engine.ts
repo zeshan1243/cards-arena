@@ -3,8 +3,9 @@ import { Rng } from '../core/deck';
 /**
  * Checkers (American / English draughts) on an 8×8 board, you against the computer.
  * Pieces sit on the dark squares; men move one square diagonally forward and kings both ways.
- * Captures are compulsory and a capturing piece must keep jumping while it can — but you may
- * choose any capture sequence, not only the longest. A man reaching the far row is crowned and
+ * Captures are optional by default (you choose whether to jump); with `forced` on, as in the
+ * standard rules, any available capture must be taken. Either way a capturing piece keeps jumping
+ * while it can, and you may choose any capture sequence, not only the longest. A man reaching the far row is crowned and
  * its move ends there. You lose when you have no pieces or no legal move. After 80 plies with
  * no capture and no man moved, the game is a draw.
  *
@@ -70,20 +71,20 @@ function at(r: number, c: number): number | null {
   return r >= 0 && r < 8 && c >= 0 && c < 8 ? r * 8 + c : null;
 }
 
-/** Every legal move for `side`; captures only, when any capture exists. */
-export function legalMoves(board: Board, side: Side): Move[] {
+/** Every legal move for `side`, captures first; with `forced`, only captures when any exists. */
+export function legalMoves(board: Board, side: Side, forced = true): Move[] {
   const jumps: Move[] = [];
   const steps: Move[] = [];
   board.forEach((p, sq) => {
     if (!p || p.side !== side) return;
     collectJumps(board, sq, p, sq, [], [], jumps);
-    if (jumps.length) return;
+    if (forced && jumps.length) return;
     for (const [dr, dc] of dirs(p)) {
       const to = at(rowOf(sq) + dr, colOf(sq) + dc);
       if (to !== null && !board[to]) steps.push({ from: sq, path: [to], captures: [] });
     }
   });
-  return jumps.length ? jumps : steps;
+  return forced && jumps.length ? jumps : [...jumps, ...steps];
 }
 
 function collectJumps(board: Board, from: number, p: Piece, sq: number, path: number[], captures: number[], out: Move[]): void {
@@ -122,7 +123,8 @@ export class CheckersEngine {
   private state: CheckersState;
   private history: CheckersState[] = [];
 
-  constructor() {
+  /** Standard rule: an available capture must be taken. Off by default. */
+  constructor(public forced = false) {
     this.state = { board: initialBoard(), turn: 0, quiet: 0, plies: 0, last: null };
   }
 
@@ -131,7 +133,7 @@ export class CheckersEngine {
   }
 
   moves(): Move[] {
-    return legalMoves(this.state.board, this.state.turn);
+    return legalMoves(this.state.board, this.state.turn, this.forced);
   }
 
   /** The winner, 'draw', or null while play goes on. */
@@ -174,11 +176,12 @@ export class CheckersEngine {
     if (moves.length <= 1) return moves[0] ?? null;
     if (level === 'easy' && rng() < 0.35) return moves[Math.floor(rng() * moves.length)];
     const side = this.state.turn;
-    const depth = DEPTH[level];
+    // Optional captures mean many more moves to weigh, so Expert looks one ply less deep.
+    const depth = this.forced ? DEPTH[level] : Math.min(DEPTH[level], 7);
     let best: Move[] = [];
     let bestScore = -Infinity;
     for (const m of order(moves)) {
-      const score = -search(applyMove(this.state.board, m), (1 - side) as Side, depth - 1, -Infinity, -bestScore + 1);
+      const score = -search(applyMove(this.state.board, m), (1 - side) as Side, depth - 1, -Infinity, -bestScore + 1, this.forced);
       if (score > bestScore) {
         bestScore = score;
         best = [m];
@@ -194,15 +197,24 @@ function order(moves: Move[]): Move[] {
 }
 
 /** Negamax with alpha-beta; scores are from `side`'s point of view. */
-function search(board: Board, side: Side, depth: number, alpha: number, beta: number): number {
-  const moves = legalMoves(board, side);
+function search(board: Board, side: Side, depth: number, alpha: number, beta: number, forced: boolean): number {
+  const moves = legalMoves(board, side, forced);
   if (!moves.length) return -10000 - depth; // losing sooner is worse
-  // Keep searching through captures so the evaluation doesn't stop mid-exchange.
-  if (depth <= 0 && !moves[0].captures.length) return evaluate(board, side);
-  if (depth <= -6) return evaluate(board, side);
   let best = -Infinity;
-  for (const m of order(moves)) {
-    const score = -search(applyMove(board, m), (1 - side) as Side, depth - 1, -beta, -alpha);
+  let list = order(moves);
+  // Past the horizon keep playing out captures so the evaluation doesn't stop mid-exchange.
+  if (depth <= 0) {
+    if (!moves[0].captures.length || depth <= -6) return evaluate(board, side);
+    if (!forced) {
+      // Captures are optional: the side to move can also decline them ("stand pat").
+      best = evaluate(board, side);
+      if (best > alpha) alpha = best;
+      if (alpha >= beta) return best;
+      list = list.filter((m) => m.captures.length);
+    }
+  }
+  for (const m of list) {
+    const score = -search(applyMove(board, m), (1 - side) as Side, depth - 1, -beta, -alpha, forced);
     if (score > best) best = score;
     if (score > alpha) alpha = score;
     if (alpha >= beta) break;

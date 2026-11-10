@@ -7,6 +7,7 @@ export const content: GameContent = {
     'You can only use cards that are uncovered: a card in the pyramid is free once both cards overlapping it from the row below are gone. One exception: a card may pair with the single card still covering it, such as a 4 sitting under a 9.',
     'When you run out of pairs, tap the stock to turn its top card onto the waste pile. The top card of the waste can pair with a free pyramid card. When the stock is empty you can turn the waste back over and go through it again: three passes by default, or choose one pass or unlimited passes.',
     'Each pair or King removed scores 5 points, each pyramid row cleared adds 25, and clearing the whole pyramid adds 250 plus 10 for every card left in the stock and waste. Use Undo to take back a move and Hint when you’re stuck.',
+    'Turn on Endless mode to play board after board: clear the pyramid and a new one is dealt, with your score carrying over. The run ends when you get stuck, so see how many boards you can clear and how high your total can go.',
   ],
   strategy: [
     'Clear the bottom row evenly. Every card you uncover high in the pyramid needs both cards below it gone, so work across the row instead of digging down one side.',
@@ -21,5 +22,6 @@ export const content: GameContent = {
     { q: 'Can I pair a card with the card covering it?', a: 'Yes. If a card is covered by just one remaining card and the two add up to 13, you can remove them together.' },
     { q: 'Is every game of Pyramid Solitaire winnable?', a: 'No. Many deals can’t be cleared, especially with a single pass. With three passes and careful play you can win a good share of games.' },
     { q: 'Can I play Pyramid Solitaire online for free?', a: 'Yes — play free in your browser on CardArena, on phone, tablet or desktop, with no download or sign-up.' },
+    { q: 'Can I keep playing after clearing the pyramid?', a: 'Yes. Turn on Endless mode and every cleared pyramid deals a new board, with your score carrying over until you run out of moves.' },
   ],
 };

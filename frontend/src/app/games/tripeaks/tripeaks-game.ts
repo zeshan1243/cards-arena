@@ -13,6 +13,9 @@ interface Stats {
   played: number;
   won: number;
   bestScore: number;
+  /** Endless mode: best running total and most boards cleared in one run. */
+  bestRun?: number;
+  mostBoards?: number;
   bestStreak: number;
 }
 
@@ -35,6 +38,9 @@ export class TriPeaksGame implements OnDestroy {
   private timer: ReturnType<typeof setInterval> | null = null;
   private hintTimer: ReturnType<typeof setTimeout> | null = null;
   private started = false;
+  /** Set the moment a deal ends, before the result modal appears, so no further moves count. */
+  private ended = false;
+  private resultTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly view = signal<TriPeaksState | null>(null);
   readonly free = signal<Set<number>>(new Set());
@@ -44,6 +50,14 @@ export class TriPeaksGame implements OnDestroy {
   readonly result = signal<'won' | 'lost' | null>(null);
   readonly hintSlot = signal<number | 'stock' | null>(null);
   readonly stats = signal<Stats>(this.storage.get<Stats>('tripeaks.stats', { played: 0, won: 0, bestScore: 0, bestStreak: 0 }));
+
+  /** Endless: clearing a board deals the next one and the score keeps adding up. */
+  readonly endless = signal<boolean>(this.storage.get<boolean>('tripeaks.endless', false));
+  /** Board number within the current run. */
+  readonly boardNo = signal(1);
+  /** Points from boards already cleared this run. */
+  readonly carried = signal(0);
+  readonly total = computed(() => this.carried() + (this.view()?.score ?? 0));
 
   readonly time = computed(() => formatTime(this.elapsed()));
   readonly wasteTop = computed(() => this.view()?.waste.slice(-2) ?? []);
@@ -63,17 +77,43 @@ export class TriPeaksGame implements OnDestroy {
 
   ngOnDestroy(): void {
     this.stopTimer();
+    if (this.resultTimer) clearTimeout(this.resultTimer);
   }
 
   // -------------------------------------------------------------- game flow
 
+  /** Start over: a fresh run (or single game). */
   newGame(): void {
     this.stopTimer();
     if (this.started && !this.result()) this.saveStats({ played: this.stats().played + 1 });
+    this.carried.set(0);
+    this.boardNo.set(1);
+    this.elapsed.set(0);
+    this.deal();
+  }
+
+  /** Endless: bank this board's score and deal the next one; the clock keeps running. */
+  nextBoard(): void {
+    this.carried.update((c) => c + (this.view()?.score ?? 0));
+    this.boardNo.update((n) => n + 1);
+    this.deal();
+  }
+
+  toggleEndless(): void {
+    const on = !this.endless();
+    this.endless.set(on);
+    this.storage.set('tripeaks.endless', on);
+    if (this.started && !this.result()) this.toast.info(on ? 'Endless mode on' : 'Endless mode off', on ? 'Clear this board and the next one is dealt — your score keeps adding up.' : 'Starts with your next game.');
+    else if (!on || this.boardNo() > 1) this.newGame();
+    else this.toast.info('Endless mode on', 'Clear a board and the next one is dealt — your score keeps adding up.');
+  }
+
+  private deal(): void {
+    if (this.resultTimer) clearTimeout(this.resultTimer);
+    this.ended = false;
     this.engine = new TriPeaksEngine(Math.floor(Math.random() * 2 ** 31));
     this.started = false;
     this.result.set(null);
-    this.elapsed.set(0);
     this.clearHint();
     this.sync();
     this.sound.play('card-deal');
@@ -81,7 +121,7 @@ export class TriPeaksGame implements OnDestroy {
   }
 
   tap(i: number): void {
-    if (this.result()) return;
+    if (this.ended) return;
     const prev = this.snapshot();
     if (!this.engine.play(i)) {
       this.nope(i);
@@ -92,7 +132,7 @@ export class TriPeaksGame implements OnDestroy {
   }
 
   draw(): void {
-    if (this.result()) return;
+    if (this.ended) return;
     const prev = this.snapshot();
     if (!this.engine.draw()) return;
     this.sound.play('card-deal');
@@ -102,6 +142,8 @@ export class TriPeaksGame implements OnDestroy {
   undo(): void {
     if (!this.engine.undo()) return;
     const prev = this.snapshot();
+    if (this.resultTimer) clearTimeout(this.resultTimer);
+    this.ended = false;
     this.result.set(null);
     this.sync();
     this.flip(prev);
@@ -141,6 +183,8 @@ export class TriPeaksGame implements OnDestroy {
   }
 
   private finish(result: 'won' | 'lost'): void {
+    if (this.ended) return;
+    this.ended = true;
     this.stopTimer();
     const s = this.stats();
     const v = this.view()!;
@@ -148,13 +192,21 @@ export class TriPeaksGame implements OnDestroy {
       played: s.played + 1,
       won: s.won + (result === 'won' ? 1 : 0),
       bestScore: Math.max(s.bestScore, v.score),
+      ...this.runStats(result),
       bestStreak: Math.max(s.bestStreak, v.bestStreak),
     });
     this.started = false;
-    setTimeout(() => {
+    this.resultTimer = setTimeout(() => {
       this.sound.play(result === 'won' ? 'win' : 'lose');
       this.result.set(result);
     }, 500);
+  }
+
+  private runStats(result: 'won' | 'lost'): Partial<Stats> {
+    if (!this.endless()) return {};
+    const s = this.stats();
+    const boards = this.boardNo() - (result === 'won' ? 0 : 1);
+    return { bestRun: Math.max(s.bestRun ?? 0, this.total()), mostBoards: Math.max(s.mostBoards ?? 0, boards) };
   }
 
   private saveStats(patch: Partial<Stats>): void {

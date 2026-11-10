@@ -53,3 +53,6 @@
   dt { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-secondary); }
   dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; } }
 .result p { margin: 0; font-size: .85rem; }
+
+@media (max-width: 420px) { .time { display: none; } }
+.chip.board-chip { border-color: rgba(0,212,255,.5); color: #a5f3fc; }

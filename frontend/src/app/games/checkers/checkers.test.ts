@@ -51,6 +51,22 @@ describe('Checkers', () => {
     expect(after[sq(2, 5)]?.side).toBe(0);
   });
 
+  it('captures are optional by default: jump or make a quiet move', () => {
+    const e = new CheckersEngine();
+    expect(e.forced).toBe(false);
+    at(e, board([[sq(6, 1), man(0)], [sq(5, 2), man(1)], [sq(6, 7), man(0)]]));
+    const moves = e.moves();
+    expect(moves[0].captures).toEqual([sq(5, 2)]);
+    expect(moves.filter((m) => !m.captures.length).length).toBeGreaterThan(0);
+    // Declining the capture is a legal move.
+    expect(e.play({ from: sq(6, 7), path: [sq(5, 6)], captures: [] })).toBe(true);
+    // With the standard rule on, only the capture is allowed.
+    const f = new CheckersEngine(true);
+    at(f, board([[sq(6, 1), man(0)], [sq(5, 2), man(1)], [sq(6, 7), man(0)]]));
+    expect(f.moves()).toHaveLength(1);
+    expect(f.play({ from: sq(6, 7), path: [sq(5, 6)], captures: [] })).toBe(false);
+  });
+
   it('a man crowned by a jump stops there and becomes a king', () => {
     const b = board([
       [sq(2, 1), man(0)],
@@ -95,9 +111,9 @@ describe('Checkers', () => {
     expect(e.bestMove('normal', seededRng(1))!.captures).toEqual([sq(3, 4)]);
   });
 
-  it('computer vs computer games finish', () => {
+  it.each([false, true])('computer vs computer games finish (forced %s)', (forced) => {
     const rng = seededRng(4);
-    const e = new CheckersEngine();
+    const e = new CheckersEngine(forced);
     let n = 0;
     while (e.result() === null && n < 400) {
       e.play(e.bestMove(n % 2 ? 'hard' : 'normal', rng)!);
