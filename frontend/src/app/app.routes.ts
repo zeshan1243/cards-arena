@@ -44,6 +44,10 @@ export const routes: Routes = [
     loadComponent: () => import('./games/checkers/checkers-game').then((m) => m.CheckersGame),
   },
   {
+    path: 'play/yacht-dice',
+    loadComponent: () => import('./games/yacht/yacht-game').then((m) => m.YachtGame),
+  },
+  {
     path: 'play/:slug',
     loadComponent: () => import('./games/core/ui/table-game-page').then((m) => m.TableGamePage),
   },

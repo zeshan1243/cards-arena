@@ -1,5 +1,11 @@
 import { Component, computed, input } from '@angular/core';
 
+const DICE_PIPS: Record<number, number[][]> = {
+  3: [[-1, -1], [0, 0], [1, 1]],
+  5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]],
+  6: [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]],
+};
+
 /** Generated SVG artwork for a game tile: a fan of cards over an accent glow. */
 @Component({
   selector: 'app-game-art',
@@ -33,6 +39,16 @@ import { Component, computed, input } from '@angular/core';
             <circle [attr.cx]="pc.x" [attr.cy]="pc.y" r="13" [attr.fill]="pc.red ? '#e11d48' : '#1e293b'" stroke="rgba(255,255,255,.45)" stroke-width="2" />
           }
         </g>
+      } @else if (slug() === 'yacht-dice') {
+        <!-- Three tumbling dice. -->
+        @for (d of dice; track $index) {
+          <g [attr.transform]="'translate(' + d.x + ' ' + d.y + ') rotate(' + d.r + ')'">
+            <rect x="-30" y="-30" width="60" height="60" rx="12" [attr.fill]="'url(#' + gid() + '-card)'" stroke="rgba(0,0,0,.18)" />
+            @for (p of d.pips; track $index) {
+              <circle [attr.cx]="p[0] * 17" [attr.cy]="p[1] * 17" r="6" fill="#1b1f2e" />
+            }
+          </g>
+        }
       } @else {
       <g transform="translate(160 196)">
         @for (s of symbols(); track $index) {
@@ -62,6 +78,12 @@ export class GameArt {
   readonly checkerPieces = [
     [1, 0, false], [3, 0, false], [0, 1, false], [2, 1, false], [3, 2, true], [1, 4, true], [2, 5, true], [4, 5, true], [5, 4, false],
   ].map(([c, r, red]) => ({ x: (c as number) * 34 - 85, y: (r as number) * 34 - 85, red: red as boolean }));
+
+  readonly dice = [
+    { x: 100, y: 108, r: -14, face: 5 },
+    { x: 165, y: 82, r: 9, face: 6 },
+    { x: 225, y: 116, r: -6, face: 3 },
+  ].map((d) => ({ ...d, pips: DICE_PIPS[d.face] }));
 
   angle(i: number): number {
     const n = this.symbols().length;

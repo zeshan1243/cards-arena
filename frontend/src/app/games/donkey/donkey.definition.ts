@@ -12,10 +12,10 @@ export const definition: GameDefinition<DonkeyView> = {
       key: 'target',
       label: 'Play to',
       choices: [
-        { value: 300, label: '300 points' },
         { value: 500, label: '500 points' },
+        { value: 1000, label: '1000 points' },
       ],
-      default: 300,
+      default: 500,
       help: 'Each round is worth 400 points in total. The game ends after the round in which someone reaches this score.',
     },
   ],

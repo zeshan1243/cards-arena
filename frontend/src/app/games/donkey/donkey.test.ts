@@ -9,7 +9,7 @@ type Inner = { hands: Card[][]; stock: Card[]; table: Card[]; piles: Card[][]; t
 const inner = (e: DonkeyEngine) => e as unknown as Inner;
 
 function setup(state: Partial<Inner>, players = 2): DonkeyEngine {
-  const e = new DonkeyEngine(testSeats(players), 1, { target: 300 });
+  const e = new DonkeyEngine(testSeats(players), 1, { target: 500 });
   e.initializeGame();
   Object.assign(inner(e), { turn: 0, phase: 'draw', piles: Array.from({ length: players }, () => []), ...state });
   return e;
@@ -107,10 +107,10 @@ describe('Donkey', () => {
   it('bots finish whole games for 2 to 6 players', () => {
     for (const players of [2, 3, 4, 5, 6]) {
       for (const seed of [1, 2, 3]) {
-        const { engine } = playThrough(definition, seed, { players, settings: { target: 500 } });
+        const { engine } = playThrough(definition, seed, { players, settings: { target: 1000 } });
         expect(engine.isGameOver()).toBe(true);
         const v = engine.getView('you') as unknown as { totals: number[] };
-        expect(Math.max(...v.totals)).toBeGreaterThanOrEqual(500);
+        expect(Math.max(...v.totals)).toBeGreaterThanOrEqual(1000);
       }
     }
   });

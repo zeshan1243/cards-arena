@@ -21,6 +21,15 @@ export class GameDetailPage {
   private readonly seo = inject(SeoService);
 
   readonly slug = input.required<string>();
+
+  /** What the game is played with, for the info box: [label, value]. */
+  kit(g: GameInfo): [string, string] {
+    const special: Record<string, [string, string]> = {
+      '29': ['Deck', '32 cards'], baloot: ['Deck', '32 cards'], 'spider-solitaire': ['Deck', '104 cards (two decks)'],
+      checkers: ['Board', '8×8, 12 pieces each'], 'yacht-dice': ['Dice', '5 dice'],
+    };
+    return special[g.slug] ?? ['Deck', '52 cards'];
+  }
   readonly game = computed(() => this.games.bySlug(this.slug()));
   readonly content = computed(() => this.games.content(this.slug()));
   readonly related = computed(() => (this.game() ? this.games.related(this.game()!) : []));
@@ -55,7 +64,7 @@ export class GameDetailPage {
         description: g.description,
         url: `${environment.siteUrl}${path}`,
         image: `${environment.siteUrl}/og/${g.slug}.jpg`,
-        genre: 'Card game',
+        genre: genreOf(g),
         gamePlatform: 'Web browser',
         applicationCategory: 'Game',
         operatingSystem: 'Any',
@@ -77,12 +86,17 @@ export class GameDetailPage {
   }
 }
 
+/** The few games here that aren't played with cards. */
+function genreOf(g: GameInfo): string {
+  return ({ checkers: 'Board game', 'yacht-dice': 'Dice game' } as Record<string, string>)[g.slug] ?? 'Card game';
+}
+
 /** e.g. "Thirteen (Tiến Lên) Online – Play Free vs AI | CardArena"; one-player games drop "vs AI". */
 function gameTitle(g: GameInfo): string {
   const label = /^\d+$/.test(g.name) ? `${g.name} Card Game` : g.aka ? `${g.name} (${g.aka})` : g.name;
   if (!g.available) return `${label} – Rules & How to Play | CardArena`;
   if (!g.botEnabled) return `${label} – Play Free Online | CardArena`;
-  const card = g.aka || label !== g.name ? '' : ' Card Game';
+  const card = g.aka || label !== g.name || genreOf(g) !== 'Card game' ? '' : ' Card Game';
   return `${label} Online – Play Free${card} vs AI | CardArena`;
 }
 

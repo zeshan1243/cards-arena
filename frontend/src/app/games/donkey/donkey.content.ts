@@ -7,7 +7,7 @@ export const content: GameContent = {
     'Piles count too. If a card in your hand matches the top card of an opponent’s pile, steal it — together with any other cards of that rank sitting on top, such as a captured pair — and put them on your own pile. If it matches the top card of your own pile, it simply joins your pile — and either way you draw again.',
     'When you play a card that matches nothing, it is thrown face up on the table and your turn ends — so you always finish your turn with four cards in hand. Choose the throw carefully: the card is now there for anyone to match.',
     'When the deck runs out, players take turns playing the cards left in their hands, one card per turn. A card that matches captures as usual; any other card is placed on the table. The round ends when every hand is empty.',
-    'Only captured cards score: every card from 2 to 9 is worth 5 points, 10, Jack, Queen and King are worth 10, and each Ace is worth 20 — 400 points in the whole deck. Rounds continue until a player reaches 300 or 500 points, and the highest total wins.',
+    'Only captured cards score: every card from 2 to 9 is worth 5 points, 10, Jack, Queen and King are worth 10, and each Ace is worth 20 — 400 points in the whole deck. Rounds continue until a player reaches 500 or 1000 points, and the highest total wins.',
   ],
   strategy: [
     'Throw cheap cards. A thrown card is worth twice its value to whoever draws its pair, so give away 2–9s before tens, picture cards or Aces.',

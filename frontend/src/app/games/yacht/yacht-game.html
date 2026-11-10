@@ -1,0 +1,139 @@
+@if (view(); as v) {
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/yacht-dice" class="round-btn" aria-label="Back to Yacht Dice page">‹</a>
+    <h1 class="title">Yacht Dice</h1>
+    <div class="chips" aria-live="polite">
+      <span class="chip">Round {{ v.round > 13 ? 13 : v.round }}/13</span>
+      <span class="chip status" [class.cpu]="v.turn !== 0">{{ status() }}</span>
+    </div>
+  </header>
+
+  <main class="body">
+    <section class="tray" aria-label="Dice">
+      <div class="dice" role="group" aria-label="Your dice — tap a die to hold it">
+        @for (d of v.dice; track $index; let i = $index) {
+          <button #die type="button" class="die" [class.held]="v.held[i] && rolled()" [class.idle]="!rolled()"
+                  [class.yacht]="yacht()" [disabled]="!myTurn() || !rolled() || v.rollsLeft === 0"
+                  [attr.aria-pressed]="v.held[i]" [attr.aria-label]="'Die ' + (i + 1) + ': ' + d + (v.held[i] ? ', held' : '')"
+                  (click)="toggle(i)">
+            <span class="face">
+              @for (on of pipsOf(d); track $index) { <i [class.on]="on"></i> }
+            </span>
+            <span class="tag">Held</span>
+          </button>
+        }
+      </div>
+      @if (yacht()) { <p class="banner" role="status">Yacht!</p> }
+
+      <div class="roll-row">
+        <button type="button" class="roll" (click)="roll()" [disabled]="!canRoll()">
+          @if (v.turn !== 0) { {{ names()[v.turn] }}’s turn }
+          @else if (!rolled()) { Roll }
+          @else if (v.rollsLeft > 0) { Roll again }
+          @else { Choose a box }
+        </button>
+        <div class="pips-left" [attr.aria-label]="v.rollsLeft + ' rolls left'">
+          @for (k of [0, 1, 2]; track k) { <i [class.used]="k >= v.rollsLeft"></i> }
+        </div>
+      </div>
+      <p class="keys">Space to roll · 1–5 to hold</p>
+    </section>
+
+    <section class="sheet" aria-label="Scorecard">
+      <table [class.multi]="v.players.length > 1">
+        <thead>
+          <tr>
+            <th scope="col" class="cat">Box</th>
+            @for (n of names(); track $index; let s = $index) {
+              <th scope="col" class="who" [class.turn]="v.turn === s && !over()">{{ n }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of upper; track c) {
+            <ng-container *ngTemplateOutlet="row; context: { c }" />
+          }
+          <tr class="sub">
+            <th scope="row" class="cat">Upper total <small>bonus at {{ bonusAt }}</small></th>
+            @for (n of names(); track $index; let s = $index) {
+              <td>
+                <span class="meter" [style.--p]="upperSum(s) / bonusAt"><b>{{ upperSum(s) }}</b></span>
+              </td>
+            }
+          </tr>
+          <tr class="sub">
+            <th scope="row" class="cat">Bonus <small>+{{ bonus }}</small></th>
+            @for (n of names(); track $index; let s = $index) {
+              <td [class.got]="upperBonusOf(s)">{{ upperBonusOf(s) ? '+' + upperBonusOf(s) : upperDone(s) ? '0' : '' }}</td>
+            }
+          </tr>
+          @for (c of lower; track c) {
+            <ng-container *ngTemplateOutlet="row; context: { c }" />
+          }
+          <tr class="sub">
+            <th scope="row" class="cat">Yacht bonus <small>+100 each</small></th>
+            @for (n of names(); track $index; let s = $index) {
+              <td [class.got]="yachtBonusOf(s)">{{ yachtBonusOf(s) ? '+' + yachtBonusOf(s) : '' }}</td>
+            }
+          </tr>
+          <tr class="total">
+            <th scope="row" class="cat">Total</th>
+            @for (t of totals(); track $index) { <td>{{ t }}</td> }
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="controls" role="toolbar" aria-label="Game controls">
+    <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
+    <div class="segmented" role="group" aria-label="Opponents">
+      @for (o of [0, 1, 2, 3]; track o) {
+        <button type="button" [attr.aria-pressed]="opponents() === o" (click)="setOpponents(o)">{{ o === 0 ? 'Solo' : 'vs ' + o }}</button>
+      }
+    </div>
+    @if (opponents() > 0) {
+      <div class="segmented levels" role="group" aria-label="Computer level">
+        @for (l of ['easy', 'normal', 'hard']; track l) {
+          <button type="button" [attr.aria-pressed]="level() === l" (click)="setLevel($any(l))">{{ l }}</button>
+        }
+      </div>
+    }
+  </footer>
+</div>
+
+<ng-template #row let-c="c">
+  <tr [class.picking]="cpuPick() === c">
+    <th scope="row" class="cat">{{ label(c) }} <small>{{ hint(c) }}</small></th>
+    @for (n of names(); track $index; let s = $index) {
+      @if (cell(s, c) !== undefined) {
+        <td class="filled" [class.zero]="cell(s, c) === 0" [class.flash]="justFilled() === s + ':' + c">{{ cell(s, c) }}</td>
+      } @else if (s === 0 && choices().has(c)) {
+        <td class="open">
+          <button type="button" class="pick" [class.best]="bestChoice() === c" [class.zero]="choices().get(c) === 0"
+                  [attr.aria-label]="'Score ' + choices().get(c) + ' in ' + label(c)" (click)="score(c)">{{ choices().get(c) }}</button>
+        </td>
+      } @else {
+        <td class="empty" [class.target]="cpuPick() === c && v.turn === s"></td>
+      }
+    }
+  </tr>
+</ng-template>
+
+<app-modal [open]="over()" [dismissible]="false" [label]="winnerText()">
+  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
+  <div class="result">
+    <div class="emoji" aria-hidden="true">{{ winnerText() === 'You won!' || totals().length === 1 ? '🎲' : '🤖' }}</div>
+    <h2 [class.lost]="totals().length > 1 && winnerText() !== 'You won!'">{{ winnerText() }}</h2>
+    <dl class="stats" [style.--cols]="totals().length">
+      @for (t of totals(); track $index) {
+        <div><dt>{{ names()[$index] }}</dt><dd>{{ t }}</dd></div>
+      }
+    </dl>
+    <p class="text-secondary">Best {{ stats().best }} · @if (opponents()) { Won {{ stats().won }} · } Played {{ stats().played }}</p>
+    <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>Play again</button>
+    <a class="btn btn-ghost btn-block" routerLink="/games">Back to games</a>
+  </div>
+</app-modal>
+}

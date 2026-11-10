@@ -86,7 +86,7 @@ export class DonkeyEngine extends BaseTableEngine implements TableGameEngine<Don
     super(seats, seed);
     if (seats.length < 2 || seats.length > 6) throw new Error('Donkey needs 2 to 6 players');
     this.n = seats.length;
-    this.target = Number(settings['target'] ?? 300);
+    this.target = Number(settings['target'] ?? 500);
     this.totals = Array(this.n).fill(0);
   }
 

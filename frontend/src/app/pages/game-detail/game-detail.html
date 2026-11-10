@@ -96,7 +96,7 @@
           <h3>Game info</h3>
           <dl>
             <dt>Players</dt><dd>{{ g.minPlayers === g.maxPlayers ? g.minPlayers : g.minPlayers + '–' + g.maxPlayers }}</dd>
-            <dt>Deck</dt><dd>{{ g.slug === '29' || g.slug === 'baloot' ? '32 cards' : '52 cards' }}</dd>
+            <dt>{{ kit(g)[0] }}</dt><dd>{{ kit(g)[1] }}</dd>
             <dt>Region</dt><dd>{{ g.region }}</dd>
             <dt>AI opponents</dt><dd>{{ g.botEnabled ? 'Yes' : 'No' }}</dd>
             <dt>Status</dt><dd>{{ g.available ? 'Live' : 'Coming soon' }}</dd>

@@ -17,6 +17,7 @@ import { content as c_tripeaks } from '../../games/tripeaks/tripeaks.content';
 import { content as c_war } from '../../games/war/war.content';
 import { content as c_checkers } from '../../games/checkers/checkers.content';
 import { content as c_donkey } from '../../games/donkey/donkey.content';
+import { content as c_yacht } from '../../games/yacht/yacht.content';
 
 export type { GameContent };
 
@@ -344,7 +345,7 @@ export const GAMES: GameInfo[] = [
     slug: 'donkey',
     name: 'Donkey',
     tagline: 'Draw, match and steal — Aces are worth 20.',
-    description: 'Draw from the deck, pair cards with the table or steal from an opponent’s pile. 2 to 6 players, first to 300 or 500 points wins.',
+    description: 'Draw from the deck, pair cards with the table or steal from an opponent’s pile. 2 to 6 players, first to 500 or 1000 points wins.',
     region: 'South Asia',
     minPlayers: 2,
     maxPlayers: 6,
@@ -357,6 +358,24 @@ export const GAMES: GameInfo[] = [
     accent: '#8B5CF6',
     art: '♣♦♠',
     related: ['seep', 'rummy', 'bhabhi-thulla'],
+  },
+  {
+    slug: 'yacht-dice',
+    name: 'Yacht Dice',
+    tagline: 'Five dice, three rolls, thirteen boxes.',
+    description: 'The classic five-dice scoring game: roll up to three times, fill 13 boxes and chase the 50-point Yacht. Play solo or against up to three computers.',
+    region: 'Worldwide',
+    minPlayers: 1,
+    maxPlayers: 4,
+    botEnabled: true,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 85,
+    releasedAt: '2026-11-10',
+    accent: '#10B981',
+    art: '⚀⚂⚄',
+    related: ['checkers', 'war', 'solitaire'],
   },
 ];
 
@@ -419,6 +438,7 @@ GAME_CONTENT['tripeaks'] = c_tripeaks;
 GAME_CONTENT['war'] = c_war;
 GAME_CONTENT['checkers'] = c_checkers;
 GAME_CONTENT['donkey'] = c_donkey;
+GAME_CONTENT['yacht-dice'] = c_yacht;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);
