@@ -40,6 +40,17 @@ const DICE_PIPS: Record<number, number[][]> = {
             <circle [attr.cx]="pc.x" [attr.cy]="pc.y" r="13" [attr.fill]="pc.red ? '#e11d48' : '#1e293b'" stroke="rgba(255,255,255,.45)" stroke-width="2" />
           }
         </g>
+      } @else if (slug() === 'chess') {
+        <!-- A board corner in perspective with a king and a knight standing on it. -->
+        <g transform="translate(160 122) scale(1 .5) rotate(45)">
+          @for (sq of boardSquares; track $index) {
+            <rect [attr.x]="sq.x" [attr.y]="sq.y" width="34" height="34" [attr.fill]="sq.dark ? '#b58863' : '#f0d9b5'" />
+          }
+        </g>
+        <g font-family="'Segoe UI Symbol', 'Noto Sans Symbols 2', 'DejaVu Sans', 'Apple Symbols', serif" text-anchor="middle" stroke-width="1.6">
+          <text x="128" y="118" font-size="78" fill="#1e1b18" stroke="none">♚</text>
+          <text x="196" y="128" font-size="66" fill="#fbfaf7" stroke="#1e1b18">♞</text>
+        </g>
       } @else if (slug() === 'yacht-dice' || slug() === 'farkle') {
         <!-- Three tumbling dice. -->
         @for (d of slug() === 'farkle' ? farkleDice : dice; track $index) {

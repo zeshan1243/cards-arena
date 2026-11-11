@@ -129,6 +129,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'yacht', icon: '🎲', title: 'Yacht!', description: 'Roll five of a kind in Yacht Dice.' },
   { id: 'big-turn', icon: '💰', title: 'High roller', description: 'Bank 2,000 points in one Farkle turn.' },
   { id: 'grandmaster', icon: '♛', title: 'Grandmaster', description: 'Beat the Expert computer at Checkers.' },
+  { id: 'checkmate', icon: '♚', title: 'Checkmate!', description: 'Beat the Expert computer at Chess.' },
 ];
 
 /** Achievements newly earned from totals (not yet in `p.achievements`). */

@@ -20,6 +20,7 @@ import { content as c_donkey } from '../../games/donkey/donkey.content';
 import { content as c_yacht } from '../../games/yacht/yacht.content';
 import { content as c_pyramid } from '../../games/pyramid/pyramid.content';
 import { content as c_farkle } from '../../games/farkle/farkle.content';
+import { content as c_chess } from '../../games/chess/chess.content';
 
 export type { GameContent };
 
@@ -341,7 +342,7 @@ export const GAMES: GameInfo[] = [
     releasedAt: '2026-11-09',
     accent: '#DC2626',
     art: '●○●',
-    related: ['war', 'solitaire', 'spider-solitaire'],
+    related: ['chess', 'war', 'solitaire'],
   },
   {
     slug: 'donkey',
@@ -415,6 +416,24 @@ export const GAMES: GameInfo[] = [
     art: '⚀⚄⚅',
     related: ['yacht-dice', 'war', 'checkers'],
   },
+  {
+    slug: 'chess',
+    name: 'Chess',
+    tagline: 'Outthink the computer and checkmate its king.',
+    description: 'The classic strategy game against the computer, with every rule: castling, en passant and promotion. Four levels, play White or Black, undo and hints.',
+    region: 'Worldwide',
+    minPlayers: 2,
+    maxPlayers: 2,
+    botEnabled: true,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 92,
+    releasedAt: '2026-11-11',
+    accent: '#B45309',
+    art: '♚♛♞',
+    related: ['checkers', 'yacht-dice', 'solitaire'],
+  },
 ];
 
 export const GAME_CONTENT: Record<string, GameContent> = {
@@ -479,6 +498,7 @@ GAME_CONTENT['donkey'] = c_donkey;
 GAME_CONTENT['yacht-dice'] = c_yacht;
 GAME_CONTENT['pyramid-solitaire'] = c_pyramid;
 GAME_CONTENT['farkle'] = c_farkle;
+GAME_CONTENT['chess'] = c_chess;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

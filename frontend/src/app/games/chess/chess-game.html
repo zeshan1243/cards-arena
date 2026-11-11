@@ -1,0 +1,101 @@
+<div class="screen">
+  <header class="topbar">
+    <a routerLink="/games/chess" class="round-btn" aria-label="Back to Chess page">‹</a>
+    <h1 class="title">Chess</h1>
+    <div class="chips" aria-live="polite">
+      <span class="chip status" [class.alert]="inCheck() && !result()">{{ status() }}</span>
+    </div>
+  </header>
+
+  <section class="table" aria-label="Chess board">
+    <div class="arena">
+      <div class="player">
+        <span class="avatar" aria-hidden="true">{{ foe.avatar }}</span>
+        <span class="who"><b>{{ foe.name }}</b><small>{{ level() }} · {{ you() === 0 ? 'Black' : 'White' }}</small></span>
+        <span class="taken" [attr.aria-label]="foe.name + ' has captured ' + (captured().theirs.length || 'nothing')">
+          @for (t of captured().theirs; track $index) { <i [class.w]="you() === 0">{{ glyph(t) }}</i> }
+          @if (captured().balance < 0) { <em>+{{ -captured().balance }}</em> }
+        </span>
+        @if (thinking()) { <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span> }
+      </div>
+
+      <div class="board" role="group" [attr.aria-label]="'Chess board, you play ' + (you() === 0 ? 'White' : 'Black')">
+        @for (sq of squares; track sq) {
+          @let at = pos(sq);
+          <button type="button" class="sq" [class.light]="isLight(sq)" [style.--r]="at.r" [style.--c]="at.c"
+                  [class.last]="isLast(sq)" [class.hint]="isHint(sq)" [class.sel]="selected() === sq" [class.check]="checkSq() === sq"
+                  [class.target]="targets().has(sq)" [class.capture]="targets().has(sq) && board()[sq]"
+                  [attr.aria-label]="squareLabel(sq)" (click)="clickSquare(sq)">
+            @if (rankLabel(sq); as r) { <span class="coord rank">{{ r }}</span> }
+            @if (fileLabel(sq); as f) { <span class="coord file">{{ f }}</span> }
+          </button>
+        }
+        @for (p of pieces(); track p.id) {
+          @let at = pos(p.sq);
+          <div class="piece" [class.w]="p.white" [class.movable]="movable().has(p.sq) && selected() === null" [style.--r]="at.r" [style.--c]="at.c" aria-hidden="true">{{ p.glyph }}</div>
+        }
+        @if (promoting(); as options) {
+          <div class="promo" role="dialog" aria-label="Choose a piece to promote to">
+            <p>Promote to</p>
+            <div class="promo-row">
+              @for (m of options; track m) {
+                <button type="button" class="piece-btn" [class.w]="you() === 0" (click)="promote(m)">{{ promoGlyph(m) }}</button>
+              }
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="cancelPromotion()">Cancel</button>
+          </div>
+        }
+      </div>
+
+      <div class="player me">
+        <span class="avatar" aria-hidden="true">🙂</span>
+        <span class="who"><b>You</b><small>{{ you() === 0 ? 'White' : 'Black' }}</small></span>
+        <span class="taken" [attr.aria-label]="'You have captured ' + (captured().mine.length || 'nothing')">
+          @for (t of captured().mine; track $index) { <i [class.w]="you() === 1">{{ glyph(t) }}</i> }
+          @if (captured().balance > 0) { <em>+{{ captured().balance }}</em> }
+        </span>
+      </div>
+
+      <ol class="moves" #strip aria-label="Moves played">
+        @for (row of moveRows(); track row.n) {
+          <li><span class="n">{{ row.n }}.</span>{{ row.white }} @if (row.black) { <span>{{ row.black }}</span> }</li>
+        } @empty {
+          <li class="empty">{{ you() === 0 ? 'You have White — tap a piece to move it.' : foe.name + ' has White and moves first.' }}</li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <footer class="controls" role="toolbar" aria-label="Game controls">
+    <button type="button" class="ctl" (click)="newGame()"><span aria-hidden="true">🔄</span><span class="lbl">New</span></button>
+    <button type="button" class="ctl" (click)="undo()" [disabled]="!history().length || !!result()"><span aria-hidden="true">↩️</span><span class="lbl">Undo</span></button>
+    <button type="button" class="ctl" (click)="hint()" [disabled]="!yourTurn()"><span aria-hidden="true">💡</span><span class="lbl">Hint</span></button>
+    <button type="button" class="ctl" (click)="switchSides()" [title]="you() === 0 ? 'Play Black instead (starts a new game)' : 'Play White instead (starts a new game)'">
+      <span aria-hidden="true">{{ you() === 0 ? '♚' : '♔' }}</span><span class="lbl">{{ you() === 0 ? 'Play Black' : 'Play White' }}</span>
+    </button>
+    <div class="segmented levels" role="group" aria-label="Computer level">
+      @for (l of ['easy', 'normal', 'hard', 'expert']; track l) {
+        <button type="button" [attr.aria-pressed]="level() === l" (click)="setLevel($any(l))">{{ l }}</button>
+      }
+    </div>
+  </footer>
+</div>
+
+@if (result(); as r) {
+  <app-modal [open]="showResult()" [dismissible]="false" [label]="r.winner === you() ? 'You won' : 'Game over'">
+    <div class="modal-ad"><app-ad-banner size="320x50" /></div>
+    <div class="result">
+      <div class="emoji" aria-hidden="true">{{ r.winner === you() ? '🏆' : r.winner === null ? '🤝' : foe.avatar }}</div>
+      <h2 [class.lost]="r.winner !== you()">{{ r.winner === you() ? 'Checkmate — you won!' : r.winner === null ? 'It’s a draw' : foe.name + ' won' }}</h2>
+      <p class="reason">{{ r.winner === null ? reasonText(r) : r.winner === you() ? 'You checkmated ' + foe.name + ' on ' + level() + '.' : foe.name + ' checkmated you.' }}</p>
+      <dl class="stats">
+        <div><dt>Moves</dt><dd>{{ moveRows().length }}</dd></div>
+        <div><dt>Material</dt><dd>{{ captured().balance > 0 ? '+' : '' }}{{ captured().balance }}</dd></div>
+        <div><dt>Level</dt><dd class="lvl">{{ level() }}</dd></div>
+      </dl>
+      <p class="text-secondary">Won {{ stats().won }} · Drawn {{ stats().drawn }} · Played {{ stats().played }}</p>
+      <button class="btn btn-primary btn-lg btn-block" type="button" (click)="newGame()" autofocus>Play again</button>
+      <button class="btn btn-ghost btn-block" type="button" (click)="reviewDone()">Look at the board</button>
+    </div>
+  </app-modal>
+}

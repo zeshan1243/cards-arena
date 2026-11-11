@@ -31,7 +31,7 @@ export class GameDetailPage {
   kit(g: GameInfo): [string, string] {
     const special: Record<string, [string, string]> = {
       '29': ['Deck', '32 cards'], baloot: ['Deck', '32 cards'], 'spider-solitaire': ['Deck', '104 cards (two decks)'],
-      checkers: ['Board', '8×8, 12 pieces each'], 'yacht-dice': ['Dice', '5 dice'], farkle: ['Dice', '6 dice'],
+      checkers: ['Board', '8×8, 12 pieces each'], chess: ['Board', '8×8, 16 pieces each'], 'yacht-dice': ['Dice', '5 dice'], farkle: ['Dice', '6 dice'],
     };
     return special[g.slug] ?? ['Deck', '52 cards'];
   }
@@ -95,7 +95,7 @@ export class GameDetailPage {
 
 /** The few games here that aren't played with cards. */
 function genreOf(g: GameInfo): string {
-  return ({ checkers: 'Board game', 'yacht-dice': 'Dice game', farkle: 'Dice game' } as Record<string, string>)[g.slug] ?? 'Card game';
+  return ({ checkers: 'Board game', chess: 'Board game', 'yacht-dice': 'Dice game', farkle: 'Dice game' } as Record<string, string>)[g.slug] ?? 'Card game';
 }
 
 /** e.g. "Thirteen (Tiến Lên) Online – Play Free vs AI | CardArena"; one-player games drop "vs AI". */
