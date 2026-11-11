@@ -1,4 +1,5 @@
 import { Component, ElementRef, Injector, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
@@ -32,6 +33,7 @@ const PASS_LABELS: Record<Passes, string> = { 1: '1 pass', 3: '3 passes', 0: 'Un
 export class PyramidGame implements OnDestroy {
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly toast = inject(ToastService);
   private readonly injector = inject(Injector);
   private readonly board = viewChild.required<ElementRef<HTMLElement>>('board');
@@ -107,7 +109,10 @@ export class PyramidGame implements OnDestroy {
   /** Start over: a fresh run (or single game). */
   newGame(): void {
     this.stopTimer();
-    if (this.started && !this.result()) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started && !this.ended) {
+      this.saveStats({ played: this.stats().played + 1 });
+      this.progress.record('pyramid-solitaire', 'loss');
+    }
     this.carried.set(0);
     this.boardNo.set(1);
     this.elapsed.set(0);
@@ -261,6 +266,8 @@ export class PyramidGame implements OnDestroy {
   private finish(result: 'won' | 'lost'): void {
     if (this.ended) return;
     this.ended = true;
+    this.progress.record('pyramid-solitaire', result === 'won' ? 'win' : 'loss');
+    if (result === 'won' && this.endless() && this.boardNo() >= 3) this.progress.unlock('marathon');
     this.stopTimer();
     const s = this.stats();
     this.saveStats({ played: s.played + 1, won: s.won + (result === 'won' ? 1 : 0), bestScore: Math.max(s.bestScore, this.view()!.score), ...this.runStats(result) });

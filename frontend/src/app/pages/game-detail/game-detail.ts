@@ -1,7 +1,9 @@
-import { Component, computed, effect, inject, input } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { Component, afterNextRender, computed, effect, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { GameService } from '../../core/services/game.service';
+import { ProgressService } from '../../core/services/progress.service';
 import { GameInfo } from '../../shared/models/game.model';
 import { SeoService } from '../../core/services/seo.service';
 import { GameArt } from '../../shared/components/game-art/game-art';
@@ -11,7 +13,7 @@ import { NotFoundPage } from '../not-found/not-found';
 
 @Component({
   selector: 'app-game-detail',
-  imports: [RouterLink, GameArt, GameCard, NotFoundPage],
+  imports: [RouterLink, DecimalPipe, GameArt, GameCard, NotFoundPage],
   templateUrl: './game-detail.html',
   styleUrl: './game-detail.scss',
 })
@@ -19,6 +21,9 @@ export class GameDetailPage {
   readonly accountsEnabled = environment.accountsEnabled;
   private readonly games = inject(GameService);
   private readonly seo = inject(SeoService);
+  private readonly progress = inject(ProgressService);
+  /** Your record comes from this browser's storage: show it only after hydration. */
+  readonly mounted = signal(false);
 
   readonly slug = input.required<string>();
 
@@ -31,6 +36,7 @@ export class GameDetailPage {
     return special[g.slug] ?? ['Deck', '52 cards'];
   }
   readonly game = computed(() => this.games.bySlug(this.slug()));
+  readonly myRecord = computed(() => this.progress.game(this.slug()));
   readonly content = computed(() => this.games.content(this.slug()));
   readonly related = computed(() => (this.game() ? this.games.related(this.game()!) : []));
   readonly isBhabhi = computed(() => this.slug() === 'bhabhi-thulla');
@@ -38,6 +44,7 @@ export class GameDetailPage {
   readonly variants = Object.values(VARIANT_DESCRIPTIONS);
 
   constructor() {
+    afterNextRender(() => this.mounted.set(true));
     effect(() => {
       const g = this.game();
       if (!g) {

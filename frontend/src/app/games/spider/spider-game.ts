@@ -1,4 +1,5 @@
 import { Component, DestroyRef, ElementRef, Injector, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
@@ -45,6 +46,7 @@ const MIN_DOWN = 0.05;
 export class SpiderGame implements OnDestroy {
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly toast = inject(ToastService);
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
@@ -97,7 +99,10 @@ export class SpiderGame implements OnDestroy {
 
   newGame(): void {
     this.stopTimers();
-    if (this.started && !this.won()) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started && !this.won()) {
+      this.saveStats({ played: this.stats().played + 1 });
+      this.progress.record('spider-solitaire', 'loss');
+    }
     this.engine = new SpiderEngine(Math.floor(Math.random() * 2 ** 31), this.suits());
     this.started = false;
     this.won.set(false);
@@ -110,7 +115,10 @@ export class SpiderGame implements OnDestroy {
 
   setSuits(n: SuitCount): void {
     if (n === this.suits()) return;
-    if (this.started && !this.won()) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started && !this.won()) {
+      this.saveStats({ played: this.stats().played + 1 });
+      this.progress.record('spider-solitaire', 'loss');
+    }
     this.started = false; // the abandoned game is counted against the old suit count
     this.suits.set(n);
     this.storage.set('spider.suits', n);
@@ -268,6 +276,7 @@ export class SpiderGame implements OnDestroy {
   private win(): void {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
+    this.progress.record('spider-solitaire', 'win');
     const s = this.stats();
     this.saveStats({
       played: s.played + 1,

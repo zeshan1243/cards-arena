@@ -63,6 +63,7 @@ export const routes: Routes = [
   { path: 'about', loadComponent: () => import('./pages/about/about').then((m) => m.AboutPage) },
   { path: 'privacy', loadComponent: () => import('./pages/privacy/privacy').then((m) => m.PrivacyPage) },
   { path: 'contact', loadComponent: () => import('./pages/contact/contact').then((m) => m.ContactPage) },
+  { path: 'progress', loadComponent: () => import('./pages/progress/progress').then((m) => m.ProgressPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings').then((m) => m.SettingsPage) },
   { path: '**', loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFoundPage) },
 ];

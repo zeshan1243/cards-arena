@@ -1,4 +1,5 @@
 import { Component, ElementRef, Injector, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
@@ -30,6 +31,7 @@ const FLIGHT = { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' };
 export class TriPeaksGame implements OnDestroy {
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly toast = inject(ToastService);
   private readonly injector = inject(Injector);
   private readonly board = viewChild.required<ElementRef<HTMLElement>>('board');
@@ -85,7 +87,10 @@ export class TriPeaksGame implements OnDestroy {
   /** Start over: a fresh run (or single game). */
   newGame(): void {
     this.stopTimer();
-    if (this.started && !this.result()) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started && !this.ended) {
+      this.saveStats({ played: this.stats().played + 1 });
+      this.progress.record('tripeaks', 'loss');
+    }
     this.carried.set(0);
     this.boardNo.set(1);
     this.elapsed.set(0);
@@ -185,6 +190,8 @@ export class TriPeaksGame implements OnDestroy {
   private finish(result: 'won' | 'lost'): void {
     if (this.ended) return;
     this.ended = true;
+    this.progress.record('tripeaks', result === 'won' ? 'win' : 'loss');
+    if (result === 'won' && this.endless() && this.boardNo() >= 3) this.progress.unlock('marathon');
     this.stopTimer();
     const s = this.stats();
     const v = this.view()!;

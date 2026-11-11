@@ -5,7 +5,7 @@
     @if (view(); as v) {
       <div class="chips" aria-live="polite">
         <span class="chip">You {{ totals()[0] }}</span>
-        <span class="chip">CPU {{ totals()[1] }}</span>
+        <span class="chip">{{ foe.name }} {{ totals()[1] }}</span>
         <span class="chip">Battle {{ v.battles + (battle() ? 1 : 0) }}</span>
       </div>
     }
@@ -14,13 +14,13 @@
   <section class="board" #board aria-label="War table">
     <div class="inner">
       <div class="side cpu">
-        <div class="pile deck" data-pile="deck-1" aria-label="Computer's deck">
+        <div class="pile deck" data-pile="deck-1" [attr.aria-label]="foe.name + '’s deck'">
           @if (deckCounts()[1]) { <app-playing-card size="fluid" [faceDown]="true" /> }
           <span class="count">{{ deckCounts()[1] }}</span>
         </div>
-        <span class="who">🤖 Computer</span>
+        <span class="who">{{ foe.avatar }} {{ foe.name }}</span>
         @if (mode() === 'quick') {
-          <div class="pile won" data-pile="won-1" aria-label="Computer's winnings">
+          <div class="pile won" data-pile="won-1" [attr.aria-label]="foe.name + '’s winnings'">
             @if (wonCounts()[1]) { <app-playing-card size="fluid" [faceDown]="true" /> }
             <span class="count">{{ wonCounts()[1] }}</span>
           </div>
@@ -72,7 +72,7 @@
   <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   <div class="result">
     <div class="emoji" aria-hidden="true">{{ result() === 0 ? '🏆' : result() === 'draw' ? '🤝' : '⚔️' }}</div>
-    <h2 [class.lost]="result() !== 0">{{ result() === 0 ? 'You won the war!' : result() === 'draw' ? 'It’s a draw' : 'The computer won' }}</h2>
+    <h2 [class.lost]="result() !== 0">{{ result() === 0 ? 'You won the war!' : result() === 'draw' ? 'It’s a draw' : foe.name + ' won the war' }}</h2>
     @if (view(); as v) {
       <dl class="stats">
         <div><dt>Your cards</dt><dd>{{ totals()[0] }}</dd></div>

@@ -1,4 +1,5 @@
 import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { catchError, of } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -50,6 +51,7 @@ export class BhabhiThullaStore implements OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly stats = inject(StatisticsService);
   private readonly toast = inject(ToastService);
+  private readonly progress = inject(ProgressService);
 
   private engine: BhabhiThullaEngine | null = null;
   private bots = new Map<string, BotProfile>();
@@ -300,6 +302,7 @@ export class BhabhiThullaStore implements OnDestroy {
     this.stopCountdown();
     this.refresh();
     const outcome = this.outcome();
+    if (outcome) this.progress.record('bhabhi-thulla', outcome === 'safe' ? 'done' : outcome);
     this.sound.play(outcome === 'loss' ? 'lose' : 'win');
     this.later(gen, 700, () => this.phase.set('finished'));
     this.recordResult();

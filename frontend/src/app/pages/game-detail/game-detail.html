@@ -102,6 +102,17 @@
             <dt>Status</dt><dd>{{ g.available ? 'Live' : 'Coming soon' }}</dd>
           </dl>
         </div>
+        @if (mounted() && myRecord(); as r) {
+          <div class="panel info mine">
+            <h3>Your record</h3>
+            <dl>
+              <dt>Played</dt><dd>{{ r.played }}</dd>
+              <dt>Won</dt><dd>{{ r.won }} ({{ r.played ? ((r.won / r.played) * 100 | number: '1.0-0') : 0 }}%)</dd>
+              <dt>Win streak</dt><dd>@if (r.streak > 1) { 🔥 }{{ r.streak }} · best {{ r.bestStreak }}</dd>
+            </dl>
+            <a routerLink="/progress" class="more">All my stats &amp; achievements →</a>
+          </div>
+        }
       </aside>
     </div>
 

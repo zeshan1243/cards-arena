@@ -1,5 +1,7 @@
 import { Component, ElementRef, OnDestroy, computed, inject, signal, viewChildren } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { RouterLink } from '@angular/router';
+import { BOT_ROSTER } from '../core/bots';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
@@ -45,6 +47,7 @@ export const SCORING = [
 export class FarkleGame implements OnDestroy {
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly tracker = inject(ProgressService);
   private readonly toast = inject(ToastService);
   private readonly rng = seededRng(Math.floor(Math.random() * 2 ** 31));
   private readonly dieEls = viewChildren<ElementRef<HTMLElement>>('die');
@@ -68,7 +71,7 @@ export class FarkleGame implements OnDestroy {
 
   readonly names = computed(() => {
     const n = this.view()?.players.length ?? 1;
-    return Array.from({ length: n }, (_, i) => (i === 0 ? 'You' : n === 2 ? 'Computer' : `CPU ${i}`));
+    return Array.from({ length: n }, (_, i) => (i === 0 ? 'You' : BOT_ROSTER[i - 1].name));
   });
   readonly myTurn = computed(() => this.view()?.turn === 0 && !this.busy() && !this.over());
   readonly choosing = computed(() => this.myTurn() && this.view()?.phase === 'choose' && !this.rolling());
@@ -123,7 +126,10 @@ export class FarkleGame implements OnDestroy {
 
   newGame(): void {
     this.clearTimers();
-    if (this.started() && !this.over()) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started() && !this.over()) {
+      this.saveStats({ played: this.stats().played + 1 });
+      if ((this.view()?.players.length ?? 1) > 1) this.tracker.record('farkle', 'loss');
+    }
     this.engine = new FarkleEngine(1 + this.opponents(), this.target());
     this.busy.set(false);
     this.rolling.set(false);
@@ -240,6 +246,7 @@ export class FarkleGame implements OnDestroy {
     this.engine.bank(pick);
     this.selected.set([]);
     if (seat === 0 && total > this.stats().bestTurn) this.saveStats({ bestTurn: total });
+    if (seat === 0 && total >= 2000) this.tracker.unlock('big-turn');
     this.log.set(`${this.names()[seat]} banked ${total.toLocaleString()}`);
     this.sound.play('turn');
     this.sync();
@@ -290,6 +297,7 @@ export class FarkleGame implements OnDestroy {
     const s = this.stats();
     const solo = v.players.length === 1;
     const won = !solo && this.engine.winner() === 0;
+    this.tracker.record('farkle', solo ? 'done' : won ? 'win' : this.engine.winner() === -1 ? 'draw' : 'loss');
     this.saveStats({
       played: s.played + 1,
       won: s.won + (won ? 1 : 0),

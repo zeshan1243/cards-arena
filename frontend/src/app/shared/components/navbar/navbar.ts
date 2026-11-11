@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, afterNextRender, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, filter, of, switchMap } from 'rxjs';
@@ -7,6 +7,7 @@ import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
 import { GameService } from '../../../core/services/game.service';
+import { ProgressService } from '../../../core/services/progress.service';
 import { PlayerAvatar } from '../player-avatar/player-avatar';
 
 interface PlayerHit {
@@ -28,6 +29,9 @@ export class Navbar {
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
 
+  readonly progress = inject(ProgressService);
+  /** The streak lives in this browser's storage, so show it only once running in the browser (keeps SSR hydration identical). */
+  readonly mounted = signal(false);
   readonly menuOpen = signal(false);
   readonly searchOpen = signal(false);
   readonly userMenuOpen = signal(false);
@@ -48,6 +52,7 @@ export class Navbar {
   );
 
   constructor() {
+    afterNextRender(() => this.mounted.set(true));
     this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
       this.menuOpen.set(false);
       this.closeSearch();

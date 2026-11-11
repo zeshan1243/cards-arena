@@ -48,10 +48,10 @@
   <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   <div class="result">
     <div class="emoji" aria-hidden="true">{{ result() === 0 ? '🏆' : result() === 'draw' ? '🤝' : '🤖' }}</div>
-    <h2 [class.lost]="result() !== 0">{{ result() === 0 ? 'You won!' : result() === 'draw' ? 'It’s a draw' : 'The computer won' }}</h2>
+    <h2 [class.lost]="result() !== 0">{{ result() === 0 ? 'You won!' : result() === 'draw' ? 'It’s a draw' : foe.name + ' won' }}</h2>
     <dl class="stats">
       <div><dt>Your pieces</dt><dd>{{ counts()[0] }}</dd></div>
-      <div><dt>Computer</dt><dd>{{ counts()[1] }}</dd></div>
+      <div><dt>{{ foe.name }}</dt><dd>{{ counts()[1] }}</dd></div>
       <div><dt>Moves</dt><dd>{{ view().plies }}</dd></div>
     </dl>
     <p class="text-secondary">Won {{ stats().won }} · Drawn {{ stats().drawn }} · Played {{ stats().played }}</p>

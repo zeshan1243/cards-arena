@@ -1,5 +1,7 @@
 import { Component, ElementRef, Injector, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { RouterLink } from '@angular/router';
+import { BOT_ROSTER } from '../core/bots';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
@@ -26,8 +28,11 @@ const FLIGHT = { duration: 280, easing: 'cubic-bezier(.2,.8,.2,1)' };
   host: { '(document:keydown.space)': 'onSpace($event)' },
 })
 export class WarGame implements OnDestroy {
+  /** Your opponent, one of the same bots as the table games. */
+  readonly foe = BOT_ROSTER[1];
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly injector = inject(Injector);
   private readonly board = viewChild.required<ElementRef<HTMLElement>>('board');
 
@@ -58,7 +63,7 @@ export class WarGame implements OnDestroy {
     if (!b) return this.started ? '' : 'Tap your deck to flip';
     const war = b.wars ? (b.wars > 1 ? `${b.wars}× WAR! ` : 'WAR! ') : '';
     const n = b.table[0].length + b.table[1].length;
-    return `${war}${b.winner === 0 ? 'You take' : 'Computer takes'} ${n} cards`;
+    return `${war}${b.winner === 0 ? 'You take' : `${this.foe.name} takes`} ${n} cards`;
   });
 
   constructor() {
@@ -79,7 +84,10 @@ export class WarGame implements OnDestroy {
 
   newGame(): void {
     this.clearTimers();
-    if (this.started && this.result() === null) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started && this.result() === null) {
+      this.saveStats({ played: this.stats().played + 1 });
+      this.progress.record('war', 'loss');
+    }
     this.engine = new WarEngine(Math.floor(Math.random() * 2 ** 31), this.mode());
     this.started = false;
     this.auto.set(false);
@@ -153,6 +161,7 @@ export class WarGame implements OnDestroy {
     this.auto.set(false);
     const s = this.stats();
     this.saveStats({ played: s.played + 1, won: s.won + (r === 0 ? 1 : 0) });
+    this.progress.record('war', r === 0 ? 'win' : r === 'draw' ? 'draw' : 'loss');
     this.started = false;
     this.later(() => {
       this.sound.play(r === 0 ? 'win' : 'lose');

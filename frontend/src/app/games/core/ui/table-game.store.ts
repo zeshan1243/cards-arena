@@ -1,4 +1,5 @@
 import { Injectable, OnDestroy, computed, inject, signal } from '@angular/core';
+import { ProgressService } from '../../../core/services/progress.service';
 import { catchError, of } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { SettingsService } from '../../../core/services/settings.service';
@@ -41,6 +42,7 @@ const LOADING_STEPS = ['Preparing table…', 'Shuffling cards…', 'Dealing card
 export class TableGameStore implements OnDestroy {
   private readonly settingsSvc = inject(SettingsService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly sound = inject(SoundService);
   private readonly auth = inject(AuthService);
   private readonly stats = inject(StatisticsService);
@@ -340,6 +342,8 @@ export class TableGameStore implements OnDestroy {
     const outcome = this.engine!.outcome();
     this.outcome.set(outcome);
     const mine = outcome.players.find((p) => p.id === HUMAN_ID);
+    const slug = this.def()?.slug;
+    if (slug && mine) this.progress.record(slug, mine.result === 'safe' ? 'done' : mine.result);
     this.sound.play(mine?.result === 'loss' ? 'lose' : 'win');
     this.later(gen, 600, () => this.phase.set('finished'));
     this.recordResult();

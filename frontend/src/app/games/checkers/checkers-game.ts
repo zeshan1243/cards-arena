@@ -1,5 +1,7 @@
 import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { RouterLink } from '@angular/router';
+import { BOT_ROSTER } from '../core/bots';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
@@ -36,8 +38,11 @@ function partway(board: Board, move: Move, k: number): Board {
   styleUrl: './checkers-game.scss',
 })
 export class CheckersGame implements OnDestroy {
+  /** Your opponent, one of the same bots as the table games. */
+  readonly foe = BOT_ROSTER[2];
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly toast = inject(ToastService);
   private readonly rng = seededRng(Math.floor(Math.random() * 2 ** 31));
 
@@ -80,7 +85,7 @@ export class CheckersGame implements OnDestroy {
   readonly counts = computed(() => [0, 1].map((side) => this.view().board.filter((p) => p?.side === side).length));
   readonly status = computed(() => {
     if (this.result() !== null) return 'Game over';
-    if (this.view().turn === 1) return 'Computer is thinking…';
+    if (this.view().turn === 1) return `${this.foe.name} is thinking…`;
     if (this.partial().length) return 'Keep jumping!';
     return this.mustCapture() ? 'You must capture' : this.canCapture() ? 'You can capture' : 'Your move';
   });
@@ -102,7 +107,10 @@ export class CheckersGame implements OnDestroy {
 
   newGame(): void {
     this.clearTimers();
-    if (this.started && this.result() === null) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started && this.result() === null) {
+      this.saveStats({ played: this.stats().played + 1 });
+      this.progress.record('checkers', 'loss');
+    }
     this.engine = new CheckersEngine(this.forced());
     this.started = false;
     this.busy.set(false);
@@ -229,6 +237,8 @@ export class CheckersGame implements OnDestroy {
     if (r === null) return false;
     const s = this.stats();
     this.saveStats({ played: s.played + 1, won: s.won + (r === 0 ? 1 : 0), drawn: s.drawn + (r === 'draw' ? 1 : 0) });
+    this.progress.record('checkers', r === 0 ? 'win' : r === 'draw' ? 'draw' : 'loss');
+    if (r === 0 && this.level() === 'expert') this.progress.unlock('grandmaster');
     this.started = false;
     this.later(() => {
       this.sound.play(r === 0 ? 'win' : 'lose');

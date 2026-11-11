@@ -1,6 +1,8 @@
 import { Component, ElementRef, OnDestroy, computed, inject, signal, viewChildren } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { BOT_ROSTER } from '../core/bots';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
@@ -35,6 +37,7 @@ const CPU_MS = 650;
 export class YachtGame implements OnDestroy {
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly toast = inject(ToastService);
   private readonly rng = seededRng(Math.floor(Math.random() * 2 ** 31));
   private readonly dieEls = viewChildren<ElementRef<HTMLElement>>('die');
@@ -63,7 +66,7 @@ export class YachtGame implements OnDestroy {
 
   readonly names = computed(() => {
     const n = this.view()?.players.length ?? 1;
-    return Array.from({ length: n }, (_, i) => (i === 0 ? 'You' : n === 2 ? 'Computer' : `CPU ${i}`));
+    return Array.from({ length: n }, (_, i) => (i === 0 ? 'You' : BOT_ROSTER[i - 1].name));
   });
   readonly myTurn = computed(() => this.view()?.turn === 0 && !this.busy() && !this.over());
   readonly rolled = computed(() => (this.view()?.rollsLeft ?? ROLLS) < ROLLS);
@@ -93,7 +96,7 @@ export class YachtGame implements OnDestroy {
     if (t.length === 1) return t[0] >= 200 ? 'Great game!' : 'Game complete';
     const best = Math.max(...t);
     const winners = t.flatMap((x, i) => (x === best ? [i] : []));
-    if (winners.length > 1) return winners.includes(0) ? 'It’s a tie!' : 'The computers tied';
+    if (winners.length > 1) return winners.includes(0) ? 'It’s a tie!' : `${winners.map((i) => this.names()[i]).join(' & ')} tied`;
     return winners[0] === 0 ? 'You won!' : `${this.names()[winners[0]]} won`;
   });
 
@@ -115,7 +118,10 @@ export class YachtGame implements OnDestroy {
 
   newGame(): void {
     this.clearTimers();
-    if (this.started() && !this.over()) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started() && !this.over()) {
+      this.saveStats({ played: this.stats().played + 1 });
+      if ((this.view()?.players.length ?? 1) > 1) this.progress.record('yacht-dice', 'loss');
+    }
     this.engine = new YachtEngine(1 + this.opponents());
     this.busy.set(false);
     this.rolling.set(false);
@@ -231,6 +237,8 @@ export class YachtGame implements OnDestroy {
 
   private fill(cat: Category): void {
     const seat = this.engine.view.turn;
+    const dice = this.engine.view.dice;
+    if (seat === 0 && dice.length === 5 && dice.every((d) => d === dice[0])) this.progress.unlock('yacht');
     this.engine.score(cat);
     this.justFilled.set(`${seat}:${cat}`);
     this.later(() => this.justFilled.set(null), 900);
@@ -273,6 +281,7 @@ export class YachtGame implements OnDestroy {
     const won = t.length > 1 && t[0] === Math.max(...t) && t.filter((x) => x === t[0]).length === 1;
     const s = this.stats();
     this.saveStats({ played: s.played + 1, won: s.won + (won ? 1 : 0), best: Math.max(s.best, t[0]) });
+    this.progress.record('yacht-dice', t.length === 1 ? 'done' : won ? 'win' : t[0] === Math.max(...t) ? 'draw' : 'loss');
     this.later(() => {
       this.sound.play(t.length === 1 || won ? 'win' : 'lose');
       this.over.set(true);

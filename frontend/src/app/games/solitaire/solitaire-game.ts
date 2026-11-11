@@ -1,4 +1,5 @@
 import { Component, ElementRef, Injector, OnDestroy, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
+import { ProgressService } from '../../core/services/progress.service';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
@@ -37,6 +38,7 @@ const FLIGHT = { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' };
 export class SolitaireGame implements OnDestroy {
   private readonly sound = inject(SoundService);
   private readonly storage = inject(StorageService);
+  private readonly progress = inject(ProgressService);
   private readonly toast = inject(ToastService);
   private readonly injector = inject(Injector);
   private readonly board = viewChild.required<ElementRef<HTMLElement>>('board');
@@ -88,7 +90,10 @@ export class SolitaireGame implements OnDestroy {
 
   newGame(): void {
     this.stopTimers();
-    if (this.started && !this.won()) this.saveStats({ played: this.stats().played + 1 });
+    if (this.started && !this.won()) {
+      this.saveStats({ played: this.stats().played + 1 });
+      this.progress.record('solitaire', 'loss');
+    }
     this.engine = new SolitaireEngine(Math.floor(Math.random() * 2 ** 31), this.drawCount());
     this.started = false;
     this.won.set(false);
@@ -281,6 +286,7 @@ export class SolitaireGame implements OnDestroy {
     this.timer = null;
     const s = this.stats();
     const score = this.view()!.score;
+    this.progress.record('solitaire', 'win');
     this.saveStats({
       played: s.played + 1,
       won: s.won + 1,
