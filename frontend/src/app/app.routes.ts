@@ -40,6 +40,10 @@ export const routes: Routes = [
     loadComponent: () => import('./games/war/war-game').then((m) => m.WarGame),
   },
   {
+    path: 'play/sudoku',
+    loadComponent: () => import('./games/sudoku/sudoku-game').then((m) => m.SudokuGame),
+  },
+  {
     path: 'play/chess',
     loadComponent: () => import('./games/chess/chess-game').then((m) => m.ChessGamePage),
   },

@@ -40,6 +40,18 @@ const DICE_PIPS: Record<number, number[][]> = {
             <circle [attr.cx]="pc.x" [attr.cy]="pc.y" r="13" [attr.fill]="pc.red ? '#e11d48' : '#1e293b'" stroke="rgba(255,255,255,.45)" stroke-width="2" />
           }
         </g>
+      } @else if (slug() === 'sudoku') {
+        <!-- A Sudoku grid in perspective with a few digits. -->
+        <g transform="translate(160 104) scale(1 .55) rotate(45)">
+          <rect x="-81" y="-81" width="162" height="162" fill="#0f1630" stroke="#c7d2fe" stroke-width="3" />
+          @for (k of sudokuLines; track $index) {
+            <line [attr.x1]="k.p" y1="-81" [attr.x2]="k.p" y2="81" stroke="#c7d2fe" [attr.stroke-width]="k.w" [attr.opacity]="k.w > 1 ? 1 : .45" />
+            <line x1="-81" [attr.y1]="k.p" x2="81" [attr.y2]="k.p" stroke="#c7d2fe" [attr.stroke-width]="k.w" [attr.opacity]="k.w > 1 ? 1 : .45" />
+          }
+          @for (n of sudokuDigits; track $index) {
+            <text [attr.x]="n.x" [attr.y]="n.y" font-size="13" font-weight="800" font-family="Outfit, sans-serif" text-anchor="middle" [attr.fill]="n.c" [attr.transform]="'rotate(-45 ' + n.x + ' ' + n.y + ')'">{{ n.d }}</text>
+          }
+        </g>
       } @else if (slug() === 'chess') {
         <!-- A board corner in perspective with a king and a knight standing on it. -->
         <g transform="translate(160 122) scale(1 .5) rotate(45)">
@@ -90,6 +102,12 @@ export class GameArt {
   readonly checkerPieces = [
     [1, 0, false], [3, 0, false], [0, 1, false], [2, 1, false], [3, 2, true], [1, 4, true], [2, 5, true], [4, 5, true], [5, 4, false],
   ].map(([c, r, red]) => ({ x: (c as number) * 34 - 85, y: (r as number) * 34 - 85, red: red as boolean }));
+
+  readonly sudokuLines = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => ({ p: k * 18 - 81, w: k % 3 === 0 ? 2.5 : 1 }));
+  readonly sudokuDigits = [
+    [0, 0, 5], [1, 0, 3], [4, 0, 7], [0, 1, 6], [3, 1, 1], [4, 1, 9], [5, 1, 5], [1, 2, 9], [2, 2, 8], [7, 2, 6],
+    [0, 3, 8], [4, 3, 6], [8, 3, 3], [0, 4, 4], [3, 4, 8], [5, 4, 3], [8, 4, 1], [4, 5, 2], [1, 6, 6], [6, 6, 2], [7, 6, 8], [4, 7, 4], [8, 7, 5], [7, 8, 7],
+  ].map(([c, r, d], i) => ({ x: c * 18 - 72, y: r * 18 - 67, d, c: i % 5 === 2 ? '#7dd3fc' : '#f1f5f9' }));
 
   readonly dice = [
     { x: 100, y: 108, r: -14, face: 5 },

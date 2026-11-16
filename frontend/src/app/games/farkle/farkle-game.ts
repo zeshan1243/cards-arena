@@ -90,6 +90,8 @@ export class FarkleGame implements OnDestroy {
     const left = v.dice.length - this.selected().length;
     return left === 0 ? 6 : left;
   });
+  /** Placeholder slots for dice set aside this turn. */
+  readonly ghosts = computed(() => Array.from({ length: 6 - (this.view()?.dice.length ?? 0) }, (_, i) => i));
   readonly bankTotal = computed(() => (this.view()?.turnPoints ?? 0) + this.pickPoints());
   readonly status = computed(() => {
     const v = this.view();

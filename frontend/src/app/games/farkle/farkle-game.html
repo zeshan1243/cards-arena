@@ -4,8 +4,8 @@
     <a routerLink="/games/farkle" class="round-btn" aria-label="Back to Farkle page">‹</a>
     <h1 class="title">Farkle</h1>
     <div class="chips" aria-live="polite">
-      <span class="chip">To {{ v.target.toLocaleString() }}</span>
       <span class="chip status" [class.cpu]="v.turn !== 0" [class.alert]="v.phase === 'farkle'">{{ status() }}</span>
+      <span class="chip">To {{ v.target.toLocaleString() }}</span>
     </div>
   </header>
 
@@ -30,11 +30,11 @@
                   [attr.aria-pressed]="selected().includes(i)" [attr.aria-label]="'Die ' + (i + 1) + ': ' + d" (click)="toggle(i)">
             <span class="face">@for (on of pipsOf(d); track $index) { <i [class.on]="on"></i> }</span>
           </button>
-        } @empty {
-          @for (k of [1, 2, 3, 4, 5, 6]; track k) { <span class="die ghost"><span class="face"></span></span> }
         }
+        <!-- Empty slots where dice were set aside, so the row never changes size. -->
+        @for (k of ghosts(); track k) { <span class="die ghost" aria-hidden="true"><span class="face"></span></span> }
+        @if (v.phase === 'farkle' && !rolling()) { <p class="banner" role="status">Farkle!</p> }
       </div>
-      @if (v.phase === 'farkle' && !rolling()) { <p class="banner" role="status">Farkle!</p> }
 
       <p class="pick-line" aria-live="polite">
         @if (choosing()) {
@@ -61,7 +61,7 @@
       <ol class="board" aria-label="Scores">
         @for (p of v.players; track $index; let s = $index) {
           <li [class.turn]="v.turn === s && !over()" [class.leader]="v.finalFrom === s">
-            <span class="who">{{ names()[s] }} @if (v.finalFrom === s) { <em>reached {{ v.target.toLocaleString() }}</em> }</span>
+            <span class="who">{{ names()[s] }}@if (v.finalFrom === s) { <em>reached {{ v.target.toLocaleString() }}</em> }</span>
             <b class="pts">{{ p.score.toLocaleString() }}</b>
             <span class="bar"><i [style.width.%]="progress(p.score) * 100"></i></span>
           </li>

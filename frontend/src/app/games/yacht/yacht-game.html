@@ -4,8 +4,8 @@
     <a routerLink="/games/yacht-dice" class="round-btn" aria-label="Back to Yacht Dice page">‹</a>
     <h1 class="title">Yacht Dice</h1>
     <div class="chips" aria-live="polite">
-      <span class="chip">Round {{ v.round > 13 ? 13 : v.round }}/13</span>
       <span class="chip status" [class.cpu]="v.turn !== 0">{{ status() }}</span>
+      <span class="chip">Round {{ v.round > 13 ? 13 : v.round }}/13</span>
     </div>
   </header>
 
@@ -23,8 +23,8 @@
             <span class="tag">Held</span>
           </button>
         }
+        @if (yacht()) { <p class="banner" role="status">Yacht!</p> }
       </div>
-      @if (yacht()) { <p class="banner" role="status">Yacht!</p> }
 
       <div class="roll-row">
         <button type="button" class="roll" (click)="roll()" [disabled]="!canRoll()">

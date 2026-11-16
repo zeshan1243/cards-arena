@@ -6,6 +6,8 @@
 .round-btn { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.3rem; text-decoration: none !important; &:hover { background: rgba(255,255,255,.08); } }
 .title { margin: 0; font-size: 1.1rem; white-space: nowrap; }
 .chips { display: flex; gap: 6px; margin-left: auto; font-variant-numeric: tabular-nums; }
+.status { min-width: 9.5rem; justify-content: center; white-space: nowrap; }
+@media (max-width: 420px) { .status { min-width: 0; } }
 .status.cpu { border-color: rgba(245,158,11,.6); color: #fde68a; }
 @media (max-width: 420px) { .topbar { padding: 8px 10px; gap: 6px; } .chip { padding: 3px 8px; font-size: .7rem; } }
 @media (max-width: 380px) { .status { display: none; } }
@@ -13,7 +15,7 @@
 /* Dice tray on the left, scorecard on the right; stacked on narrow screens. */
 .body { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr); min-height: 0; overflow: hidden;
   background: radial-gradient(ellipse at 30% 40%, rgba(255,255,255,.06), transparent 60%), linear-gradient(180deg, #1c2440, #0b1020); }
-@media (max-width: 860px) { .body { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); } }
+@media (max-width: 860px) { .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); } }
 
 /* The felt is as tall as its dice; dice size to its width. */
 .tray { container-type: inline-size; align-self: center; display: grid; align-content: center; justify-items: center; gap: clamp(12px, 3vh, 26px); padding: clamp(14px, 3vw, 32px);
@@ -21,7 +23,7 @@
   background: radial-gradient(ellipse at 50% 35%, #1f8a5a, #0f5132 70%, #0a3d26); box-shadow: inset 0 0 0 8px #5b3a22, inset 0 0 0 10px rgba(0,0,0,.35), inset 0 10px 40px rgba(0,0,0,.45), 0 16px 40px rgba(0,0,0,.4); }
 @media (max-width: 860px) { .tray { margin: 8px 10px 0; padding: 14px 10px 10px; gap: 10px; border-radius: 16px; } }
 
-.dice { --gap: clamp(8px, 3cqw, 16px); --d: min(84px, calc((100cqw - 4 * var(--gap)) / 5.3)); display: flex; gap: var(--gap); padding-top: 10px; }
+.dice { --gap: clamp(8px, 3cqw, 16px); --d: min(84px, calc((100cqw - 4 * var(--gap)) / 5.3)); position: relative; display: flex; gap: var(--gap); padding-top: 10px; }
 .die { position: relative; display: grid; justify-items: center; gap: 6px; padding: 0; border: 0; background: none; cursor: pointer; color: inherit; -webkit-tap-highlight-color: transparent;
   transition: transform var(--dur-fast) var(--ease-out);
   &:disabled { cursor: default; }
@@ -38,7 +40,8 @@
 .tag { font-size: .62rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #fde68a; visibility: hidden; }
 .die.held .tag { visibility: visible; }
 
-.banner { margin: -6px 0 0; font-family: var(--font-display); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; color: #fde68a; text-shadow: 0 2px 12px rgba(245,158,11,.7); animation: pop .5s var(--ease-out); }
+/* Floats over the dice so showing it never moves the layout. */
+.banner { position: absolute; z-index: 2; top: 50%; left: 50%; translate: -50% -60%; margin: 0; padding: 2px 18px; border-radius: 999px; background: rgba(11,16,32,.85); pointer-events: none; white-space: nowrap; font-family: var(--font-display); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; color: #fde68a; text-shadow: 0 2px 12px rgba(245,158,11,.7); animation: pop .5s var(--ease-out); }
 @keyframes pop { from { transform: scale(.4); opacity: 0; } }
 
 .roll-row { display: flex; align-items: center; gap: 14px; }
@@ -47,7 +50,9 @@
   &:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #b45309, 0 4px 10px rgba(0,0,0,.35); }
   &:disabled { cursor: default; filter: saturate(.3) brightness(.8); }
   &:focus-visible { outline: 3px solid #fff; outline-offset: 3px; } }
-@media (max-width: 860px) { .roll { min-width: 150px; min-height: 46px; font-size: 1rem; } }
+/* Fixed width: the label changes, the button doesn't. */
+.roll { width: 200px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 860px) { .roll { width: 170px; min-width: 0; min-height: 46px; font-size: 1rem; } }
 .pips-left { display: flex; gap: 6px; i { width: 12px; height: 12px; border-radius: 50%; background: #fde68a; box-shadow: 0 0 8px rgba(253,230,138,.7); transition: all var(--dur-fast); } i.used { background: rgba(0,0,0,.35); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); } }
 .keys { margin: 0; font-size: .72rem; color: rgba(255,255,255,.55); }
 @media (max-width: 860px), (hover: none) { .keys { display: none; } }
@@ -68,8 +73,8 @@ td { font-weight: 800; font-size: 1rem; }
 td.filled.zero { color: rgba(255,255,255,.35); }
 td.flash { animation: flash .9s var(--ease-out); }
 @keyframes flash { from { background: rgba(245,158,11,.45); } }
-td.open { padding: 3px 4px; }
-.pick { width: 100%; min-height: 30px; padding: 0 6px; border-radius: 8px; border: 1px dashed rgba(0,212,255,.55); background: rgba(0,212,255,.08); color: #7dd3fc; font: inherit; font-weight: 800; cursor: pointer;
+td.open { padding: 2px 3px; }
+.pick { box-sizing: border-box; display: block; width: 100%; height: 28px; padding: 0 4px; border-radius: 8px; border: 1px dashed rgba(0,212,255,.55); background: rgba(0,212,255,.08); color: #7dd3fc; font: inherit; font-weight: 800; cursor: pointer;
   transition: background var(--dur-fast), transform var(--dur-fast);
   &:hover { background: rgba(0,212,255,.22); transform: scale(1.04); }
   &.best { border-style: solid; border-color: #22d3ee; background: rgba(34,211,238,.2); color: #e0f7ff; box-shadow: 0 0 12px rgba(34,211,238,.35); }

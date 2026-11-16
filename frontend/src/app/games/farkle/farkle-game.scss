@@ -6,6 +6,8 @@
 .round-btn { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.3rem; text-decoration: none !important; &:hover { background: rgba(255,255,255,.08); } }
 .title { margin: 0; font-size: 1.1rem; white-space: nowrap; }
 .chips { display: flex; gap: 6px; margin-left: auto; font-variant-numeric: tabular-nums; }
+.status { min-width: 9.5rem; justify-content: center; white-space: nowrap; }
+@media (max-width: 420px) { .status { min-width: 0; } }
 .status.cpu { border-color: rgba(245,158,11,.6); color: #fde68a; }
 @media (max-width: 420px) { .topbar { padding: 8px 10px; gap: 6px; } .chip { padding: 3px 8px; font-size: .7rem; } }
 @media (max-width: 380px) { .status { display: none; } }
@@ -22,7 +24,7 @@
   background: radial-gradient(ellipse at 50% 35%, #1f8a5a, #0f5132 70%, #0a3d26); box-shadow: inset 0 0 0 8px #5b3a22, inset 0 0 0 10px rgba(0,0,0,.35), inset 0 10px 40px rgba(0,0,0,.45), 0 16px 40px rgba(0,0,0,.4); }
 @media (max-width: 860px) { .tray { margin: 8px 10px 0; padding: 14px 10px 10px; gap: 10px; border-radius: 16px; } }
 
-.dice { --gap: clamp(8px, 3cqw, 16px); --d: min(80px, calc((100cqw - 5 * var(--gap)) / 6.4)); display: flex; gap: var(--gap); padding-top: 10px; }
+.dice { --gap: clamp(8px, 3cqw, 16px); --d: min(80px, calc((100cqw - 5 * var(--gap)) / 6.4)); position: relative; display: flex; gap: var(--gap); padding-top: 10px; }
 .die { position: relative; display: grid; justify-items: center; gap: 6px; padding: 0; border: 0; background: none; cursor: pointer; color: inherit; -webkit-tap-highlight-color: transparent;
   transition: transform var(--dur-fast) var(--ease-out);
   &:disabled { cursor: default; }
@@ -35,7 +37,8 @@
   i.on { background: radial-gradient(circle at 35% 30%, #4b5563, #0b1020); } }
 .die.idle .face { opacity: .45; }
 
-.banner { margin: -6px 0 0; font-family: var(--font-display); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; color: #fde68a; text-shadow: 0 2px 12px rgba(245,158,11,.7); animation: pop .5s var(--ease-out); }
+/* Floats over the dice so showing it never moves the layout. */
+.banner { position: absolute; z-index: 2; top: 50%; left: 50%; translate: -50% -40%; margin: 0; padding: 2px 18px; border-radius: 999px; background: rgba(11,16,32,.85); pointer-events: none; white-space: nowrap; font-family: var(--font-display); font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 900; color: #fde68a; text-shadow: 0 2px 12px rgba(245,158,11,.7); animation: pop .5s var(--ease-out); }
 @keyframes pop { from { transform: scale(.4); opacity: 0; } }
 
 .roll-row { display: flex; align-items: center; gap: 14px; }
@@ -67,8 +70,9 @@
   b { color: #fde68a; } .bad { color: #fca5a5; } }
 .link { padding: 0; border: 0; background: none; color: #7dd3fc; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 
-.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.roll { min-width: 170px; }
+/* Fixed-width buttons: their labels change every roll, but they stay put. */
+.actions { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; width: min(100%, 440px); }
+.roll, .bank { min-width: 0 !important; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bank { min-width: 130px; min-height: 52px; padding: 10px 22px; border-radius: 999px; cursor: pointer; font-family: var(--font-display); font-size: 1.05rem; font-weight: 800; color: #052e1b;
   border: 0; background: linear-gradient(180deg, #86efac, #22c55e); box-shadow: 0 6px 0 #15803d, 0 10px 20px rgba(0,0,0,.35); transition: transform var(--dur-fast), box-shadow var(--dur-fast);
   &:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #15803d, 0 4px 10px rgba(0,0,0,.35); }
@@ -84,7 +88,7 @@
 .board li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; padding: 10px 14px; border-radius: 14px; background: rgba(11,16,32,.75); border: 1px solid var(--border-color); transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
   &.turn { border-color: #f59e0b; box-shadow: 0 0 0 1px #f59e0b, 0 0 18px rgba(245,158,11,.25); } }
 @media (max-width: 860px) { .board li { padding: 8px 10px; } }
-.who { font-weight: 700; font-size: .9rem; em { display: block; font-style: normal; font-size: .68rem; color: #fde68a; } }
+.who { min-width: 0; font-weight: 700; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; em { margin-left: 6px; font-style: normal; font-size: .68rem; color: #fde68a; } }
 .pts { font-family: var(--font-display); font-size: 1.25rem; font-variant-numeric: tabular-nums; }
 .bar { grid-column: 1 / -1; height: 6px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden;
   i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #22c55e, #fde68a); transition: width .5s var(--ease-out); } }

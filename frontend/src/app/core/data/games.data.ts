@@ -21,6 +21,7 @@ import { content as c_yacht } from '../../games/yacht/yacht.content';
 import { content as c_pyramid } from '../../games/pyramid/pyramid.content';
 import { content as c_farkle } from '../../games/farkle/farkle.content';
 import { content as c_chess } from '../../games/chess/chess.content';
+import { content as c_sudoku } from '../../games/sudoku/sudoku.content';
 
 export type { GameContent };
 
@@ -432,7 +433,25 @@ export const GAMES: GameInfo[] = [
     releasedAt: '2026-11-11',
     accent: '#B45309',
     art: '♚♛♞',
-    related: ['checkers', 'yacht-dice', 'solitaire'],
+    related: ['checkers', 'sudoku', 'solitaire'],
+  },
+  {
+    slug: 'sudoku',
+    name: 'Sudoku',
+    tagline: 'Fill the grid so every row, column and box has 1 to 9.',
+    description: 'The classic number puzzle: four levels from Easy to Expert, a daily puzzle, notes, hints, undo and mistake checking. Every puzzle has exactly one solution.',
+    region: 'Worldwide',
+    minPlayers: 1,
+    maxPlayers: 1,
+    botEnabled: false,
+    multiplayerEnabled: false,
+    available: true,
+    categories: ['classic', 'popular'],
+    popularity: 90,
+    releasedAt: '2026-11-16',
+    accent: '#6366F1',
+    art: '①⑤⑨',
+    related: ['solitaire', 'chess', 'tripeaks'],
   },
 ];
 
@@ -499,6 +518,7 @@ GAME_CONTENT['yacht-dice'] = c_yacht;
 GAME_CONTENT['pyramid-solitaire'] = c_pyramid;
 GAME_CONTENT['farkle'] = c_farkle;
 GAME_CONTENT['chess'] = c_chess;
+GAME_CONTENT['sudoku'] = c_sudoku;
 
 export function findGame(slug: string): GameInfo | undefined {
   return GAMES.find((g) => g.slug === slug);

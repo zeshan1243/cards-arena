@@ -130,6 +130,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'big-turn', icon: '💰', title: 'High roller', description: 'Bank 2,000 points in one Farkle turn.' },
   { id: 'grandmaster', icon: '♛', title: 'Grandmaster', description: 'Beat the Expert computer at Checkers.' },
   { id: 'checkmate', icon: '♚', title: 'Checkmate!', description: 'Beat the Expert computer at Chess.' },
+  { id: 'sudoku-expert', icon: '🔢', title: 'Number cruncher', description: 'Solve an Expert Sudoku without a hint.' },
 ];
 
 /** Achievements newly earned from totals (not yet in `p.achievements`). */
