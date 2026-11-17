@@ -1,12 +1,13 @@
 // Runs after `npm run build` (npm "postbuild" hook):
 //  - sitemap.xml from the prerendered pages, so new games are listed automatically;
-//  - 404.html (the client-side app shell) so Vercel answers unknown URLs with a real 404.
+//  - 404.html (the client-side app shell). vercel.json rewrites every URL that matches no file to it,
+//    so unknown URLs render the noindexed "Page not found" page instead of a copy of the homepage.
 import { copyFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const SITE = 'https://www.cardsarena.world';
 const OUT = 'dist/frontend/browser';
-const PRIORITY = { '/': '1.0', '/games': '0.9', '/about': '0.4', '/contact': '0.3', '/privacy': '0.3' };
+const PRIORITY = { '/': '1.0', '/games': '0.9', '/about': '0.4', '/contact': '0.3', '/privacy': '0.3', '/terms': '0.3' };
 
 function pages(dir) {
   return readdirSync(dir).flatMap((name) => {

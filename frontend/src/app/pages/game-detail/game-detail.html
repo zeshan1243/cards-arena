@@ -60,10 +60,10 @@
           <section>
             @if (g.botEnabled) {
               <h2>Play {{ g.name }} against AI</h2>
-              <p>{{ c.aiNote ?? 'Choose from four bot levels. Easy bots play loosely; Normal bots duck and shed their high cards; Hard bots remember which players are void in each suit; Expert bots count cards and estimate the risk of a Thulla before every play.' }}</p>
+              <p>{{ c.aiNote ?? 'Choose from four bot levels, from Easy for learning the rules to Expert for a real challenge.' }}</p>
             } @else {
               <h2>Play {{ g.name }} online</h2>
-              <p>Every deal is shuffled fresh. Play on your phone, tablet or computer — your best score, best time and win record are saved in your browser.</p>
+              <p>{{ c.aiNote ?? 'Play on your phone, tablet or computer. Your results are saved in your browser.' }}</p>
             }
             <a class="btn btn-primary" [routerLink]="['/play', g.slug]">Start a game</a>
           </section>

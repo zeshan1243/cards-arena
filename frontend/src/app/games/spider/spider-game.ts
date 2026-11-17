@@ -5,7 +5,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { PlayingCard } from '../../shared/components/playing-card/playing-card';
 import { Card } from '../../shared/models/card.model';
@@ -39,7 +38,7 @@ const MIN_DOWN = 0.05;
 
 @Component({
   selector: 'app-spider-game',
-  imports: [RouterLink, PlayingCard, Modal, AdBanner],
+  imports: [RouterLink, PlayingCard, Modal],
   templateUrl: './spider-game.html',
   styleUrl: './spider-game.scss',
 })
@@ -83,7 +82,7 @@ export class SpiderGame implements OnDestroy {
   constructor() {
     inject(SeoService).apply({
       title: 'Play Spider Solitaire Online – Free, 1, 2 or 4 Suits | CardArena',
-      description: 'Play Spider Solitaire free in your browser. 1, 2 or 4 suits, drag and drop or tap to move, unlimited undo and hints. No download or sign-up.',
+      description: 'Play Spider Solitaire free in your browser. 1, 2 or 4 suits, drag and drop or tap to move, with undo and hints. No download or sign-up.',
       path: '/games/spider-solitaire',
       image: '/og/spider-solitaire.jpg',
     });

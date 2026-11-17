@@ -70,6 +70,7 @@ export const routes: Routes = [
   ...(environment.accountsEnabled ? accountRoutes : accountRoutes.map((r) => ({ path: r.path, redirectTo: '' }))),
   { path: 'about', loadComponent: () => import('./pages/about/about').then((m) => m.AboutPage) },
   { path: 'privacy', loadComponent: () => import('./pages/privacy/privacy').then((m) => m.PrivacyPage) },
+  { path: 'terms', loadComponent: () => import('./pages/terms/terms').then((m) => m.TermsPage) },
   { path: 'contact', loadComponent: () => import('./pages/contact/contact').then((m) => m.ContactPage) },
   { path: 'progress', loadComponent: () => import('./pages/progress/progress').then((m) => m.ProgressPage) },
   { path: 'settings', loadComponent: () => import('./pages/settings/settings').then((m) => m.SettingsPage) },

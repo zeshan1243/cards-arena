@@ -42,7 +42,7 @@
 <section class="section alt">
   <div class="container">
     <div class="section-head">
-      <div><span class="eyebrow">Popular</span><h2>Most played</h2></div>
+      <div><span class="eyebrow">Popular</span><h2>Popular picks</h2></div>
     </div>
     <div class="grid four">
       @for (g of popular; track g.slug) { <app-game-card [game]="g" (play)="play($event)" /> }

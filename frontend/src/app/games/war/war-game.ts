@@ -5,7 +5,6 @@ import { BOT_ROSTER } from '../core/bots';
 import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { PlayingCard } from '../../shared/components/playing-card/playing-card';
 import { Battle, Side, WarEngine, WarMode, WarState } from './war.engine';
@@ -22,7 +21,7 @@ const FLIGHT = { duration: 280, easing: 'cubic-bezier(.2,.8,.2,1)' };
 
 @Component({
   selector: 'app-war-game',
-  imports: [RouterLink, PlayingCard, Modal, AdBanner],
+  imports: [RouterLink, PlayingCard, Modal],
   templateUrl: './war-game.html',
   styleUrl: './war-game.scss',
   host: { '(document:keydown.space)': 'onSpace($event)' },

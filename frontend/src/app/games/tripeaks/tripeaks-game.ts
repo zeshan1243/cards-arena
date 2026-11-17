@@ -5,7 +5,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { PlayingCard } from '../../shared/components/playing-card/playing-card';
 import { TriPeaksEngine, TriPeaksState } from './tripeaks.engine';
@@ -24,7 +23,7 @@ const FLIGHT = { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' };
 
 @Component({
   selector: 'app-tripeaks-game',
-  imports: [RouterLink, PlayingCard, Modal, AdBanner],
+  imports: [RouterLink, PlayingCard, Modal],
   templateUrl: './tripeaks-game.html',
   styleUrl: './tripeaks-game.scss',
 })

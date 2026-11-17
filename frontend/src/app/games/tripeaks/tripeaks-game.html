@@ -54,7 +54,6 @@
 </div>
 
 <app-modal [open]="!!result()" [dismissible]="false" [label]="result() === 'won' ? 'Board cleared' : 'No moves left'">
-  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   <div class="result">
     <div class="emoji" aria-hidden="true">{{ result() === 'won' ? '🏔️' : '🃏' }}</div>
     @if (view(); as v) {

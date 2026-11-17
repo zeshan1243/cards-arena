@@ -6,7 +6,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { Grid, Level, PEERS, boxOf, candidates, colOf, conflicts, daySeed, generate, rowOf, seededRng } from './sudoku.engine';
 
@@ -37,7 +36,7 @@ const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 
 @Component({
   selector: 'app-sudoku-game',
-  imports: [RouterLink, Modal, AdBanner],
+  imports: [RouterLink, Modal],
   templateUrl: './sudoku-game.html',
   styleUrl: './sudoku-game.scss',
 })

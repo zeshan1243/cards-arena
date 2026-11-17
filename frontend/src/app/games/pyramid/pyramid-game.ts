@@ -5,7 +5,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { PlayingCard } from '../../shared/components/playing-card/playing-card';
 import { Card, SUIT_SYMBOL } from '../../shared/models/card.model';
@@ -26,7 +25,7 @@ const PASS_LABELS: Record<Passes, string> = { 1: '1 pass', 3: '3 passes', 0: 'Un
 
 @Component({
   selector: 'app-pyramid-game',
-  imports: [RouterLink, PlayingCard, Modal, AdBanner],
+  imports: [RouterLink, PlayingCard, Modal],
   templateUrl: './pyramid-game.html',
   styleUrl: './pyramid-game.scss',
 })

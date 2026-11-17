@@ -29,7 +29,6 @@ import { GameInfo } from '../../shared/models/game.model';
               <option value="popular">Popular</option>
               <option value="newest">Newest</option>
               <option value="az">A–Z</option>
-              <option value="most-played">Most played</option>
             </select>
           </label>
         </div>

@@ -122,7 +122,6 @@
 </ng-template>
 
 <app-modal [open]="over()" [dismissible]="false" [label]="winnerText()">
-  <div class="modal-ad"><app-ad-banner size="320x50" /></div>
   <div class="result">
     <div class="emoji" aria-hidden="true">{{ winnerText() === 'You won!' || totals().length === 1 ? '🎲' : '🤖' }}</div>
     <h2 [class.lost]="totals().length > 1 && winnerText() !== 'You won!'">{{ winnerText() }}</h2>

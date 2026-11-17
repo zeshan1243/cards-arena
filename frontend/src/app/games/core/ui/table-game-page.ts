@@ -6,7 +6,6 @@ import { GameService } from '../../../core/services/game.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { SettingsService } from '../../../core/services/settings.service';
 import { GameTimer } from '../../../shared/components/game-timer/game-timer';
-import { AdBanner } from '../../../shared/components/ad-banner/ad-banner';
 import { Loader } from '../../../shared/components/loader/loader';
 import { Modal } from '../../../shared/components/modal/modal';
 import { PlayerAvatar } from '../../../shared/components/player-avatar/player-avatar';
@@ -35,7 +34,7 @@ const PASS_ROTATION: Record<SeatPosition, number> = { left: 180, 'top-left': -13
 
 @Component({
   selector: 'app-table-game-page',
-  imports: [AdBanner, RouterLink, Loader, Modal, GameTimer, PlayerAvatar, ActionPanel, SeatPile, TableFloor, TableHand, TableScores, TableSeat, TableTrick],
+  imports: [RouterLink, Loader, Modal, GameTimer, PlayerAvatar, ActionPanel, SeatPile, TableFloor, TableHand, TableScores, TableSeat, TableTrick],
   providers: [TableGameStore],
   templateUrl: './table-game-page.html',
   styleUrl: './table-game-page.scss',

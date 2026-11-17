@@ -31,11 +31,12 @@ export const content: GameContent = {
     },
     {
       q: 'Why does a Hokm hand end before all 13 tricks are played?',
-      a: 'Only the first team to seven tricks matters, so the hand stops as soon as a team reaches seven. This keeps games fast — a typical match to 5 points takes about 5–10 minutes.',
+      a: 'Only the first team to seven tricks matters, so the hand stops as soon as a team reaches seven. Once one side has seven, the other cannot catch up, so the remaining cards are not played.',
     },
     {
-      q: 'Can I play Hokm online for free?',
-      a: 'Yes. On CardArena you can play Hokm free in your browser with AI partners and opponents — no download or account needed.',
+      q: 'Can a Hokm match end in a tie?',
+      a: 'No. Only the team that wins a hand scores, and the match ends as soon as a team reaches the target (3, 5 or 7 points), so one team is always ahead. A Kot can carry a team past the target, for example from 4 to 6 in a match to 5.',
     },
   ],
+  aiNote: 'As Hakem, bots name the longest suit in their first five cards, though Easy bots sometimes pick a random suit and play a random legal card about 40% of the time. Normal, Hard and Expert bots count played cards to lead the highest card left in a suit and avoid overtaking a winning partner; Hard and Expert only hold back when the partner’s card is sure to win the trick.',
 };

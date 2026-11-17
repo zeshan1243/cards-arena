@@ -7,7 +7,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { seededRng } from '../core/deck';
 import {
@@ -29,7 +28,7 @@ const CPU_MS = 650;
 
 @Component({
   selector: 'app-yacht-game',
-  imports: [RouterLink, NgTemplateOutlet, Modal, AdBanner],
+  imports: [RouterLink, NgTemplateOutlet, Modal],
   templateUrl: './yacht-game.html',
   styleUrl: './yacht-game.scss',
   host: { '(document:keydown)': 'onKey($event)' },

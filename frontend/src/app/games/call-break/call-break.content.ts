@@ -34,8 +34,9 @@ export const content: GameContent = {
       a: 'On CardArena every player must call at least 1 trick and at most 8 tricks each round.',
     },
     {
-      q: 'Can I play Call Break online for free?',
-      a: 'Yes — play Call Break free in your browser against AI opponents of different skill levels, with no download or sign-up required.',
+      q: 'What happens if two players tie for the highest total?',
+      a: 'If two or more players share the top score after the last round, the game ends as a draw between them rather than going to an extra round.',
     },
   ],
+  aiNote: 'Bots work out their call from Aces, guarded Kings, high spades, spare spades for ruffing and short side suits. Easy bots miscall by a trick either way and play a random legal card about 40% of the time; Normal bots occasionally call one trick off, while Hard and Expert bots always call their full estimate. Above Easy, bots track played cards and lead the highest remaining card of a suit when they hold it.',
 };

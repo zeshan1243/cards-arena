@@ -5,7 +5,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { BOT_ROSTER } from '../core/bots';
 import { ChessGame, KING, Level, Move, Played, Result, SearchRequest, Side, TYPES, colOf, fromOf, promoOf, rowOf, search, sqName, toOf } from './chess.engine';
@@ -30,7 +29,7 @@ const REASON: Record<Result['reason'], string> = {
 
 @Component({
   selector: 'app-chess-game',
-  imports: [RouterLink, Modal, AdBanner],
+  imports: [RouterLink, Modal],
   templateUrl: './chess-game.html',
   styleUrl: './chess-game.scss',
 })

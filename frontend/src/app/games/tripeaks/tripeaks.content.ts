@@ -17,12 +17,13 @@ export const content: GameContent = {
     'Remember the wrap-around: a King and an Ace connect, so a chain like Q-K-A-2 is legal and can rescue a stuck position.',
     'Use undo to try a different branch when a chain has two possible continuations — the best line is often not obvious.',
   ],
+  aiNote: 'The game screen shows your score, current streak and time. Undo costs no points but still counts as a move, and Hint picks the card that keeps your streak going longest, or the stock when nothing fits. Your games won, best score and longest streak are saved on your device, along with your best total and most boards cleared in Endless mode.',
   faq: [
     { q: 'Can a King be played on an Ace in Tri Peaks?', a: 'Yes. On CardArena ranks wrap around, so a King can go on an Ace and an Ace on a King, as in most modern versions of Tri Peaks.' },
     { q: 'Does the suit or colour matter in Tri Peaks?', a: 'No. Only the rank matters: any card one higher or one lower than the waste card can be played, whatever its suit or colour.' },
     { q: 'How is Tri Peaks scored?', a: 'Each card in a streak scores its position in the streak (1, 2, 3 …), so long chains score fast. Clearing a peak top adds 15 points, clearing all three adds 30, and each unused stock card adds 5.' },
     { q: 'Can every game of Tri Peaks be won?', a: 'No — some deals cannot be cleared whatever you do, because the stock only goes through once. Careful planning and undo help you win far more often.' },
-    { q: 'Can I play Tri Peaks Solitaire online for free?', a: 'Yes — play Tri Peaks free in your browser on CardArena, on phone, tablet or desktop, with no download or sign-up needed.' },
+    { q: 'What happens to my streak when I draw from the stock?', a: 'It resets. Turning a stock card ends the current streak, so the next card you play from the peaks scores 1 point again. That’s why it pays to play every card you can before drawing.' },
     { q: 'Can I keep playing after clearing the peaks?', a: 'Yes. Turn on Endless mode and every cleared board deals a new one, with your score carrying over until you run out of moves.' },
   ],
 };

@@ -3,9 +3,9 @@ import { GameContent } from '../../core/data/game-content';
 export const content: GameContent = {
   howToPlay: [
     'Checkers — called Draughts in Britain — is a two-player strategy game played on the 64 squares of an 8×8 board. Each player starts with 12 pieces on the dark squares of the three rows nearest them. On CardArena you play the red pieces at the bottom against the computer’s black pieces, and you move first.',
-    'Pieces move diagonally forward one square onto an empty dark square. To capture, jump diagonally over an opponent’s piece that is next to you onto the empty square directly behind it; the jumped piece is removed. If, after a jump, the same piece can jump again, it keeps going — one turn can capture several pieces in a chain.',
+    'Pieces move diagonally forward one square onto an empty dark square. To capture, jump diagonally over an opponent’s piece that is next to you onto the empty square directly behind it; the jumped piece is removed. If, after a jump, the same piece can jump again, it must keep going — once a jump sequence starts it has to be completed, so one turn can capture several pieces in a chain.',
     'On CardArena capturing is your choice: you can jump an enemy piece or make a different move instead, and the computer plays by the same rule. Pieces that can capture glow gold. If you prefer the standard tournament rule, turn on Must jump — then any available capture has to be taken, though you may still choose which one. Highlighted pieces are the ones that can move, and green dots show where the selected piece can go.',
-    'When a piece reaches the far row it is crowned King. Kings move and capture diagonally both forwards and backwards, which makes them far more powerful. A piece that is crowned during a jump ends its move there.',
+    'When a piece reaches the far row it is crowned King. Kings move and capture diagonally both forwards and backwards, which makes them far more powerful. A piece that is crowned — including during a jump sequence — ends its move there.',
     'You win by capturing all of the computer’s pieces or by leaving it with no legal move. If 40 moves pass on each side with no capture and no ordinary piece moved, the game is a draw. Choose Easy, Normal, Hard or Expert, and use Undo and Hint while you learn.',
   ],
   strategy: [
@@ -16,12 +16,12 @@ export const content: GameContent = {
     'Trade when you are ahead. Exchanging pieces one for one makes a material lead count for more as the board empties.',
     'Get a king early in the endgame, and use two kings together to corner a lone enemy king.',
   ],
-  aiNote: 'Choose from four computer levels. Easy looks one move ahead and sometimes blunders; Normal sees short exchanges coming; Hard reads five moves deep; Expert searches eight moves ahead and always plays out capture sequences to the end.',
+  aiNote: 'Choose from four computer levels. Easy looks one move ahead and sometimes plays at random; Normal sees short exchanges coming; Hard calculates several moves ahead; Expert looks up to eight half-moves deep (seven when captures are optional). Every level plays out pending captures before judging a position.',
   faq: [
     { q: 'Do you have to jump in Checkers?', a: 'In standard American and English checkers, yes: if you can capture, you must. On CardArena capturing is optional by default, so you decide whether to jump. Turn on Must jump to play with the standard forced-capture rule.' },
     { q: 'Can kings move backwards?', a: 'Yes. A king moves one square diagonally in any direction and can capture both forwards and backwards. Ordinary pieces only move and capture forwards.' },
     { q: 'Who moves first in Checkers?', a: 'In tournament checkers the dark pieces move first. On CardArena you always move first, playing red against the computer’s black pieces.' },
     { q: 'Is Checkers the same as Draughts?', a: 'Yes — Checkers is the American name and Draughts the British name for the same game on an 8×8 board. International draughts is a different variant played on a 10×10 board.' },
-    { q: 'Can I play Checkers online for free?', a: 'Yes — play Checkers free in your browser on CardArena against the computer at four levels, on phone, tablet or desktop, with no download or sign-up.' },
+    { q: 'Can I stop partway through a multiple jump?', a: 'No. Once a piece starts jumping it must keep capturing while it can, although you may choose which route to take when there is more than one. The only exception is crowning: a piece that reaches the far row becomes a King and its move ends there.' },
   ],
 };

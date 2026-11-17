@@ -6,7 +6,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { seededRng } from '../core/deck';
 import { FarkleEngine, FarkleState, Level, keeps, scoringIndexes } from './farkle.engine';
@@ -39,7 +38,7 @@ export const SCORING = [
 
 @Component({
   selector: 'app-farkle-game',
-  imports: [RouterLink, Modal, AdBanner],
+  imports: [RouterLink, Modal],
   templateUrl: './farkle-game.html',
   styleUrl: './farkle-game.scss',
   host: { '(document:keydown)': 'onKey($event)' },

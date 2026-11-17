@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/services/seo.service';
 import { CONTACT_EMAIL } from '../contact/contact';
 
-/** Keep in step with what the site actually loads: Google Analytics, AdSense, Adsterra, Vercel, localStorage. */
+/** Keep in step with what the site actually loads: Google Analytics, AdSense, Vercel, localStorage. */
 @Component({
   selector: 'app-privacy-page',
   imports: [RouterLink],
@@ -26,7 +26,7 @@ import { CONTACT_EMAIL } from '../contact/contact';
       <ul>
         <li><strong>No account needed.</strong> You can play every game without signing up. We do not ask for your name, email address or any other personal details to play.</li>
         <li><strong>Data stored on your device.</strong> Your settings (sound, game speed, difficulty), game preferences, Solitaire statistics and whether you have dismissed certain notices are saved in your browser’s local storage. This stays on your device; we do not receive it. You can clear it at any time in your browser settings.</li>
-        <li><strong>Usage data.</strong> Like most websites, we collect anonymous information about how the site is used — pages visited, approximate location (country/city), device and browser type, and how long visits last — through Google Analytics.</li>
+        <li><strong>Usage data.</strong> Like most websites, we collect information about how the site is used — pages visited, approximate location (country/city), device and browser type, and how long visits last — through Google Analytics. Google Analytics uses cookies and a random identifier rather than your name, and we do not use it to identify you.</li>
         <li><strong>Server logs.</strong> Our hosting provider, Vercel, automatically records technical information such as your IP address, browser and the pages requested, to deliver the site and keep it secure.</li>
         <li><strong>Messages you send us.</strong> If you email us, we receive your email address and whatever you write, and use it only to reply.</li>
       </ul>
@@ -44,7 +44,7 @@ import { CONTACT_EMAIL } from '../contact/contact';
       </ul>
 
       <h2>Advertising</h2>
-      <p>CardArena is free because it shows ads. We work with these advertising partners:</p>
+      <p>CardArena is free because it shows ads. We work with this advertising partner:</p>
       <ul>
         <li>
           <strong>Google AdSense.</strong> Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites.
@@ -54,14 +54,11 @@ import { CONTACT_EMAIL } from '../contact/contact';
           <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener">www.aboutads.info</a> or, in Europe,
           <a href="https://www.youronlinechoices.eu/" target="_blank" rel="noopener">www.youronlinechoices.eu</a>.
         </li>
-        <li>
-          <strong>Adsterra.</strong> Banner ads and sponsored links may be provided by Adsterra, which may use cookies and similar technologies to show
-          ads and measure their performance. See <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noopener">Adsterra’s privacy policy</a>.
-        </li>
       </ul>
       <p>
-        Where the law requires it (for example for visitors in the European Economic Area, the UK and Switzerland), you will be asked for consent
-        before personalised ads are shown, and you can change your choice at any time. If you decline, you may still see non-personalised ads.
+        If you visit from the European Economic Area, the UK or Switzerland, Google Analytics and advertising cookies are switched off by default.
+        Where a consent message is shown, they are only used if you agree, and you can change your choice at any time from the
+        privacy link in that message. If you decline, you may still see non-personalised or limited ads.
       </p>
 
       <h2>How we use information</h2>
@@ -107,12 +104,12 @@ import { CONTACT_EMAIL } from '../contact/contact';
 })
 export class PrivacyPage {
   readonly email = CONTACT_EMAIL;
-  readonly updated = 'October 28, 2026';
+  readonly updated = 'November 17, 2026';
 
   constructor() {
     inject(SeoService).apply({
       title: 'Privacy Policy | CardArena',
-      description: 'How CardArena handles your data: local game settings, Google Analytics, advertising cookies from Google AdSense and Adsterra, and your choices.',
+      description: 'How CardArena handles your data: local game settings, Google Analytics, advertising cookies from Google AdSense, and your choices.',
       path: '/privacy',
     });
   }

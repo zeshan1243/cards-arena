@@ -6,7 +6,6 @@ import { SeoService } from '../../core/services/seo.service';
 import { SoundService } from '../../core/services/sound.service';
 import { StorageService } from '../../core/services/storage.service';
 import { ToastService } from '../../core/services/toast.service';
-import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
 import { Modal } from '../../shared/components/modal/modal';
 import { seededRng } from '../core/deck';
 import { Board, CheckersEngine, CheckersState, Level, Move, Side, colOf, isDark, rowOf } from './checkers.engine';
@@ -33,7 +32,7 @@ function partway(board: Board, move: Move, k: number): Board {
 
 @Component({
   selector: 'app-checkers-game',
-  imports: [RouterLink, Modal, AdBanner],
+  imports: [RouterLink, Modal],
   templateUrl: './checkers-game.html',
   styleUrl: './checkers-game.scss',
 })

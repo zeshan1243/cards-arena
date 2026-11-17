@@ -5,7 +5,7 @@ export const content: GameContent = {
     'Pyramid Solitaire is a one-player card game played with a standard 52-card deck. Twenty-eight cards are dealt face up in a pyramid of seven rows, each row overlapping the one above it. The other 24 cards form the stock. Your goal is to remove every card from the pyramid.',
     'Cards are removed in pairs that add up to 13. Aces count 1, number cards their face value, Jacks 11 and Queens 12 — so a 6 pairs with a 7, a 4 with a 9, an Ace with a Queen and a 2 with a Jack. Kings count 13 and are removed on their own.',
     'You can only use cards that are uncovered: a card in the pyramid is free once both cards overlapping it from the row below are gone. One exception: a card may pair with the single card still covering it, such as a 4 sitting under a 9.',
-    'When you run out of pairs, tap the stock to turn its top card onto the waste pile. The top card of the waste can pair with a free pyramid card. When the stock is empty you can turn the waste back over and go through it again: three passes by default, or choose one pass or unlimited passes.',
+    'When you run out of pairs, tap the stock to turn its top card onto the waste pile, one card at a time. The top card of the waste can pair with a free pyramid card. When the stock is empty you can turn the waste back over and go through it again, at no cost in points: three passes by default, or choose one pass or unlimited passes.',
     'Each pair or King removed scores 5 points, each pyramid row cleared adds 25, and clearing the whole pyramid adds 250 plus 10 for every card left in the stock and waste. Use Undo to take back a move and Hint when you’re stuck.',
     'Turn on Endless mode to play board after board: clear the pyramid and a new one is dealt, with your score carrying over. The run ends when you get stuck, so see how many boards you can clear and how high your total can go.',
   ],
@@ -16,12 +16,13 @@ export const content: GameContent = {
     'Count the passes. With three passes, note which stock cards you’ll need and when they come up, and save pairs that need them for the right pass.',
     'Kings are free points: remove them as soon as they are uncovered.',
   ],
+  aiNote: 'The game screen shows your score, which pass you’re on and your time. Tap two cards to pair them, or a King to remove it. Changing the number of passes before your first move deals a new game straight away; otherwise it applies from your next game. Undo costs no points but counts as a move, Hint points out a pair or King to remove, or tells you to draw, and your games won and best score are saved on your device, along with your best total and most boards cleared in Endless mode.',
   faq: [
     { q: 'What adds up to 13 in Pyramid Solitaire?', a: 'Ace + Queen, 2 + Jack, 3 + 10, 4 + 9, 5 + 8 and 6 + 7. Kings are worth 13 on their own and are removed singly.' },
     { q: 'How many times can I go through the deck?', a: 'Three passes by default on CardArena. You can also choose a single pass for a harder game or unlimited passes for a relaxed one.' },
     { q: 'Can I pair a card with the card covering it?', a: 'Yes. If a card is covered by just one remaining card and the two add up to 13, you can remove them together.' },
     { q: 'Is every game of Pyramid Solitaire winnable?', a: 'No. Many deals can’t be cleared, especially with a single pass. With three passes and careful play you can win a good share of games.' },
-    { q: 'Can I play Pyramid Solitaire online for free?', a: 'Yes — play free in your browser on CardArena, on phone, tablet or desktop, with no download or sign-up.' },
+    { q: 'Is there a penalty for going through the stock again?', a: 'No. Turning the waste back into the stock costs no points. The only limit is the number of passes you chose — one, three or unlimited — and any cards left in the stock and waste are worth 10 points each if you clear the pyramid.' },
     { q: 'Can I keep playing after clearing the pyramid?', a: 'Yes. Turn on Endless mode and every cleared pyramid deals a new board, with your score carrying over until you run out of moves.' },
   ],
 };

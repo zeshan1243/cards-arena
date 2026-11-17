@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../../environments/environment';
-import { SMARTLINK_URL } from '../../../core/services/ads.service';
 import { GameService } from '../../../core/services/game.service';
 
 @Component({
@@ -37,7 +36,7 @@ import { GameService } from '../../../core/services/game.service';
           <a routerLink="/contact">Contact</a>
           <a routerLink="/privacy">Privacy policy</a>
           <a routerLink="/settings">Settings</a>
-          <a [href]="smartlink" target="_blank" rel="sponsored noopener noreferrer">Sponsored</a>
+          <a routerLink="/terms">Terms of use</a>
         </nav>
       </div>
       <div class="container bottom">
@@ -58,9 +57,8 @@ import { GameService } from '../../../core/services/game.service';
 })
 export class Footer {
   readonly accountsEnabled = environment.accountsEnabled;
-  readonly smartlink = SMARTLINK_URL;
   private readonly games = inject(GameService);
-  readonly regional = this.games.byCategory('regional').slice(0, 6);
+  readonly regional = this.games.byCategory('regional');
   readonly classic = this.games.byCategory('classic');
   readonly year = new Date().getFullYear();
 }
